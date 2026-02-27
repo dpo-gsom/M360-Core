@@ -3,575 +3,407 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Индикатор состояния: Профилактика выгорания</title>
+<title>Индикатор выгорания</title>
+<!-- Подключаем библиотеку для генерации картинки из HTML -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <style>
-/* ===== RESET & BASE ===== */
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --b50:#eff6ff;--b100:#dbeafe;--b400:#60a5fa;--b500:#3b82f6;
-  --b600:#2563eb;--b700:#1d4ed8;--b800:#1e40af;
-  --g50:#f0fdf4;--g100:#dcfce7;--g500:#22c55e;--g600:#16a34a;--g700:#15803d;
-  --y50:#fefce8;--y100:#fef9c3;--y500:#eab308;--y600:#ca8a04;--y700:#a16207;
-  --r50:#fef2f2;--r100:#fee2e2;--r400:#f87171;--r500:#ef4444;--r600:#dc2626;--r700:#b91c1c;
-  --o500:#f97316;--o600:#ea580c;--o700:#c2410c;
-  --s50:#f9fafb;--s100:#f3f4f6;--s200:#e5e7eb;--s300:#d1d5db;
-  --s400:#9ca3af;--s500:#6b7280;--s600:#4b5563;--s700:#374151;--s800:#1f2937;
+/* ===== VARIABLES (Corporate Colors) ===== */
+:root {
+  --c-dark: #003B48;   /* Dark Teal */
+  --c-gray: #495761;   /* Slate Gray */
+  --c-red:  #C31532;   /* Corporate Red */
+  
+  --c-bg: #f8fafc;
+  --c-border: #e2e8f0;
+  
+  /* Semantic colors for results */
+  --s-good: #10b981; /* Green */
+  --s-warn: #f59e0b; /* Yellow */
+  --s-bad:  var(--c-red); /* Red */
 }
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  background:var(--s100);color:var(--s800);line-height:1.6;
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--c-gray);
+  background: transparent; /* Для прозрачного встраивания */
+  line-height: 1.5;
 }
-.container{max-width:780px;margin:0 auto;padding:24px 16px}
+
+/* Основной контейнер виджета */
+.widget-app {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(73, 87, 97, 0.1);
+  overflow: hidden;
+  border: 1px solid var(--c-border);
+}
 
 /* ===== HEADER ===== */
-.header{
-  background:linear-gradient(135deg,var(--s800),var(--s600));
-  color:#fff;padding:36px 28px;border-radius:16px;
-  text-align:center;margin-bottom:24px;
-  box-shadow:0 4px 24px rgba(31,41,55,.2);
+.header {
+  background: var(--c-dark);
+  color: #fff;
+  padding: 24px;
+  text-align: center;
 }
-.header h1{font-size:1.55rem;font-weight:800;margin-bottom:6px}
-.header p{font-size:.92rem;opacity:.88}
+.header h2 { font-size: 1.3rem; margin-bottom: 6px; font-weight: 700; }
+.header p { font-size: 0.9rem; opacity: 0.85; }
 
-/* ===== INSTRUCTIONS ===== */
-.info-box{
-  background:#fff;padding:20px 24px;border-radius:12px;
-  margin-bottom:20px;border-left:4px solid var(--b500);
-  box-shadow:0 1px 4px rgba(0,0,0,.06);
-}
-.info-box h2{color:var(--b700);font-size:1.05rem;margin-bottom:8px}
-.info-box p{font-size:.91rem;color:var(--s600);margin-bottom:4px}
+/* ===== SCREENS ===== */
+.screen { display: none; padding: 24px; }
+.screen.active { display: block; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ===== SCALE LEGEND (sticky) ===== */
-.legend{
-  background:#fff;padding:10px 16px;border-radius:10px;
-  position:sticky;top:8px;z-index:100;
-  box-shadow:0 2px 12px rgba(0,0,0,.1);border:1px solid var(--s200);
-  margin-bottom:10px;
+/* ===== INTRO ===== */
+.intro-box {
+  background: var(--c-bg);
+  padding: 20px;
+  border-left: 4px solid var(--c-dark);
+  border-radius: 8px;
+  margin-bottom: 24px;
 }
-.legend-title{
-  font-size:.7rem;color:var(--s400);text-transform:uppercase;
-  letter-spacing:.8px;font-weight:700;margin-bottom:4px;
+.btn-primary {
+  display: block; width: 100%; max-width: 250px; margin: 0 auto;
+  background: var(--c-dark); color: #fff;
+  border: none; padding: 14px; border-radius: 8px;
+  font-size: 1.05rem; font-weight: 600; cursor: pointer;
+  transition: opacity 0.2s;
 }
-.legend-row{display:flex;justify-content:space-between;gap:2px}
-.legend-item{
-  flex:1;text-align:center;font-size:.72rem;color:var(--s600);line-height:1.3;
-}
-.legend-item b{color:var(--b600);display:block;font-size:.85rem}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:disabled { background: var(--c-border); color: var(--c-gray); cursor: not-allowed; }
 
-/* ===== PROGRESS ===== */
-.prog{margin-bottom:18px}
-.prog-text{text-align:center;font-size:.84rem;color:var(--s400);margin-bottom:5px}
-.prog-track{background:var(--s200);border-radius:8px;height:6px;overflow:hidden}
-.prog-fill{
-  height:100%;width:0%;border-radius:8px;
-  background:linear-gradient(90deg,var(--b500),var(--g500));
-  transition:width .4s ease;
+/* ===== WIZARD (QUIZ) ===== */
+.progress-bar {
+  background: var(--c-border); height: 6px; border-radius: 4px;
+  margin-bottom: 20px; overflow: hidden;
 }
+.progress-fill {
+  background: var(--c-dark); height: 100%; width: 0%;
+  transition: width 0.3s ease;
+}
+.q-meta { text-align: center; font-size: 0.85rem; color: var(--c-gray); margin-bottom: 16px; font-weight: 600; }
+.q-text { font-size: 1.15rem; font-weight: 600; text-align: center; color: var(--c-dark); margin-bottom: 24px; min-height: 55px;}
 
-/* ===== QUESTION CARD ===== */
-.qcard{
-  background:#fff;padding:20px 22px;border-radius:12px;
-  margin-bottom:10px;border:2px solid transparent;
-  box-shadow:0 1px 3px rgba(0,0,0,.05);
-  transition:border-color .3s,box-shadow .3s;
+/* Scale options */
+.legend-top {
+  display: flex; justify-content: space-between;
+  font-size: 0.75rem; color: var(--c-gray); margin-bottom: 8px; font-weight: 500;
 }
-.qcard.done{border-color:var(--g100)}
-.qcard.miss{border-color:var(--r400);animation:shake .45s}
-@keyframes shake{
-  0%,100%{transform:translateX(0)}
-  25%{transform:translateX(-5px)}75%{transform:translateX(5px)}
+.options-row {
+  display: flex; gap: 8px; margin-bottom: 30px;
 }
-.qtop{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
-.qnum{
-  flex-shrink:0;width:28px;height:28px;border-radius:50%;
-  background:var(--s100);color:var(--s700);
-  display:flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:.82rem;
+.opt-btn {
+  flex: 1; height: 50px; border: 2px solid var(--c-border);
+  background: #fff; color: var(--c-gray);
+  border-radius: 8px; font-size: 1.1rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
 }
-.qtxt{font-size:.97rem;color:var(--s700);padding-top:3px}
+.opt-btn:hover { border-color: var(--c-gray); background: var(--c-bg); }
+.opt-btn.selected { background: var(--c-dark); border-color: var(--c-dark); color: #fff; }
 
-/* options row */
-.opts{display:flex;gap:5px}
-.opt{flex:1;position:relative}
-.opt input{position:absolute;opacity:0;pointer-events:none}
-.opt label{
-  display:flex;align-items:center;justify-content:center;
-  height:40px;border:2px solid var(--s200);border-radius:8px;
-  cursor:pointer;font-weight:700;font-size:.92rem;
-  color:var(--s400);background:var(--s50);
-  transition:all .15s ease;user-select:none;
+.nav-buttons { display: flex; gap: 12px; }
+.btn-sec {
+  flex: 1; background: var(--c-bg); color: var(--c-gray); border: 1px solid var(--c-border);
+  padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;
 }
-.opt label:hover{border-color:var(--b400);color:var(--b600);background:var(--b50)}
-.opt input:checked+label{
-  background:var(--s700);border-color:var(--s700);color:#fff;
-  box-shadow:0 2px 8px rgba(55,65,81,.3);
+.btn-sec:hover { background: var(--c-border); }
+.btn-next {
+  flex: 2; background: var(--c-dark); color: #fff; border: none;
+  padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
 }
-
-/* ===== SUBMIT ===== */
-.submit-wrap{text-align:center;padding:20px 0}
-.btn-go{
-  background:linear-gradient(135deg,var(--b700),var(--b500));
-  color:#fff;border:none;padding:14px 44px;font-size:1.05rem;
-  font-weight:700;border-radius:12px;cursor:pointer;
-  box-shadow:0 4px 16px rgba(30,64,175,.35);
-  transition:transform .2s,box-shadow .2s;
-}
-.btn-go:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(30,64,175,.45)}
+.btn-next:disabled { background: var(--c-border); color: var(--c-gray); cursor: not-allowed; }
 
 /* ===== RESULTS ===== */
-#results{display:none}
-.rhead{
-  background:linear-gradient(135deg,var(--s800),var(--s600));
-  color:#fff;padding:28px;border-radius:16px;text-align:center;
-  margin-bottom:20px;box-shadow:0 4px 24px rgba(31,41,55,.2);
+/* Wrapper for image export */
+#export-wrap { background: #fff; padding: 20px; border-radius: 8px; }
+
+.r-card {
+  border: 1px solid var(--c-border); border-radius: 10px; padding: 16px 20px;
+  margin-bottom: 12px;
 }
-.rhead h2{font-size:1.45rem;margin-bottom:6px}
-.rhead p{opacity:.85;font-size:.88rem}
+.r-card h4 { color: var(--c-dark); margin-bottom: 4px; font-size: 1.05rem;}
+.score-line { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.score-num { font-size: 1.5rem; font-weight: 800; }
 
-.rcard{
-  background:#fff;padding:22px 24px;border-radius:12px;
-  margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);
-}
-.rcard h3{font-size:1.08rem;margin-bottom:2px}
-.rcard .rsub{font-size:.82rem;color:var(--s400);margin-bottom:10px}
+.bar-bg { background: var(--c-bg); height: 8px; border-radius: 4px; overflow: hidden; }
+.bar-fg { height: 100%; transition: width 1s ease; }
+/* Semantic colors */
+.bg-good { background: var(--s-good); } .col-good { color: var(--s-good); }
+.bg-warn { background: var(--s-warn); } .col-warn { color: var(--s-warn); }
+.bg-bad  { background: var(--s-bad); }  .col-bad  { color: var(--s-bad); }
 
-.score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
-.score-num{font-size:1.9rem;font-weight:800;line-height:1}
-.score-num.low{color:var(--g600)}.score-num.med{color:var(--y600)}.score-num.high{color:var(--r600)}
+.r-desc { font-size: 0.85rem; margin-top: 10px; color: var(--c-gray); }
 
-.badge{
-  display:inline-block;padding:3px 14px;border-radius:20px;
-  font-size:.8rem;font-weight:600;
-}
-.badge.low{background:var(--g100);color:var(--g700)}
-.badge.med{background:var(--y100);color:var(--y700)}
-.badge.high{background:var(--r100);color:var(--r700)}
+/* Overall */
+.overall-box { text-align: center; padding: 20px; background: var(--c-bg); border-radius: 10px; margin: 20px 0; }
+.overall-box h3 { margin-bottom: 8px; }
 
-.bar-track{background:var(--s100);border-radius:8px;height:12px;overflow:hidden;margin-bottom:10px}
-.bar-fill{
-  height:100%;border-radius:8px;width:0%;
-  transition:width 1.2s cubic-bezier(.4,0,.2,1);
-}
-.bar-fill.low{background:linear-gradient(90deg,#22c55e,#86efac)}
-.bar-fill.med{background:linear-gradient(90deg,#eab308,#fde047)}
-.bar-fill.high{background:linear-gradient(90deg,#ef4444,#fca5a5)}
+/* Recs */
+.recs h4 { color: var(--c-dark); margin: 16px 0 8px; }
+.recs ul { padding-left: 20px; font-size: 0.85rem; margin-bottom: 16px; }
+.recs li { margin-bottom: 4px; }
 
-.rdesc{font-size:.88rem;color:var(--s500);line-height:1.55}
+/* Actions */
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.btn-save { flex: 1; background: var(--c-red); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn-save:hover { opacity: 0.9; }
 
-/* overall */
-.ocard{
-  background:#fff;padding:28px;border-radius:12px;margin:20px 0;
-  box-shadow:0 2px 10px rgba(0,0,0,.08);text-align:center;
-}
-.ocard .oicon{font-size:3rem;margin-bottom:6px}
-.ocard h3{font-size:1.25rem;margin-bottom:8px}
-.ocard p{font-size:.93rem;color:var(--s600);max-width:600px;margin:0 auto;line-height:1.6}
-
-/* recommendations */
-.rec-box{
-  background:var(--b50);padding:22px 24px;border-radius:12px;
-  margin:14px 0;border-left:4px solid var(--b500);
-}
-.rec-box h4{color:var(--b700);margin-bottom:10px;font-size:1.02rem}
-.rec-box ul{padding-left:20px}
-.rec-box li{margin-bottom:5px;font-size:.9rem;color:var(--s700)}
-
-.warn-box{
-  background:var(--s100);padding:18px 20px;border-radius:10px;
-  margin:20px 0; border:1px solid var(--s200);
-  font-size:.85rem;color:var(--s600);line-height:1.5; text-align:center;
-}
-.external-link{
-  display:inline-block; margin-top:10px; padding:8px 16px;
-  background:#fff; border:1px solid var(--s300); color:var(--s700);
-  text-decoration:none; border-radius:6px; font-weight:600; font-size:.85rem;
-  transition:all .2s;
-}
-.external-link:hover{ background:var(--s200); color:var(--s800); }
-
-.btn-again{
-  background:var(--s500);color:#fff;border:none;
-  padding:12px 32px;font-size:.95rem;font-weight:600;
-  border-radius:10px;cursor:pointer;transition:background .3s;
-  margin-top:10px;
-}
-.btn-again:hover{background:var(--s700)}
-
-.center{text-align:center}
-
-/* responsive */
-@media(max-width:600px){
-  .container{padding:12px 8px}
-  .header{padding:26px 18px}.header h1{font-size:1.25rem}
-  .opts{gap:3px}
-  .opt label{height:36px;font-size:.82rem;border-radius:6px}
-  .qcard{padding:14px 12px}
-  .legend{padding:8px 10px}
-  .legend-item{font-size:.62rem}
-  .legend-item b{font-size:.78rem}
+@media(max-width: 500px) {
+  .opt-btn { height: 40px; font-size: 1rem; }
+  .screen { padding: 16px; }
+  .actions { flex-direction: column; }
 }
 </style>
 </head>
 <body>
-<div class="container">
 
-  <!-- ======== HEADER ======== -->
+<div class="widget-app">
   <div class="header">
-    <h1>Индикатор выгорания руководителя</h1>
-    <p>Инструмент для саморефлексии и оценки баланса ресурсов</p>
+    <h2>Индикатор выгорания</h2>
+    <p>Инструмент для самоанализа руководителя</p>
   </div>
 
-  <!-- ======== QUIZ ======== -->
-  <div id="quiz">
+  <!-- SCREEN 1: INTRO -->
+  <div id="screen-intro" class="screen active">
+    <div class="intro-box">
+      <p>Ниже приведены 15 утверждений о рабочих буднях.</p>
+      <p>Оцените, как часто вы испытываете эти состояния. Вдумчиво отвечайте на каждый вопрос.</p>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Начать анализ</button>
+  </div>
 
-    <div class="info-box">
-      <h2>📋 Опросник самоанализа</h2>
-      <p>Ниже приведены 15 утверждений о рабочих буднях менеджера.</p>
-      <p>Оцените, <strong>как часто</strong> вы испытываете подобные состояния, выбрав число от 0 до 6.</p>
-      <p>Здесь нет правильных ответов. Это не тест, а возможность честно взглянуть на свой уровень энергии.</p>
+  <!-- SCREEN 2: WIZARD -->
+  <div id="screen-quiz" class="screen">
+    <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+    <div class="q-meta" id="q-counter">Вопрос 1 из 15</div>
+    
+    <div class="q-text" id="q-text">Текст вопроса</div>
+    
+    <div class="legend-top">
+      <span>0 - Никогда</span>
+      <span>6 - Каждый день</span>
+    </div>
+    <div class="options-row" id="opts-container">
+      <!-- Buttons 0-6 generated by JS -->
     </div>
 
-    <!-- sticky scale legend -->
-    <div class="legend" id="legend">
-      <div class="legend-title">Частота состояний</div>
-      <div class="legend-row">
-        <div class="legend-item"><b>0</b>Никогда</div>
-        <div class="legend-item"><b>1</b>Очень редко</div>
-        <div class="legend-item"><b>2</b>Редко</div>
-        <div class="legend-item"><b>3</b>Иногда</div>
-        <div class="legend-item"><b>4</b>Часто</div>
-        <div class="legend-item"><b>5</b>Очень часто</div>
-        <div class="legend-item"><b>6</b>Каждый день</div>
+    <div class="nav-buttons">
+      <button class="btn-sec" id="btn-prev" onclick="goPrev()">Назад</button>
+      <button class="btn-next" id="btn-next" onclick="goNext()" disabled>Далее</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: RESULTS -->
+  <div id="screen-results" class="screen">
+    <!-- Блок для скриншота -->
+    <div id="export-wrap">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <h3 style="color: var(--c-dark);">Ваш персональный профиль</h3>
       </div>
+      
+      <div id="cards-container"></div>
+      <div id="overall-container"></div>
+      <div class="recs" id="recs-container"></div>
     </div>
-
-    <!-- progress -->
-    <div class="prog">
-      <div class="prog-text" id="progText">Отвечено: 0 из 15</div>
-      <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+    
+    <div class="actions">
+      <button class="btn-save" onclick="saveAsImage()">📸 Сохранить результат</button>
+      <button class="btn-sec" onclick="location.reload()">Пройти заново</button>
     </div>
-
-    <!-- questions will be injected here -->
-    <div id="questionsBox"></div>
-
-    <div class="submit-wrap">
-      <button class="btn-go" onclick="submitQuiz()">Анализировать результат</button>
-    </div>
-  </div>
-
-  <!-- ======== RESULTS ======== -->
-  <div id="results">
-    <div class="rhead">
-      <h2>Ваш персональный профиль</h2>
-      <p>Оценка состояния по трём ключевым метрикам менеджера</p>
-    </div>
-
-    <!-- 3 scale cards -->
-    <div class="rcard" id="resEX"></div>
-    <div class="rcard" id="resCY"></div>
-    <div class="rcard" id="resPE"></div>
-
-    <!-- overall -->
-    <div class="ocard" id="resOverall"></div>
-
-    <!-- recommendations -->
-    <div id="recsBox"></div>
-
-    <!-- disclaimer & external link -->
-    <div class="warn-box">
-      ℹ️ <strong>Обратите внимание:</strong> Данный инструмент создан специально для саморефлексии в рамках нашего курса и не является медицинским диагнозом. 
-      <br><br>
-      Если вы хотите пройти расширенное академическое тестирование по классической методике (опросник В. Бойко или адаптация К. Маслач), вы можете сделать это на стороннем ресурсе.
-      <br>
-      <!-- ЗАМЕНИТЕ ССЫЛКУ НИЖЕ НА ВАШУ -->
-      <a href="https://psytests.org/work/mbigs-run.html" target="_blank" class="external-link">Пройти классический тест на внешнем сайте ↗</a>
-    </div>
-
-    <div class="center">
-      <button class="btn-again" onclick="restart()">↻ Пройти заново</button>
+    <div style="text-align:center; margin-top: 16px; font-size: 0.75rem; color: var(--c-gray);">
+      Инструмент саморефлексии. Не является медицинским диагнозом.
     </div>
   </div>
 
-</div><!-- /container -->
+</div>
 
 <script>
-/* =============================================================
-   DATA (CUSTOM QUESTIONS FOR MANAGERS)
-   ============================================================= */
+// --- ДАННЫЕ (КАСТОМНЫЕ ВОПРОСЫ) ---
 const questions = [
-  // EX: Истощение (Energy)
-  {id:1,  text:"К концу рабочего дня я чувствую себя как выжатый лимон.", scale:"EX"},
-  {id:2,  text:"Мне всё чаще хочется отгородиться от проблем команды и побыть в абсолютной тишине.", scale:"CY"},
-  {id:3,  text:"Я легко нахожу решения для нетипичных или сложных управленческих ситуаций.", scale:"PE"},
-  {id:4,  text:"Мысль о списке рабочих задач с утра вызывает у меня внутреннюю тяжесть.", scale:"EX"},
-  {id:5,  text:"Меня начинают раздражать просьбы сотрудников или коллег из других отделов.", scale:"CY"},
-  {id:6,  text:"Я четко вижу, что мой опыт и навыки приносят реальную пользу бизнесу.", scale:"PE"},
-  {id:7,  text:"После общения с командой, проведения встреч или 1-on-1 я ощущаю эмоциональную пустоту.", scale:"EX"},
-  {id:8,  text:"Я выполняю многие задачи «на автомате», потеряв к ним искренний интерес.", scale:"CY"},
-  {id:9,  text:"У меня получается вдохновлять команду и поддерживать позитивный настрой сотрудников.", scale:"PE"},
-  {id:10, text:"Мне стало не хватать сил на личную жизнь, хобби и семью после работы.", scale:"EX"},
-  {id:11, text:"Я ловлю себя на безразличии к тому, будут ли достигнуты цели проектов в этом квартале.", scale:"CY"},
-  {id:12, text:"Я чувствую гордость за качество работы, которую делаю я и мой отдел.", scale:"PE"},
-  {id:13, text:"Я стал(а) гораздо быстрее уставать от привычных дел, которые раньше давались легко.", scale:"EX"},
-  {id:14, text:"Я всё чаще сомневаюсь в том, что моя управленческая работа имеет реальную ценность.", scale:"CY"},
+  {id:1, text:"К концу рабочего дня я чувствую себя как выжатый лимон.", scale:"EX"},
+  {id:2, text:"Мне хочется отгородиться от проблем команды и побыть в абсолютной тишине.", scale:"CY"},
+  {id:3, text:"Я легко нахожу решения для нетипичных управленческих ситуаций.", scale:"PE"},
+  {id:4, text:"Мысль о списке рабочих задач с утра вызывает у меня внутреннюю тяжесть.", scale:"EX"},
+  {id:5, text:"Меня начинают раздражать просьбы сотрудников или коллег.", scale:"CY"},
+  {id:6, text:"Я четко вижу, что мой опыт приносит реальную пользу бизнесу.", scale:"PE"},
+  {id:7, text:"После проведения встреч или 1-on-1 я ощущаю эмоциональную пустоту.", scale:"EX"},
+  {id:8, text:"Я выполняю многие задачи «на автомате», потеряв к ним искренний интерес.", scale:"CY"},
+  {id:9, text:"У меня получается вдохновлять команду и поддерживать настрой.", scale:"PE"},
+  {id:10, text:"Мне стало не хватать сил на личную жизнь и хобби после работы.", scale:"EX"},
+  {id:11, text:"Я ловлю себя на безразличии к тому, будут ли достигнуты цели отдела.", scale:"CY"},
+  {id:12, text:"Я чувствую гордость за качество работы, которую делаю я и моя команда.", scale:"PE"},
+  {id:13, text:"Я стал(а) быстрее уставать от рутины, которая раньше давалась легко.", scale:"EX"},
+  {id:14, text:"Я всё чаще сомневаюсь в том, что моя работа имеет реальную ценность.", scale:"CY"},
   {id:15, text:"Я уверен(а) в своей профессиональной компетентности как руководителя.", scale:"PE"}
 ];
 
-const TOTAL = questions.length;     // 15
-// Все шкалы по 5 вопросов (5 * 6 баллов = 30 макс)
-const MAX_EX = 30, MAX_CY = 30, MAX_PE = 30; 
+let currentIndex = 0;
+let answers = new Array(questions.length).fill(null);
 
-/* =============================================================
-   RENDER QUESTIONS
-   ============================================================= */
-(function renderQuiz(){
-  const box = document.getElementById('questionsBox');
-  questions.forEach((q,i)=>{
-    let optsHTML = '';
-    for(let v=0;v<=6;v++){
-      optsHTML += `
-        <div class="opt">
-          <input type="radio" name="q${q.id}" id="q${q.id}_${v}" value="${v}"
-                 onchange="markAnswered(${q.id})">
-          <label for="q${q.id}_${v}">${v}</label>
-        </div>`;
-    }
-    box.innerHTML += `
-      <div class="qcard" id="card${q.id}">
-        <div class="qtop">
-          <div class="qnum">${i+1}</div>
-          <div class="qtxt">${q.text}</div>
-        </div>
-        <div class="opts">${optsHTML}</div>
-      </div>`;
-  });
-})();
-
-/* =============================================================
-   PROGRESS & INTERACTION
-   ============================================================= */
-function markAnswered(qid){
-  document.getElementById('card'+qid).classList.add('done');
-  document.getElementById('card'+qid).classList.remove('miss');
-  updateProgress();
+// --- ЛОГИКА ИНТЕРФЕЙСА ---
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function updateProgress(){
-  let n = 0;
-  questions.forEach(q=>{
-    if(document.querySelector(`input[name="q${q.id}"]:checked`)) n++;
-  });
-  document.getElementById('progText').textContent = `Отвечено: ${n} из ${TOTAL}`;
-  document.getElementById('progFill').style.width = (n/TOTAL*100)+'%';
+function startQuiz() {
+  showScreen('screen-quiz');
+  renderQuestion();
 }
 
-/* =============================================================
-   SUBMIT & SCORING
-   ============================================================= */
-function submitQuiz(){
-  let missing = [];
-  questions.forEach(q=>{
-    if(!document.querySelector(`input[name="q${q.id}"]:checked`)){
-      missing.push(q.id);
-      const c = document.getElementById('card'+q.id);
-      c.classList.add('miss');
-    }
-  });
-  if(missing.length){
-    document.getElementById('card'+missing[0]).scrollIntoView({behavior:'smooth',block:'center'});
-    return;
+function renderQuestion() {
+  const q = questions[currentIndex];
+  document.getElementById('q-counter').innerText = `Вопрос ${currentIndex + 1} из ${questions.length}`;
+  document.getElementById('q-text').innerText = q.text;
+  document.getElementById('prog').style.width = ((currentIndex) / questions.length * 100) + '%';
+  
+  // Кнопки Назад/Далее
+  document.getElementById('btn-prev').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+  const btnNext = document.getElementById('btn-next');
+  btnNext.innerText = currentIndex === questions.length - 1 ? 'Результат' : 'Далее';
+  btnNext.disabled = answers[currentIndex] === null;
+
+  // Рендер кнопок 0-6
+  const optsContainer = document.getElementById('opts-container');
+  optsContainer.innerHTML = '';
+  for(let i=0; i<=6; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    if(answers[currentIndex] === i) btn.classList.add('selected');
+    btn.innerText = i;
+    btn.onclick = () => selectOption(i);
+    optsContainer.appendChild(btn);
   }
-
-  let scores = {EX:0, CY:0, PE:0};
-  questions.forEach(q=>{
-    const val = +document.querySelector(`input[name="q${q.id}"]:checked`).value;
-    scores[q.scale] += val;
-  });
-
-  showResults(scores);
 }
 
-/* =============================================================
-   LEVEL HELPERS (Adjusted for 30 max per scale)
-   ============================================================= */
-// EX: Истощение (высокий балл = плохо)
-function exLevel(s){ return s<=10?'low':s<=19?'med':'high'; }
-// CY: Цинизм/Отстраненность (высокий балл = плохо)
-function cyLevel(s){ return s<=9?'low':s<=17?'med':'high'; }
-// PE: Эффективность (высокий балл = ХОРОШО. Низкий балл = выгорание)
-function peLevel(s){ return s>=22?'low':s>=15?'med':'high'; } 
-// Примечание по PE: 'low' означает "Low Burnout" (состояние в норме), 'high' = "High Burnout" (опасно).
-
-const levelName = {
-  low:{EX:'В норме',CY:'В норме',PE:'Высокая'},
-  med:{EX:'Зона риска',CY:'Зона риска',PE:'Снижена'},
-  high:{EX:'Критично',CY:'Критично',PE:'Критично низкая'}
-};
-const peLevelLabel = {low:'Высокая (В норме)', med:'Сниженная (Зона риска)', high:'Критично низкая'};
-
-/* =============================================================
-   RENDER RESULTS
-   ============================================================= */
-function showResults(sc){
-  const lvEX = exLevel(sc.EX);
-  const lvCY = cyLevel(sc.CY);
-  const lvPE = peLevel(sc.PE);
-
-  // — Energy / Exhaustion —
-  renderScaleCard('resEX',{
-    title:'Уровень энергии (Истощение)',
-    sub:'Насколько вы устаете физически и эмоционально',
-    score:sc.EX, max:MAX_EX, lv:lvEX,
-    label:levelName[lvEX].EX,
-    desc: lvEX==='high'
-      ? 'Ваша «батарейка» на нуле. Вы испытываете сильное истощение, которое, скорее всего, влияет не только на работу, но и на личную жизнь. Требуется срочный отдых и пересмотр задач.'
-      : lvEX==='med'
-      ? 'Вы часто работаете на пределе сил. Накопленная усталость уже дает о себе знать. Это идеальный момент, чтобы пересмотреть границы рабочего времени и начать делегировать.'
-      : 'У вас хороший баланс энергии. Вы умеете восстанавливаться и справляться с текущей рабочей нагрузкой руководителя без серьезных потерь.'
-  });
-
-  // — Engagement / Cynicism —
-  renderScaleCard('resCY',{
-    title:'Вовлеченность (Отстраненность)',
-    sub:'Уровень интереса к задачам и эмпатии к команде',
-    score:sc.CY, max:MAX_CY, lv:lvCY,
-    label:levelName[lvCY].CY,
-    desc: lvCY==='high'
-      ? 'Вы ощущаете сильную отстраненность от работы. Включился защитный механизм психики — «цинизм». Вас могут раздражать коллеги, а результаты проектов кажутся бессмысленными.'
-      : lvCY==='med'
-      ? 'Появляются первые звоночки безразличия. Иногда вам хочется «спрятаться» от команды или вы делаете задачи чисто механически. Стоит поискать новые смыслы в работе.'
-      : 'Вы сохраняете живой интерес к работе и процессам. У вас нормальный, эмпатичный контакт с командой, вы искренне вовлечены в результат.'
-  });
-
-  // — Efficacy / Confidence —
-  renderScaleCard('resPE',{
-    title:'Профессиональная уверенность',
-    sub:'Оценка собственной компетентности и результатов',
-    score:sc.PE, max:MAX_PE, lv:lvPE,
-    label:peLevelLabel[lvPE],
-    desc: lvPE==='high' // high burnout = low score
-      ? 'У вас наблюдается серьезный кризис самооценки. Вы обесцениваете свои успехи как руководителя и сомневаетесь в собственной пользе. Это классический признак выгорания.'
-      : lvPE==='med'
-      ? 'Ваша уверенность в себе как в менеджере немного пошатнулась. Вы стали чаще сомневаться в принимаемых решениях или не замечаете своих успехов.'
-      : 'Отличный результат! Вы чувствуете себя компетентным руководителем, видите свой вклад в бизнес и адекватно оцениваете свои достижения.'
-  });
-
-  // — Overall —
-  renderOverall(lvEX, lvCY, lvPE);
-
-  // — Recommendations —
-  renderRecs(lvEX, lvCY, lvPE);
-
-  // show
-  document.getElementById('quiz').style.display='none';
-  document.getElementById('results').style.display='block';
-  window.scrollTo({top:0,behavior:'smooth'});
+function selectOption(val) {
+  answers[currentIndex] = val;
+  renderQuestion(); // перерисовываем для подсветки
 }
 
-function renderScaleCard(elId, d){
-  const pct = Math.round(d.score / d.max * 100);
-  const cls = d.lv; 
-
-  document.getElementById(elId).innerHTML = `
-    <h3>${d.title}</h3>
-    <div class="rsub">${d.sub}</div>
-    <div class="score-row">
-      <span class="score-num ${cls}">${d.score}</span>
-      <span class="badge ${cls}">${d.label}</span>
-    </div>
-    <div class="bar-track">
-      <div class="bar-fill ${cls}" id="bar_${elId}"></div>
-    </div>
-    <div class="rdesc">${d.desc}</div>`;
-
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      document.getElementById('bar_'+elId).style.width = pct+'%';
-    });
-  });
-}
-
-function renderOverall(lEX,lCY,lPE){
-  const highs = [lEX,lCY,lPE].filter(l=>l==='high').length;
-  const meds  = [lEX,lCY,lPE].filter(l=>l==='med').length;
-
-  let icon,title,text,color;
-
-  if(highs===0 && meds===0){
-    icon='🟢'; title='Ресурсное состояние'; color='var(--g700)';
-    text='Вы находитесь в отличной форме. Навыки ассертивности и самоуправления работают на вас. Продолжайте в том же духе и будьте ролевой моделью для своей команды!';
-  } else if(highs===0){
-    icon='🟡'; title='Начальное напряжение'; color='var(--y700)';
-    text='Показатели в "желтой зоне". Вы еще справляетесь, но напряжение копится. Используйте инструменты профилактики, о которых мы говорим в курсе, прямо сейчас.';
-  } else if(highs===1){
-    icon='🟠'; title='Локальное выгорание'; color='var(--o700)';
-    text='Один из параметров в критической зоне. Ваша система дала сбой. Подумайте, что именно забирает у вас больше всего сил — операционка, конфликты в команде или отсутствие четких целей?';
-  } else if(highs===2){
-    icon='🔴'; title='Выраженное выгорание'; color='var(--r600)';
-    text='Красная зона по двум показателям. Вы находитесь в состоянии сильного выгорания. Необходим разговор с вашим руководителем о приоритетах, честный отпуск и пересмотр рутины.';
+function goNext() {
+  if (currentIndex < questions.length - 1) {
+    currentIndex++;
+    renderQuestion();
   } else {
-    icon='🚨'; title='Острая фаза выгорания'; color='var(--r700)';
-    text='Тревожный сигнал: все три показателя в красной зоне. В таком состоянии управлять командой не только тяжело, но и разрушительно для вас. Рекомендуем обратиться к специалисту (коуч, корпоративный психолог).';
+    calculateResults();
   }
-
-  document.getElementById('resOverall').innerHTML = `
-    <div class="oicon">${icon}</div>
-    <h3 style="color:${color}">${title}</h3>
-    <p>${text}</p>`;
 }
 
-/* =============================================================
-   RECOMMENDATIONS (Manager Focused)
-   ============================================================= */
-function renderRecs(lEX,lCY,lPE){
-  const box = document.getElementById('recsBox');
-  let html = '';
-
-  if(lEX==='high'||lEX==='med'){
-    html += recBlock('🔋 Для восстановления энергии:', [
-      'Проведите инвентаризацию задач: используйте матрицу Эйзенхауэра, чтобы отсечь лишнее.',
-      'Передайте хотя бы 1-2 регулярные задачи подчиненным (да, поначалу они сделают хуже вас, но это инвестиция).',
-      'Заблокируйте в календаре 1 час в день на "Тихое время" для работы над стратегией, без почты и мессенджеров.',
-      'Практикуйте жесткое отключение от рабочих чатов после окончания рабочего дня.'
-    ]);
+function goPrev() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderQuestion();
   }
-
-  if(lCY==='high'||lCY==='med'){
-    html += recBlock('🤝 Для возвращения вовлеченности:',[
-      'Смените фокус: попробуйте выступить наставником для младшего сотрудника — передача опыта отлично возвращает смысл.',
-      'Поговорите со своим руководителем: запросите новые, нестандартные проекты, которые вас зажигают.',
-      'Ограничьте токсичное общение: если в смежных отделах есть "жалобщики", сократите время неформального общения с ними.',
-      'Вспомните 3 вещи, за которые вы изначально ценили эту компанию или должность.'
-    ]);
-  }
-
-  if(lPE==='high'||lPE==='med'){
-    html += recBlock('🏆 Для укрепления уверенности:',[
-      'Заведите "Папку побед": сохраняйте туда благодарности от клиентов, удачные отчеты и выполненные KPI.',
-      'Запросите честную обратную связь (Feedback) у коллег вашего уровня (peer-to-peer), чтобы увидеть себя со стороны.',
-      'Разделите большие цели на микро-шаги. Празднуйте с командой даже небольшие промежуточные успехи.',
-      'Вспомните сложный кризис в прошлом, который вы успешно преодолели. Ваши навыки никуда не делись.'
-    ]);
-  }
-
-  box.innerHTML = html;
 }
 
-function recBlock(title, items){
-  return `<div class="rec-box">
-    <h4>${title}</h4>
-    <ul>${items.map(i=>'<li>'+i+'</li>').join('')}</ul>
-  </div>`;
+// --- ПОДСЧЕТ И РЕЗУЛЬТАТЫ ---
+function calculateResults() {
+  document.getElementById('prog').style.width = '100%';
+  
+  let scores = { EX: 0, CY: 0, PE: 0 };
+  questions.forEach((q, i) => { scores[q.scale] += answers[i]; });
+
+  // Пороги (макс 30 на шкалу)
+  const getLvEX = (s) => s<=10 ? 'good' : s<=19 ? 'warn' : 'bad';
+  const getLvCY = (s) => s<=9  ? 'good' : s<=17 ? 'warn' : 'bad';
+  const getLvPE = (s) => s>=22 ? 'good' : s>=15 ? 'warn' : 'bad'; // инверсия
+
+  const lvEX = getLvEX(scores.EX);
+  const lvCY = getLvCY(scores.CY);
+  const lvPE = getLvPE(scores.PE);
+
+  const labels = {
+    good: {EX:'В норме', CY:'В норме', PE:'Высокая'},
+    warn: {EX:'Зона риска', CY:'Зона риска', PE:'Снижена'},
+    bad:  {EX:'Критично', CY:'Критично', PE:'Критично низкая'}
+  };
+
+  const cContainer = document.getElementById('cards-container');
+  cContainer.innerHTML = '';
+  
+  cContainer.innerHTML += buildCard('Уровень энергии (Истощение)', scores.EX, lvEX, labels[lvEX].EX, 
+    lvEX==='bad' ? 'Сильное истощение. Требуется срочный отдых и пересмотр задач.' : 
+    lvEX==='warn'? 'Накопленная усталость. Пора пересмотреть границы рабочего времени.' : 'Хороший баланс энергии и умение восстанавливаться.');
+  
+  cContainer.innerHTML += buildCard('Вовлеченность (Отстраненность)', scores.CY, lvCY, labels[lvCY].CY, 
+    lvCY==='bad' ? 'Защитный цинизм. Результаты кажутся бессмысленными.' : 
+    lvCY==='warn'? 'Появляются первые звоночки безразличия. Ищите новые смыслы.' : 'Живой интерес к работе и хороший контакт с командой.');
+  
+  cContainer.innerHTML += buildCard('Профессиональная уверенность', scores.PE, lvPE, labels[lvPE].PE, 
+    lvPE==='bad' ? 'Кризис самооценки и обесценивание своих успехов.' : 
+    lvPE==='warn'? 'Уверенность в себе пошатнулась, вы стали чаще сомневаться.' : 'Вы чувствуете себя компетентным и видите свой вклад.');
+
+  // Overall
+  const badCount = [lvEX, lvCY, lvPE].filter(x=>x==='bad').length;
+  const warnCount = [lvEX, lvCY, lvPE].filter(x=>x==='warn').length;
+  let oTitle, oCol;
+  
+  if(badCount===0 && warnCount===0){ oTitle='Отличное состояние'; oCol='var(--s-good)'; }
+  else if(badCount===0){ oTitle='Начальное напряжение'; oCol='var(--s-warn)'; }
+  else if(badCount===1){ oTitle='Локальное выгорание'; oCol='var(--s-warn)'; }
+  else { oTitle='Острое выгорание'; oCol='var(--s-bad)'; }
+
+  document.getElementById('overall-container').innerHTML = `
+    <div class="overall-box">
+      <h3 style="color:${oCol}">${oTitle}</h3>
+      <p style="font-size:0.9rem">Используйте материалы курса, чтобы скорректировать свою управленческую рутину.</p>
+    </div>
+  `;
+
+  showScreen('screen-results');
+  
+  // Анимация баров
+  setTimeout(() => {
+    document.getElementById('bar-ex').style.width = (scores.EX/30*100)+'%';
+    document.getElementById('bar-cy').style.width = (scores.CY/30*100)+'%';
+    document.getElementById('bar-pe').style.width = (scores.PE/30*100)+'%';
+  }, 100);
 }
 
-function restart(){
-  document.getElementById('results').style.display='none';
-  document.getElementById('quiz').style.display='block';
-  document.querySelectorAll('input[type="radio"]').forEach(r=>r.checked=false);
-  document.querySelectorAll('.qcard').forEach(c=>{c.classList.remove('done','miss')});
-  updateProgress();
-  window.scrollTo({top:0,behavior:'smooth'});
+function buildCard(title, score, level, label, desc) {
+  return `
+    <div class="r-card">
+      <div class="score-line">
+        <h4>${title}</h4>
+        <span class="score-num col-${level}">${score}/30</span>
+      </div>
+      <div style="font-size:0.8rem; font-weight:600; margin-bottom:6px" class="col-${level}">${label}</div>
+      <div class="bar-bg"><div class="bar-fg bg-${level}" id="bar-${title=== 'Уровень энергии (Истощение)'?'ex':title.includes('Вовлеч')?'cy':'pe'}" style="width:0%"></div></div>
+      <div class="r-desc">${desc}</div>
+    </div>
+  `;
+}
+
+// --- ЭКСПОРТ В КАРТИНКУ ---
+function saveAsImage() {
+  const target = document.getElementById('export-wrap');
+  const btn = document.querySelector('.btn-save');
+  const originalText = btn.innerText;
+  
+  btn.innerText = "⏳ Формируем...";
+  btn.disabled = true;
+
+  // Используем html2canvas
+  html2canvas(target, {
+    scale: 2, // высокое качество
+    backgroundColor: '#ffffff'
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'burnout-profile.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    btn.innerText = "✅ Сохранено!";
+    setTimeout(() => { 
+      btn.innerText = originalText; 
+      btn.disabled = false;
+    }, 2000);
+  });
 }
 </script>
 </body>
