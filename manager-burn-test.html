@@ -9,8 +9,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --c1:#C31532;--c1h:#a01029;--c1l:rgba(195,21,50,.06);
-  --c2:#495761;--c2l:rgba(73,87,97,.07);
-  --c3:#003B48;--c3l:rgba(0,59,72,.05);
+  --c2:#495761;--c3:#003B48;--c3l:rgba(0,59,72,.05);
   --g:#16a34a;--gl:#dcfce7;--gd:#15803d;
   --y:#d97706;--yl:#fef3c7;--yd:#92400e;
   --r:#C31532;--rl:#fce8eb;--rd:#a01029;
@@ -18,49 +17,50 @@
   --t1:#1a1f25;--t2:#495761;--t3:#8a949d;--brd:#dfe3e7;
   --rad:12px;
 }
+html,body{height:100%;overflow:hidden}
 body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
-  background:var(--bg);color:var(--t1);line-height:1.6;-webkit-font-smoothing:antialiased}
-.sd{max-width:520px;margin:0 auto;padding:12px}
+  background:var(--bg);color:var(--t1);line-height:1.6;-webkit-font-smoothing:antialiased;
+  display:flex;align-items:center;justify-content:center}
+.sd{width:100%;max-width:520px;padding:12px}
 
-/* ===== VIEWS ===== */
-.sd-v{display:none}.sd-v.on{display:block}
+.sd-v{display:none}.sd-v.on{display:flex;flex-direction:column;justify-content:center;min-height:0}
 
 /* ===== INTRO ===== */
-.sd-intro{background:var(--w);border-radius:var(--rad);padding:32px 24px;
+.sd-intro{background:var(--w);border-radius:var(--rad);padding:28px 22px;
   text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.sd-intro-ico{width:52px;height:52px;background:var(--c3);color:#fff;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 14px}
-.sd-intro h2{color:var(--c3);font-size:1.15rem;margin-bottom:10px}
-.sd-intro p{color:var(--t2);font-size:.88rem;margin-bottom:6px}
-.sd-intro .note{color:var(--t3);font-size:.78rem;font-style:italic;margin:2px 0 18px}
-.btn-start{background:var(--c1);color:#fff;border:none;padding:12px 36px;
-  font-size:.98rem;font-weight:700;border-radius:8px;cursor:pointer;
+.sd-intro-ico{width:48px;height:48px;background:var(--c3);color:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin:0 auto 12px}
+.sd-intro h2{color:var(--c3);font-size:1.1rem;margin-bottom:8px}
+.sd-intro p{color:var(--t2);font-size:.86rem;margin-bottom:4px}
+.sd-intro .note{color:var(--t3);font-size:.76rem;font-style:italic;margin:4px 0 16px}
+.btn-start{background:var(--c1);color:#fff;border:none;padding:11px 34px;
+  font-size:.95rem;font-weight:700;border-radius:8px;cursor:pointer;
   transition:background .2s,transform .15s}
 .btn-start:hover{background:var(--c1h);transform:translateY(-1px)}
 
 /* ===== PROGRESS ===== */
-.sd-prog{margin-bottom:14px}
-.sd-prog-row{display:flex;justify-content:space-between;margin-bottom:5px}
-.sd-prog-row span{font-size:.78rem;color:var(--t3);font-weight:600}
+.sd-prog{margin-bottom:12px}
+.sd-prog-row{display:flex;justify-content:space-between;margin-bottom:4px}
+.sd-prog-row span{font-size:.76rem;color:var(--t3);font-weight:600}
 .sd-prog-track{background:var(--brd);border-radius:6px;height:4px;overflow:hidden}
 .sd-prog-fill{height:100%;background:var(--c1);border-radius:6px;transition:width .4s ease;width:0%}
 
-/* ===== QUESTION CARD ===== */
-.sd-qc{background:var(--w);border-radius:var(--rad);padding:28px 22px;
-  box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:14px;
-  transition:opacity .2s ease,transform .2s ease}
+/* ===== QUESTION ===== */
+.sd-qc{background:var(--w);border-radius:var(--rad);padding:24px 20px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:12px;
+  transition:opacity .2s,transform .2s}
 .sd-qc.fade{opacity:0;transform:translateY(10px)}
-.sd-qt{font-size:1.06rem;text-align:center;min-height:50px;
+.sd-qt{font-size:1.02rem;text-align:center;min-height:48px;
   display:flex;align-items:center;justify-content:center;
-  line-height:1.5;margin-bottom:22px;color:var(--t1)}
-.sd-labels{display:flex;justify-content:space-between;padding:0 2px;margin-bottom:6px}
-.sd-labels span{font-size:.68rem;color:var(--t3);max-width:80px;line-height:1.2}
+  line-height:1.5;margin-bottom:18px;color:var(--t1)}
+.sd-labels{display:flex;justify-content:space-between;padding:0 2px;margin-bottom:5px}
+.sd-labels span{font-size:.66rem;color:var(--t3);max-width:76px;line-height:1.2}
 .sd-labels span:first-child{text-align:left}
 .sd-labels span:last-child{text-align:right}
 .sd-opts{display:flex;gap:8px}
-.sd-o{flex:1;height:48px;border:2px solid var(--brd);border-radius:10px;
+.sd-o{flex:1;height:46px;border:2px solid var(--brd);border-radius:10px;
   background:var(--w);color:var(--t2);font-size:1.1rem;font-weight:700;
-  cursor:pointer;transition:all .15s ease;display:flex;align-items:center;justify-content:center}
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
 .sd-o:hover{border-color:var(--c1);color:var(--c1);background:var(--c1l)}
 .sd-o.sel{background:var(--c1);border-color:var(--c1);color:#fff;
   box-shadow:0 2px 8px rgba(195,21,50,.25);transform:scale(1.06)}
@@ -68,95 +68,70 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
 /* ===== NAV ===== */
 .sd-nav{display:flex;justify-content:space-between;align-items:center}
 .btn-back{background:none;border:2px solid var(--brd);color:var(--t2);
-  padding:10px 18px;font-size:.88rem;font-weight:600;border-radius:8px;
+  padding:9px 16px;font-size:.86rem;font-weight:600;border-radius:8px;
   cursor:pointer;transition:all .2s}
 .btn-back:hover{border-color:var(--c2);color:var(--c3)}
 .btn-back:disabled{opacity:.25;cursor:default;pointer-events:none}
 .btn-next{background:var(--brd);border:none;color:var(--t3);
-  padding:10px 26px;font-size:.92rem;font-weight:700;border-radius:8px;
+  padding:9px 24px;font-size:.9rem;font-weight:700;border-radius:8px;
   cursor:not-allowed;transition:all .2s;margin-left:auto}
 .btn-next.go{background:var(--c1);color:#fff;cursor:pointer;
   box-shadow:0 2px 10px rgba(195,21,50,.3)}
 .btn-next.go:hover{background:var(--c1h);transform:translateY(-1px)}
 
-/* ===== RESULT CARD (captured as image) ===== */
-.sd-rc{background:var(--w);border-radius:var(--rad);padding:28px 24px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:14px}
-.sd-rc-hdr{text-align:center;padding-bottom:14px;margin-bottom:18px;
+/* ===== RESULT CARD ===== */
+.sd-rc{background:var(--w);border-radius:var(--rad);padding:24px 22px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:12px}
+.sd-rc-hdr{text-align:center;padding-bottom:12px;margin-bottom:14px;
   border-bottom:2px solid var(--bg)}
-.sd-rc-hdr h2{color:var(--c3);font-size:1.1rem;margin-bottom:2px}
-.sd-rc-hdr p{color:var(--t3);font-size:.78rem}
-.sd-sr{margin-bottom:16px}
-.sd-sr:last-of-type{margin-bottom:0}
-.sd-sr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.sd-sr-name{font-size:.88rem;font-weight:700;color:var(--t1)}
-.sd-sr-sc{font-size:.84rem;font-weight:700}
+.sd-rc-hdr h2{color:var(--c3);font-size:1.05rem;margin-bottom:2px}
+.sd-rc-hdr p{color:var(--t3);font-size:.74rem}
+.sd-sr{margin-bottom:14px}.sd-sr:last-of-type{margin-bottom:0}
+.sd-sr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.sd-sr-name{font-size:.84rem;font-weight:700;color:var(--t1)}
+.sd-sr-sc{font-size:.82rem;font-weight:700}
 .sd-sr-sc.green{color:var(--g)}.sd-sr-sc.yellow{color:var(--y)}.sd-sr-sc.red{color:var(--r)}
 .sd-bt{background:var(--bg);border-radius:6px;height:8px;overflow:hidden;margin-bottom:4px}
 .sd-bf{height:100%;border-radius:6px;width:0%;transition:width 1s cubic-bezier(.4,0,.2,1)}
 .sd-bf.green{background:var(--g)}.sd-bf.yellow{background:var(--y)}.sd-bf.red{background:var(--r)}
-.sd-zl{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.7rem;font-weight:600}
+.sd-zl{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.68rem;font-weight:600}
 .sd-zl.green{background:var(--gl);color:var(--gd)}
 .sd-zl.yellow{background:var(--yl);color:var(--yd)}
 .sd-zl.red{background:var(--rl);color:var(--rd)}
-.sd-ov{text-align:center;padding-top:16px;margin-top:18px;border-top:2px solid var(--bg)}
-.sd-ov-i{font-size:2rem;margin-bottom:2px}
-.sd-ov h3{font-size:1.02rem;margin-bottom:6px}
-.sd-ov p{font-size:.82rem;color:var(--t2);line-height:1.5;max-width:400px;margin:0 auto}
-.sd-rc-ft{text-align:center;padding-top:12px;margin-top:14px;
-  border-top:1px solid var(--bg);font-size:.68rem;color:var(--t3)}
-
-/* ===== DETAILS & RECS ===== */
-.sd-det{background:var(--w);padding:14px 18px;border-radius:var(--rad);
-  margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.sd-det h4{font-size:.88rem;margin-bottom:4px;color:var(--t1)}
-.sd-det p{font-size:.82rem;color:var(--t2);line-height:1.5}
-.sd-rec{background:var(--c3l);padding:16px 18px;border-radius:var(--rad);
-  margin-bottom:8px;border-left:3px solid var(--c3)}
-.sd-rec h4{color:var(--c3);font-size:.88rem;margin-bottom:6px}
-.sd-rec ul{padding-left:16px}
-.sd-rec li{font-size:.82rem;color:var(--t2);margin-bottom:3px}
+.sd-ov{text-align:center;padding-top:14px;margin-top:16px;border-top:2px solid var(--bg)}
+.sd-ov-i{font-size:1.8rem;margin-bottom:2px}
+.sd-ov h3{font-size:.98rem;margin-bottom:5px}
+.sd-ov p{font-size:.8rem;color:var(--t2);line-height:1.5;max-width:400px;margin:0 auto}
+.sd-rc-ft{text-align:center;padding-top:10px;margin-top:12px;
+  border-top:1px solid var(--bg);font-size:.66rem;color:var(--t3)}
 
 /* ===== ACTIONS ===== */
-.sd-acts{display:flex;gap:8px;justify-content:center;margin:14px 0;flex-wrap:wrap}
-.btn-save{background:var(--c1);color:#fff;border:none;padding:11px 22px;
-  font-size:.88rem;font-weight:600;border-radius:8px;cursor:pointer;
+.sd-acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.btn-save{background:var(--c1);color:#fff;border:none;padding:10px 20px;
+  font-size:.86rem;font-weight:600;border-radius:8px;cursor:pointer;
   transition:all .2s;display:flex;align-items:center;gap:5px}
 .btn-save:hover{background:var(--c1h);transform:translateY(-1px)}
 .btn-save:disabled{opacity:.6;cursor:wait;transform:none}
 .btn-rst{background:none;border:2px solid var(--brd);color:var(--t2);
-  padding:11px 22px;font-size:.88rem;font-weight:600;border-radius:8px;
+  padding:10px 20px;font-size:.86rem;font-weight:600;border-radius:8px;
   cursor:pointer;transition:all .2s}
 .btn-rst:hover{border-color:var(--c2);color:var(--c3)}
 
-/* ===== DEEPER + WARN ===== */
-.sd-deep{background:var(--w);padding:16px 18px;border-radius:var(--rad);
-  margin:10px 0;border:1px dashed var(--brd);text-align:center}
-.sd-deep h4{font-size:.86rem;color:var(--t1);margin-bottom:3px}
-.sd-deep p{font-size:.76rem;color:var(--t3);margin-bottom:8px}
-.sd-deep a{display:inline-block;padding:8px 18px;background:var(--c3);
-  color:#fff;text-decoration:none;border-radius:6px;font-weight:600;
-  font-size:.8rem;transition:background .2s}
-.sd-deep a:hover{background:var(--c2)}
-.sd-warn{background:var(--yl);padding:10px 14px;border-radius:8px;margin:10px 0;
-  font-size:.74rem;color:var(--yd);line-height:1.4;border-left:3px solid var(--y)}
-
-/* ===== RESPONSIVE ===== */
 @media(max-width:480px){
   .sd{padding:8px 6px}
-  .sd-intro{padding:24px 14px}
-  .sd-qc{padding:22px 14px}
+  .sd-intro{padding:20px 14px}
+  .sd-qc{padding:18px 12px}
   .sd-opts{gap:5px}
-  .sd-o{height:44px;font-size:1rem;border-radius:8px}
-  .sd-qt{font-size:.98rem;min-height:44px}
-  .sd-rc{padding:20px 14px}
+  .sd-o{height:42px;font-size:1rem;border-radius:8px}
+  .sd-qt{font-size:.95rem;min-height:42px}
+  .sd-rc{padding:18px 14px}
 }
 </style>
 </head>
 <body>
 <div class="sd">
 
-  <!-- ========== INTRO ========== -->
+  <!-- ===== INTRO ===== -->
   <div class="sd-v on" id="vIntro">
     <div class="sd-intro">
       <div class="sd-intro-ico">📋</div>
@@ -168,7 +143,7 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
     </div>
   </div>
 
-  <!-- ========== QUIZ ========== -->
+  <!-- ===== QUIZ ===== -->
   <div class="sd-v" id="vQuiz">
     <div class="sd-prog">
       <div class="sd-prog-row">
@@ -191,34 +166,18 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
     </div>
   </div>
 
-  <!-- ========== RESULTS ========== -->
+  <!-- ===== RESULTS ===== -->
   <div class="sd-v" id="vRes">
     <div class="sd-rc" id="resCard"></div>
-    <div id="detBox"></div>
-    <div id="recBox"></div>
     <div class="sd-acts">
       <button class="btn-save" id="bSave" onclick="saveImg()">📸 Сохранить результат</button>
       <button class="btn-rst" onclick="restart()">↻ Пройти заново</button>
-    </div>
-    <div class="sd-deep">
-      <h4>📎 Хотите пройти валидированный клинический опросник?</h4>
-      <p>Для более точной оценки рекомендуем MBI в адаптации Н.&nbsp;Е.&nbsp;Водопьяновой.</p>
-      <!-- ▼ ЗАМЕНИТЕ ССЫЛКУ НА ВАШУ ▼ -->
-      <a href="https://psytests.org/burn/maslach.html" target="_blank" rel="noopener">Пройти опросник MBI →</a>
-    </div>
-    <div class="sd-warn">
-      ⚠️ Инструмент носит рефлексивный характер и не является клиническим диагнозом.
-      Теоретическая основа: трёхкомпонентная модель профессионального выгорания (К.&nbsp;Маслач).
-      При беспокойстве обратитесь к психологу, коучу или программе EAP.
     </div>
   </div>
 
 </div>
 
 <script>
-/* =============================================================
-   DATA · 18 items · 3 scales · 6 each (3 forward + 3 reversed)
-   ============================================================= */
 const QS=[
   {id:1, txt:"Я просыпаюсь с энергией и готовностью к рабочему дню.",                                    sc:"EN",rv:0},
   {id:2, txt:"Мне всё чаще кажется, что моя работа не имеет особого смысла.",                             sc:"EG",rv:1},
@@ -239,35 +198,23 @@ const QS=[
   {id:17,txt:"Я готов(а) вкладываться в работу сверх минимума, когда вижу в этом ценность для дела.",       sc:"EG",rv:0},
   {id:18,txt:"Я ловлю себя на мысли, что не дотягиваю до уровня, который нужен на моей позиции.",          sc:"CF",rv:1}
 ];
-const N=QS.length, MAX=30, MIN=6, RNG=MAX-MIN;
-
-/* ===== state ===== */
+const N=QS.length,MAX=30,MIN=6,RNG=MAX-MIN;
 let cur=0;
 const ans=new Array(N).fill(null);
 
-/* =============================================================
-   VIEWS
-   ============================================================= */
 function show(id){
   document.querySelectorAll('.sd-v').forEach(v=>v.classList.remove('on'));
   document.getElementById(id).classList.add('on');
-  document.querySelector('.sd').scrollIntoView({behavior:'smooth',block:'start'});
 }
-
 function start(){show('vQuiz');renderQ()}
 
-/* =============================================================
-   RENDER QUESTION
-   ============================================================= */
 function renderQ(){
   document.getElementById('qTxt').textContent=QS[cur].txt;
   document.getElementById('pLbl').textContent=`Вопрос ${cur+1} из ${N}`;
   document.getElementById('pFill').style.width=((cur+1)/N*100)+'%';
   document.getElementById('bBack').disabled=(cur===0);
-
   const bn=document.getElementById('bNext');
   bn.textContent=(cur===N-1)?'Показать результаты':'Далее →';
-
   const box=document.getElementById('qOpts');
   box.innerHTML='';
   for(let v=1;v<=5;v++){
@@ -291,13 +238,7 @@ function updNext(){
   ans[cur]!==null?bn.classList.add('go'):bn.classList.remove('go');
 }
 
-/* =============================================================
-   NAVIGATION (animated)
-   ============================================================= */
-function next(){
-  if(ans[cur]===null)return;
-  cur<N-1?anim(cur+1):calc();
-}
+function next(){if(ans[cur]===null)return;cur<N-1?anim(cur+1):calc()}
 function prev(){if(cur>0)anim(cur-1)}
 
 function anim(idx){
@@ -306,9 +247,6 @@ function anim(idx){
   setTimeout(()=>{cur=idx;renderQ();requestAnimationFrame(()=>c.classList.remove('fade'))},200);
 }
 
-/* =============================================================
-   SCORING
-   ============================================================= */
 function calc(){
   const sc={EN:0,EG:0,CF:0};
   QS.forEach((q,i)=>{const v=ans[i];sc[q.sc]+=q.rv?(6-v):v});
@@ -317,37 +255,19 @@ function calc(){
 
 function zone(s){return s>=24?'green':s>=16?'yellow':'red'}
 const ZL={green:'Ресурсное состояние',yellow:'Зона внимания',red:'Зона риска'};
-
-/* =============================================================
-   RESULTS
-   ============================================================= */
-const SM={
-  EN:{nm:'⚡ Энергия и ресурс',ds:{
-    green:'У вас достаточно сил — вы восстанавливаетесь и сохраняете концентрацию. Хороший фундамент для управленческой работы.',
-    yellow:'Периодически вы ощущаете нехватку сил и усталость, которая не уходит за выходные. Стоит обратить внимание на восстановление.',
-    red:'Ваши энергетические ресурсы серьёзно истощены. Усталость стала привычным фоном — это один из главных сигналов выгорания.'}},
-  EG:{nm:'🎯 Вовлечённость и смысл',ds:{
-    green:'Вы сохраняете живой интерес к работе и чувствуете, что ваш труд имеет значение.',
-    yellow:'Интерес к работе колеблется. Бывают моменты отстранённости — стоит присмотреться, что именно демотивирует.',
-    red:'Вы заметно отстранились от работы и сомневаетесь в её ценности. Дистанцирование — ключевой компонент выгорания.'}},
-  CF:{nm:'💪 Уверенность в себе',ds:{
-    green:'Вы верите в свои силы, уверены в решениях и чувствуете профессиональный рост.',
-    yellow:'Иногда сомневаетесь в себе и своих решениях. Если сомнения нарастают — поработайте с обратной связью.',
-    red:'Вы серьёзно недооцениваете свою эффективность. Это подрывает мотивацию и качество решений — вам нужна поддержка.'}}
-};
+const SM={EN:'⚡ Энергия и ресурс',EG:'🎯 Вовлечённость и смысл',CF:'💪 Уверенность в себе'};
 
 function showRes(sc){
   const zs={};
   ['EN','EG','CF'].forEach(k=>zs[k]=zone(sc[k]));
 
-  /* ---- result card (for screenshot) ---- */
   let h=`<div class="sd-rc-hdr"><h2>Самодиагностика: ваш ресурс</h2>
     <p>Энергия · Вовлечённость · Уверенность</p></div>`;
 
   ['EN','EG','CF'].forEach(k=>{
     const z=zs[k],pct=Math.round((sc[k]-MIN)/RNG*100);
     h+=`<div class="sd-sr"><div class="sd-sr-top">
-      <span class="sd-sr-name">${SM[k].nm}</span>
+      <span class="sd-sr-name">${SM[k]}</span>
       <span class="sd-sr-sc ${z}">${sc[k]}/${MAX}</span></div>
       <div class="sd-bt"><div class="sd-bf ${z}" data-p="${pct}"></div></div>
       <span class="sd-zl ${z}">${ZL[z]}</span></div>`;
@@ -357,23 +277,10 @@ function showRes(sc){
   h+=`<div class="sd-ov"><div class="sd-ov-i">${ov.i}</div>
     <h3 style="color:${ov.c}">${ov.t}</h3><p>${ov.p}</p></div>
     <div class="sd-rc-ft">${new Date().toLocaleDateString('ru-RU',
-      {day:'numeric',month:'long',year:'numeric'})} · Рефлексивное упражнение</div>`;
+      {day:'numeric',month:'long',year:'numeric'})}</div>`;
 
   document.getElementById('resCard').innerHTML=h;
-
-  /* ---- details ---- */
-  let d='';
-  ['EN','EG','CF'].forEach(k=>{
-    d+=`<div class="sd-det"><h4>${SM[k].nm}</h4><p>${SM[k].ds[zs[k]]}</p></div>`;
-  });
-  document.getElementById('detBox').innerHTML=d;
-
-  /* ---- recs ---- */
-  mkRecs(zs);
-
   show('vRes');
-
-  /* animate bars */
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     document.querySelectorAll('.sd-bf').forEach(b=>b.style.width=b.dataset.p+'%');
   }));
@@ -384,58 +291,21 @@ function overall(z){
   if(g===3)return{i:'🟢',t:'Ресурсное состояние',c:'var(--g)',
     p:'Все три показателя в зелёной зоне. Вы сохраняете энергию, вовлечённость и уверенность.'};
   if(r===0&&g>=2)return{i:'🟢',t:'В целом хороший ресурс',c:'var(--g)',
-    p:'Большинство показателей в норме. Посмотрите, что требует внимания, и внесите небольшие корректировки.'};
+    p:'Большинство показателей в норме. Посмотрите, что требует внимания.'};
   if(r===0)return{i:'🟡',t:'Есть зоны для внимания',c:'var(--y)',
     p:'Напряжение ощущается по нескольким направлениям. Хороший момент для профилактики.'};
   if(r===1)return{i:'🟠',t:'Есть зона риска',c:'var(--r)',
-    p:'Один из компонентов в красной зоне. Рекомендуем изучить рекомендации и обсудить ситуацию с коучем или HR.'};
+    p:'Один из компонентов в красной зоне — рекомендуем обсудить ситуацию с коучем или HR.'};
   if(r===2)return{i:'🔴',t:'Выраженные признаки выгорания',c:'var(--r)',
-    p:'Два показателя в красной зоне. Вам нужна поддержка — поговорите с руководителем, психологом или программой EAP.'};
+    p:'Два показателя в красной зоне. Вам нужна поддержка — поговорите с руководителем или психологом.'};
   return{i:'🚨',t:'Высокий риск выгорания',c:'var(--r)',
-    p:'Все компоненты в красной зоне. Пожалуйста, обратитесь за профессиональной помощью и обсудите нагрузку с руководством.'};
+    p:'Все компоненты в красной зоне. Пожалуйста, обратитесь за профессиональной помощью.'};
 }
 
-/* =============================================================
-   RECOMMENDATIONS
-   ============================================================= */
-function mkRecs(z){
-  let h='';
-  if(z.EN!=='green')h+=rb('💤 Восстановление энергии',[
-    'Проведите «аудит календаря» — найдите встречи, которые можно убрать или сократить',
-    'Делегируйте хотя бы одну задачу, которую привыкли делать сами',
-    'Установите «стоп-время»: после определённого часа — никаких рабочих сообщений',
-    'Микро-паузы: 5 минут отдыха каждые 90 минут работы',
-    'Проверьте базу: сон (7–8 ч), движение, питание']);
-  if(z.EG!=='green')h+=rb('🎯 Возвращение вовлечённости',[
-    'Запишите 3 вещи, которые когда-то привлекли вас в эту роль. Что из этого осталось?',
-    'Найдите задачу, которая вам по-настоящему интересна, и уделите ей больше времени',
-    'Обсудите с руководителем карьерные ожидания — возможно, пора обновить цели',
-    'Попробуйте «джоб-крафтинг»: перестройте процесс под свои сильные стороны',
-    'Поговорите с коллегами-менеджерами: ощущение «я такой один» усиливает отчуждение']);
-  if(z.CF!=='green')h+=rb('💪 Укрепление уверенности',[
-    'Заведите «дневник побед» — записывайте 1–2 управленческих успеха каждый день',
-    'Запросите обратную связь: «Что у меня получается хорошо как у руководителя?»',
-    'Вспомните 3 сложные ситуации, которые вы успешно разрешили за последний год',
-    'Найдите ментора или peer-группу — обсуждение кейсов снижает синдром самозванца',
-    'Инвестируйте в обучение навыку, в котором чувствуете неуверенность']);
-  h+=rb('🧭 Общие рекомендации',[
-    'Регулярные 1-on-1 с вашим руководителем — не только про задачи, но и про ваше состояние',
-    'Стройте команду, которой можно доверять: лучшая страховка от перегрузки',
-    'Выделяйте «стратегическое время» — хотя бы 2 часа в неделю на мышление вместо реактивных задач',
-    'Помните: выгорание руководителя = выгорание команды. Забота о себе — управленческий навык']);
-  document.getElementById('recBox').innerHTML=h;
-}
-function rb(t,items){
-  return`<div class="sd-rec"><h4>${t}</h4><ul>${items.map(i=>'<li>'+i+'</li>').join('')}</ul></div>`;
-}
-
-/* =============================================================
-   SAVE AS PNG
-   ============================================================= */
 async function saveImg(){
   const btn=document.getElementById('bSave'),card=document.getElementById('resCard');
   if(typeof html2canvas==='undefined'){
-    alert('Для сохранения сделайте скриншот экрана (PrtScr / Cmd+Shift+4)');return;
+    alert('Сделайте скриншот экрана (PrtScr / Cmd+Shift+4)');return;
   }
   btn.disabled=true;btn.innerHTML='⏳ Формирую…';
   try{
@@ -451,9 +321,6 @@ async function saveImg(){
   }
 }
 
-/* =============================================================
-   RESTART
-   ============================================================= */
 function restart(){ans.fill(null);cur=0;show('vIntro')}
 </script>
 </body>
