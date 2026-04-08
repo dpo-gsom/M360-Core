@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Управленческий ДНК: тест PAEI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #C31532;
+  --dark: #003B48;
+  --slate: #495761;
+  --cream: #FAF8F4;
+  --sand: #F0EDE6;
+  --border: #DDD8CF;
+  --white: #FFFFFF;
+
+  --p: #1A5FA5;   --p-bg: #EEF3FB; --p-border: #9DBAE0;
+  --a: #7B3FA0;   --a-bg: #F4EDFB; --a-border: #C9AAEA;
+  --e: #B85C00;   --e-bg: #FEF3E6; --e-border: #F0C080;
+  --i: #1A6B4A;   --i-bg: #EBF5EF; --i-border: #A8D5BC;
+
+  --score-4: #003B48;
+  --score-3: #495761;
+  --score-2: #8A9BA3;
+  --score-1: #C8D4D9;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--dark);
+}
+
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
+  z-index: 100;
+}
+
+#app { max-width: 700px; margin: 0 auto; padding: 44px 20px 60px; }
+
+/* ─── INTRO ─── */
+.intro { animation: fadeUp 0.6s ease both; }
+
+.intro-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 20px;
+}
+
+.intro-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 7vw, 56px); font-weight: 700;
+  color: var(--dark); line-height: 1.1; margin-bottom: 8px;
+}
+.intro-title em { color: var(--red); font-style: normal; display: block; }
+
+.intro-divider { width: 60px; height: 2px; background: var(--red); margin: 24px 0; }
+
+.intro-lead {
+  font-size: 15px; line-height: 1.75; color: var(--slate); margin-bottom: 28px;
+}
+
+.intro-instruction {
+  background: var(--dark); color: var(--white);
+  border-radius: 10px; padding: 20px 22px; margin-bottom: 24px;
+  font-size: 14px; line-height: 1.7;
+}
+.intro-instruction strong { color: #F0C080; }
+
+.intro-anon {
+  background: var(--sand); border-radius: 8px; padding: 14px 18px;
+  font-size: 13px; color: var(--slate); line-height: 1.6; margin-bottom: 32px;
+  border-left: 3px solid var(--border);
+}
+
+.paei-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+.paei-chip {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.5px; border: 1.5px solid;
+}
+.paei-chip.p { background: var(--p-bg); color: var(--p); border-color: var(--p-border); }
+.paei-chip.a { background: var(--a-bg); color: var(--a); border-color: var(--a-border); }
+.paei-chip.e { background: var(--e-bg); color: var(--e); border-color: var(--e-border); }
+.paei-chip.i { background: var(--i-bg); color: var(--i); border-color: var(--i-border); }
+
+.btn-start {
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  background: var(--dark); color: var(--white); border: none; border-radius: 4px;
+  padding: 16px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-start:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ─── PROGRESS ─── */
+.progress-bar-wrap { margin-bottom: 28px; }
+.progress-top {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+}
+.progress-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); }
+.progress-right { display: flex; align-items: center; gap: 14px; }
+.score-counter {
+  font-size: 13px; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px;
+  background: var(--sand); border: 1.5px solid var(--border);
+  color: var(--slate); transition: all 0.2s;
+}
+.score-counter.ready { background: var(--i-bg); border-color: var(--i-border); color: var(--i); }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--red); border-radius: 2px; transition: width 0.4s ease; }
+
+/* ─── BLOCK ─── */
+.block-wrap { animation: cardIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both; }
+
+.block-zone {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 6px;
+}
+.block-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 4vw, 24px); font-weight: 700; color: var(--dark);
+  line-height: 1.3; margin-bottom: 6px;
+}
+.block-question { font-size: 13px; color: var(--slate); margin-bottom: 24px; line-height: 1.6; font-style: italic; }
+
+/* ─── MATRIX ─── */
+.matrix-wrap { overflow-x: auto; margin-bottom: 20px; }
+.matrix {
+  width: 100%; min-width: 340px; border-collapse: separate; border-spacing: 0;
+}
+
+.matrix th {
+  text-align: center; padding: 0 0 12px; font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--slate);
+  width: 60px;
+}
+.matrix th:first-child { text-align: left; width: auto; padding-left: 0; }
+
+.matrix th .score-head {
+  width: 40px; height: 40px; border-radius: 50%; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; border: 2px solid var(--border);
+  color: var(--slate); background: var(--white);
+}
+
+.matrix td {
+  padding: 6px 0; vertical-align: middle;
+}
+.matrix td:first-child {
+  padding-right: 16px; font-size: 13px; line-height: 1.55; color: var(--slate);
+  padding-bottom: 14px; padding-top: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.matrix tr:last-child td:first-child { border-bottom: none; }
+.matrix td:not(:first-child) {
+  text-align: center; border-bottom: 1px solid var(--border);
+}
+.matrix tr:last-child td:not(:first-child) { border-bottom: none; }
+
+.matrix-cell {
+  width: 40px; height: 40px; border-radius: 50%; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border: 2px solid var(--border); background: var(--white);
+  transition: border-color 0.15s, background 0.15s, opacity 0.15s;
+  position: relative;
+}
+.matrix-cell:hover { border-color: var(--dark); }
+.matrix-cell::after {
+  content: '';
+  width: 18px; height: 18px; border-radius: 50%;
+  background: transparent;
+  transition: background 0.15s;
+}
+.matrix-cell.selected::after { background: var(--dark); }
+.matrix-cell.selected { border-color: var(--dark); }
+.matrix-cell.impossible {
+  opacity: 0.18;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.matrix-cell.impossible {
+  opacity: 0.18;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─── NEXT BTN ─── */
+.btn-next {
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 4px; padding: 15px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, opacity 0.2s, transform 0.15s;
+  opacity: 0.35; pointer-events: none;
+}
+.btn-next.ready { opacity: 1; pointer-events: all; }
+.btn-next.ready:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ─── RESULTS ─── */
+.results { animation: fadeUp 0.6s ease both; }
+
+.results-hero {
+  text-align: center; margin-bottom: 32px;
+}
+.results-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 16px; }
+
+.dna-code {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 10vw, 72px); font-weight: 700;
+  letter-spacing: 8px; color: var(--dark); line-height: 1;
+  margin-bottom: 8px;
+}
+
+.results-sub { font-size: 14px; color: var(--slate); line-height: 1.6; margin-bottom: 24px; }
+
+/* ─── BARS ─── */
+.bars-section { margin-bottom: 28px; }
+.bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.bar-label { font-size: 13px; font-weight: 700; min-width: 100px; }
+.bar-label.p { color: var(--p); }
+.bar-label.a { color: var(--a); }
+.bar-label.e { color: var(--e); }
+.bar-label.i { color: var(--i); }
+.bar-track { flex: 1; height: 10px; background: var(--sand); border-radius: 5px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 5px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+.bar-fill.p { background: var(--p); }
+.bar-fill.a { background: var(--a); }
+.bar-fill.e { background: var(--e); }
+.bar-fill.i { background: var(--i); }
+.bar-score { font-size: 13px; font-weight: 700; color: var(--dark); min-width: 36px; text-align: right; }
+.bar-code { font-size: 11px; font-weight: 700; min-width: 18px; text-align: center; }
+.bar-code.big { color: var(--dark); font-size: 14px; }
+.bar-code.small { color: var(--slate); }
+.bar-code.dash { color: var(--border); }
+
+/* ─── ROLE CARDS ─── */
+.roles-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 14px; }
+.roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+.role-card {
+  border-radius: 10px; padding: 16px 16px; border: 1.5px solid;
+}
+.role-card.p { background: var(--p-bg); border-color: var(--p-border); }
+.role-card.a { background: var(--a-bg); border-color: var(--a-border); }
+.role-card.e { background: var(--e-bg); border-color: var(--e-border); }
+.role-card.i { background: var(--i-bg); border-color: var(--i-border); }
+.role-card.dimmed { opacity: 0.4; }
+
+.role-letter { font-size: 28px; font-family: 'Cormorant Garamond', serif; font-weight: 700; margin-bottom: 4px; }
+.role-card.p .role-letter { color: var(--p); }
+.role-card.a .role-letter { color: var(--a); }
+.role-card.e .role-letter { color: var(--e); }
+.role-card.i .role-letter { color: var(--i); }
+.role-name { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+.role-code-badge {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 3px; margin-bottom: 8px;
+}
+.role-card.p .role-code-badge { background: var(--p); color: #fff; }
+.role-card.a .role-code-badge { background: var(--a); color: #fff; }
+.role-card.e .role-code-badge { background: var(--e); color: #fff; }
+.role-card.i .role-code-badge { background: var(--i); color: #fff; }
+.role-desc { font-size: 12px; color: var(--slate); line-height: 1.55; }
+
+/* ─── PATHOLOGIES ─── */
+.pathology-section {
+  background: #FEF0F2; border: 1.5px solid #F2A0AC; border-radius: 10px;
+  padding: 18px 20px; margin-bottom: 24px;
+}
+.pathology-title { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C31532; margin-bottom: 12px; }
+.pathology-item {
+  display: flex; gap: 12px; margin-bottom: 10px; font-size: 13px; align-items: flex-start;
+}
+.pathology-item:last-child { margin-bottom: 0; }
+.pathology-code {
+  font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700;
+  color: #C31532; flex-shrink: 0; min-width: 20px; margin-top: -1px;
+}
+.pathology-name { font-weight: 700; color: var(--dark); margin-bottom: 2px; font-size: 12px; }
+.pathology-desc { color: var(--slate); line-height: 1.5; font-size: 12px; }
+
+.btn-save {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 4px; padding: 15px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s; margin-bottom: 12px;
+}
+.btn-save:hover { background: var(--red); }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-restart {
+  width: 100%; background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 4px; padding: 14px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.btn-restart:hover { border-color: var(--dark); background: var(--sand); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes cardIn { from { opacity:0; transform:translateY(18px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+@media (max-width: 500px) {
+  .roles-grid { grid-template-columns: 1fr; }
+  .matrix-cell { width: 38px; height: 38px; font-size: 13px; }
+  .matrix th .score-head { width: 38px; height: 38px; font-size: 14px; }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ── DATA ──
+const ZONES = ['Зона 1: Задачи и результат','Зона 1: Задачи и результат','Зона 1: Задачи и результат','Зона 1: Задачи и результат','Зона 2: Процессы и изменения','Зона 2: Процессы и изменения','Зона 2: Процессы и изменения','Зона 2: Процессы и изменения','Зона 3: Люди и взаимодействие','Зона 3: Люди и взаимодействие','Зона 3: Люди и взаимодействие','Зона 3: Люди и взаимодействие'];
+
+const BLOCK_TITLES = ['Приоритеты в работе','Принятие решений','Реакция на проблему','Отношение к KPI','Планирование','Правила и регламенты','Реакция на изменения','Контроль и делегирование','Мотивация команды','Конфликт в команде','Оценка кандидатов','Проведение совещаний'];
+
+const BLOCK_QUESTIONS = [
+  'Что для вас является самым важным фокусом в роли руководителя отдела?',
+  'Вам нужно принять решение о том, как именно отдел будет выполнять сложный квартальный план. Как вы будете действовать?',
+  'В работе вашего отдела произошёл серьёзный сбой. Руководство ждёт действий.',
+  'Руководство спускает на ваш отдел новую матрицу KPI на следующий год.',
+  'Вам нужно спланировать работу подразделения на следующий квартал.',
+  'В компании внедряется новый жёсткий корпоративный стандарт (например, по безопасности или комплаенсу).',
+  'Компания внедряет новую IT-систему. Старая привычна, новая — сложная, но перспективная.',
+  'У вас в подчинении группа сотрудников и крупный многосоставной проект.',
+  'Ваша команда демотивирована после неудачного завершения важного проекта.',
+  'Два ваших ключевых сотрудника не могут договориться о том, как реализовывать задачу.',
+  'Вы проводите собеседование и выбираете кандидата в свой отдел. На что вы обратите внимание в первую очередь?',
+  'Как обычно проходят ваши регулярные планёрки с отделом?'
+];
+
+// [P, A, E, I] texts per block
+const BLOCK_OPTIONS_PAEI = [
+  [
+    'Обеспечить выполнение текущих планов и достижение конкретных, измеримых результатов точно в срок.',
+    'Организовать бесперебойную и понятную работу отдела, где всё прозрачно, структурировано и нет места хаосу.',
+    'Находить новые возможности для развития подразделения, инициировать изменения и предлагать нестандартные решения.',
+    'Создать сплочённую команду, где люди доверяют друг другу, вовлечены в процесс и работают как единый механизм.'
+  ],
+  [
+    'Выберу самый быстрый и практичный путь, чтобы немедленно приступить к действиям, по ходу скорректируем.',
+    'Соберу исторические данные, проанализирую риски и выберу наиболее системный, безопасный и просчитанный вариант.',
+    'Опираясь на интуицию и глобальное видение, предложу принципиально новый подход к выполнению этой задачи.',
+    'Обсужу варианты с ключевыми сотрудниками, чтобы решение было общим и каждый был готов взять за него ответственность.'
+  ],
+  [
+    'Немедленно включусь в процесс лично, чтобы как можно быстрее устранить сбой и выдать результат.',
+    'Детально разберусь, на каком этапе алгоритма произошла ошибка, чтобы внедрить точку контроля и исключить её в будущем.',
+    'Посмотрю на ситуацию глобально — возможно, это явный сигнал, что нам пора вообще перестроить этот бизнес-процесс.',
+    'Соберу вовлечённых сотрудников, чтобы вместе разобрать ситуацию без поиска виноватых и снять напряжение.'
+  ],
+  [
+    'Сфокусируюсь на том, какие конкретные шаги нужно сделать мне и отделу прямо сейчас, чтобы выполнить эти цифры.',
+    'Декомпозирую показатели, создам таблицы и систему регулярного мониторинга, чтобы методично отслеживать прогресс.',
+    'Оценю, насколько эти KPI соответствуют будущим вызовам компании, и подумаю, как их можно адаптировать или перевыполнить.',
+    'Проведу встречу с отделом, чтобы объяснить смысл новых показателей, ответить на вопросы и убедиться, что люди их принимают.'
+  ],
+  [
+    'Определю ключевые задачи, распределю их по исполнителям и брошу все силы на то, чтобы они были выполнены.',
+    'Тщательно распишу ресурсы, бюджеты и регламенты взаимодействия, чтобы план был реалистичным и выполнялся без сбоев.',
+    'Сформирую амбициозное видение того, где мы должны оказаться, и задам новые, неочевидные направления для работы.',
+    'Организую совместную сессию планирования, чтобы учесть мнения коллег, договориться о целях и синхронизировать усилия.'
+  ],
+  [
+    'Восприму как данность, но постараюсь быстро адаптировать к реальности, чтобы стандарт не тормозил текущую работу.',
+    'Внимательно изучу документ и лично проконтролирую, чтобы все процессы в моём отделе строго ему соответствовали.',
+    'Критически оценю документ: подумаю, как обойти излишнюю бюрократию или предложу руководству, как его улучшить.',
+    'Помогу команде плавно принять новые правила, сглаживая возможное недовольство, сопротивление и стресс.'
+  ],
+  [
+    'Буду требовать от команды быстрее освоить базовые функции системы, чтобы не просесть в результатах в переходный период.',
+    'Запрошу подробные инструкции и прослежу, чтобы переход был пошаговым, чётким и без потери данных.',
+    'Восприму с энтузиазмом — буду искать в новой системе скрытые возможности для прорыва и оптимизации нашей работы.',
+    'Уделю внимание тому, как люди чувствуют себя в период перемен, буду оказывать поддержку и собирать обратную связь.'
+  ],
+  [
+    'Поставлю задачи и буду требовать результат; если кто-то сильно тормозит — могу забрать задачу и сделать сам.',
+    'Выстрою систему регулярной отчётности и контрольных точек, чтобы объективно отслеживать статус задач на каждом этапе.',
+    'Обрисую команде общую идею проекта и финальную цель, дав свободу действий, чтобы они проявили инициативу.',
+    'Распределю задачи с учётом сильных сторон каждого и буду следить за тем, чтобы внутри команды не было трений.'
+  ],
+  [
+    'Переключу внимание людей на новые срочные задачи — лучший способ забыть о неудаче это погрузиться в работу.',
+    'Проведу структурный разбор полётов, обновлю процессы, чтобы дать людям уверенность, что система теперь работает лучше.',
+    'Выступлю с вдохновляющей речью, покажу новые перспективы и докажу, что эта неудача — лишь ступень к более крупной цели.',
+    'Поговорю с каждым сотрудником, дам возможность выговориться, окажу эмоциональную поддержку и восстановлю доверие.'
+  ],
+  [
+    'Вмешаюсь и приму волевое решение сам, сказав, как именно нужно сделать, чтобы спор не затягивал сроки.',
+    'Попрошу их подготовить объективные данные и обосную решение, опираясь исключительно на логику, регламенты и цифры.',
+    'Предложу им третий, нестандартный вариант, который изменит саму парадигму их спора и выведет задачу на новый уровень.',
+    'Выступлю модератором: помогу им услышать аргументы друг друга и найти компромисс, который устроит обе стороны.'
+  ],
+  [
+    'На его энергичность, готовность много работать и конкретные профессиональные результаты в прошлом.',
+    'На его системность, внимание к деталям, дисциплинированность и готовность чётко следовать правилам компании.',
+    'На его амбициозность, нестандартное мышление и готовность предлагать смелые идеи.',
+    'На то, насколько он эмпатичен, как легко находит общий язык с людьми и насколько органично вольётся в коллектив.'
+  ],
+  [
+    'Максимально кратко и по делу: быстро пробегаемся по статусам задач, выясняем, кто что делает, и сразу идём работать.',
+    'Структурированно: всегда есть строгая повестка, тайминг, протокол встречи и фиксация договорённостей для контроля.',
+    'Динамично: часто превращаю встречи в мозговой штурм, где обсуждаем новые идеи, стратегии и пути развития.',
+    'Открыто: использую встречи для синхронизации, обмена мнениями и поддержания доверительной атмосферы в команде.'
+  ]
+];
+
+// Randomization table: for each block, position of [P,A,E,I] in display order [A,B,C,D]
+// Value at index = which role [0=P,1=A,2=E,3=I]
+const BLOCK_ORDER = [
+  [3,0,2,1], // Block 1:  A=I, B=P, C=E, D=A
+  [0,1,2,3], // Block 2:  A=P, B=A, C=E, D=I
+  [2,3,0,1], // Block 3:  A=E, B=I, C=P, D=A
+  [0,2,1,3], // Block 4:  A=P, B=E, C=A, D=I
+  [1,0,3,2], // Block 5:  A=A, B=P, C=I, D=E
+  [1,2,0,3], // Block 6:  A=A, B=E, C=P, D=I
+  [2,0,1,3], // Block 7:  A=E, B=P, C=A, D=I
+  [0,3,1,2], // Block 8:  A=P, B=I, C=A, D=E
+  [3,1,2,0], // Block 9:  A=I, B=A, C=E, D=P
+  [1,3,0,2], // Block 10: A=A, B=I, C=P, D=E
+  [0,2,3,1], // Block 11: A=P, B=E, C=I, D=A
+  [3,0,2,1]  // Block 12: A=I, B=P, C=E, D=A
+];
+
+const ROLE_INFO = {
+  P: { name: 'Producer — Результативник', focus: 'Фокус на «что делать». Важна скорость и итог. Энергичен, ориентирован на задачи, нетерпелив к промедлению.' },
+  A: { name: 'Administrator — Администратор', focus: 'Фокус на «как делать». Важна система, правила и порядок. Структурирует хаос, следит за соблюдением процессов.' },
+  E: { name: 'Entrepreneur — Предприниматель', focus: 'Фокус на «зачем и когда». Важны идеи, изменения и будущее. Видит возможности там, где другие видят стены.' },
+  I: { name: 'Integrator — Интегратор', focus: 'Фокус на «кто делает». Важна атмосфера, ценности и климат. Создаёт доверие и превращает группу людей в команду.' }
+};
+
+const PATHOLOGIES = {
+  P: { code: 'P---', name: 'Одинокий рейнджер', desc: 'Всё делает сам, не умеет делегировать, команда не растёт.' },
+  A: { code: '-A--', name: 'Бюрократ', desc: 'Соблюдение правил важнее результата. Топит любые идеи в бумажках.' },
+  E: { code: '--E-', name: 'Поджигатель', desc: 'Генерирует 100 идей в минуту, бросает дела на полпути, команда в хаосе.' },
+  I: { code: '---I', name: 'Горячий сторонник', desc: 'Со всеми согласен, избегает конфликтов ценой эффективности, боится принимать решения.' }
+};
+
+// ── STATE ──
+let state = {
+  screen: 'intro',
+  block: 0,
+  // answers[block] = {rowScores: [score for row 0..3 by display order], colUsed: Set}
+  answers: Array.from({length: 12}, () => ({ row: [null,null,null,null] })),
+  scores: { P:0, A:0, E:0, I:0 }
+};
+
+// ── RENDER ──
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'intro') app.innerHTML = renderIntro();
+  else if (state.screen === 'quiz') app.innerHTML = renderQuiz();
+  else if (state.screen === 'results') app.innerHTML = renderResults();
+}
+
+function renderIntro() {
+  return `<div class="intro">
+    <div class="intro-eyebrow">Модель Ицхака Адизеса</div>
+    <div class="intro-title">Управленческий ДНК:<em>тест PAEI</em></div>
+    <div class="intro-divider"></div>
+    <p class="intro-lead">Идеального руководителя не существует — но существует идеальная команда. Этот тест поможет определить вашу естественную роль в управлении и зоны развития.</p>
+    <div class="intro-instruction">
+      <strong>Как проходить:</strong> В каждом из 12 блоков распределите баллы <strong>4, 3, 2, 1</strong> между четырьмя утверждениями. Каждый балл — ровно одному варианту. Сумма в блоке всегда равна <strong>10</strong>. Выбирайте интуитивно — нет правильных или неправильных ответов.
+    </div>
+    <div class="intro-anon">🔒 Результаты анонимны. Данные не сохраняются на сервере и доступны только вам — для саморазвития.</div>
+    <div class="paei-chips">
+      <div class="paei-chip p">P — Producer</div>
+      <div class="paei-chip a">A — Administrator</div>
+      <div class="paei-chip e">E — Entrepreneur</div>
+      <div class="paei-chip i">I — Integrator</div>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">Начать тест →</button>
+  </div>`;
+}
+
+function renderQuiz() {
+  const b = state.block;
+  const ans = state.answers[b];
+  const order = BLOCK_ORDER[b];
+  const pct = Math.round((b / 12) * 100);
+  const total = ans.row.reduce((s, v) => s + (v || 0), 0);
+  const allFilled = ans.row.every(v => v !== null);
+  const scoreReady = allFilled && total === 10;
+  const scores = [1,2,3,4];
+
+  const rows = order.map((roleIdx, rowIdx) => {
+    const text = BLOCK_OPTIONS_PAEI[b][roleIdx];
+    const rowScore = ans.row[rowIdx];
+    const cells = scores.map(s => {
+      const isSelected = rowScore === s;
+      const cls = 'matrix-cell' + (isSelected ? ' selected' : '');
+      return `<td><div class="${cls}" data-row="${rowIdx}" data-score="${s}" onclick="setScore(${b},${rowIdx},${s})"></div></td>`;
+    }).join('');
+    return `<tr><td>${text}</td>${cells}</tr>`;
+  }).join('');
+
+  const scoreCounterCls = scoreReady ? 'score-counter ready' : 'score-counter';
+  const scoreLabel = scoreReady ? '✓ 10 / 10' : `${total} / 10`;
+  const btnCls = scoreReady ? 'btn-next ready' : 'btn-next';
+  const isLast = b === 11;
+
+  return `<div class="block-wrap">
+    <div class="progress-bar-wrap">
+      <div class="progress-top">
+        <div class="progress-label">Блок ${b+1} из 12</div>
+        <div class="progress-right">
+          <div class="${scoreCounterCls}" id="score-counter">${scoreLabel}</div>
+          <div style="font-size:11px;font-weight:700;color:var(--red)">${pct}%</div>
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="block-zone">${ZONES[b]}</div>
+    <div class="block-title">${BLOCK_TITLES[b]}</div>
+    <div class="block-question">${BLOCK_QUESTIONS[b]}</div>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th></th>
+            <th><div class="score-head">1</div></th>
+            <th><div class="score-head">2</div></th>
+            <th><div class="score-head">3</div></th>
+            <th><div class="score-head">4</div></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <button class="${btnCls}" id="btn-next" onclick="nextBlock()">${isLast ? 'Получить результат →' : 'Следующий блок →'}</button>
+  </div>`;
+}
+
+function renderResults() {
+  const sc = state.scores;
+  const maxScore = 48;
+  const minScore = 12;
+  const range = maxScore - minScore;
+
+  function codeChar(val) {
+    if (val >= 30) return 'big';
+    if (val >= 20) return 'small';
+    return 'dash';
+  }
+  function codeLetter(key, val) {
+    if (val >= 30) return key.toUpperCase();
+    if (val >= 20) return key.toLowerCase();
+    return '-';
+  }
+
+  const code = ['P','A','E','I'].map(k => codeLetter(k, sc[k])).join('');
+
+  const bars = ['P','A','E','I'].map(k => {
+    const v = sc[k];
+    const pct = Math.round(((v - minScore) / range) * 100);
+    const cc = codeChar(v);
+    const letter = codeLetter(k, v);
+    return `<div class="bar-row">
+      <div class="bar-label ${k.toLowerCase()}">${k} — ${['Результативник','Администратор','Предприниматель','Интегратор'][['P','A','E','I'].indexOf(k)]}</div>
+      <div class="bar-track"><div class="bar-fill ${k.toLowerCase()}" id="bar-${k}" style="width:0%" data-w="${pct}"></div></div>
+      <div class="bar-score">${v}</div>
+      <div class="bar-code ${cc}">${letter}</div>
+    </div>`;
+  }).join('');
+
+  const roleCards = ['P','A','E','I'].map(k => {
+    const v = sc[k];
+    const isDimmed = v < 20;
+    const info = ROLE_INFO[k];
+    const lvl = v >= 30 ? 'Сильная роль' : v >= 20 ? 'Достаточный уровень' : 'Зона развития';
+    return `<div class="role-card ${k.toLowerCase()} ${isDimmed ? 'dimmed' : ''}">
+      <div class="role-letter">${k}</div>
+      <div class="role-name">${info.name}</div>
+      <div class="role-code-badge">${lvl}</div>
+      <div class="role-desc">${info.focus}</div>
+    </div>`;
+  }).join('');
+
+  const pathItems = ['P','A','E','I'].filter(k => sc[k] < 20);
+  const pathHtml = pathItems.length > 0 ? `
+    <div class="pathology-section">
+      <div class="pathology-title">⚠ Зоны риска</div>
+      ${pathItems.map(k => {
+        const p = PATHOLOGIES[k];
+        return `<div class="pathology-item">
+          <div class="pathology-code">${p.code}</div>
+          <div>
+            <div class="pathology-name">${p.name}</div>
+            <div class="pathology-desc">${p.desc}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  return `<div class="results">
+    <div class="results-hero">
+      <div class="results-eyebrow">Ваш управленческий код</div>
+      <div class="dna-code">${code}</div>
+      <div class="results-sub">Код PAEI отражает выраженность четырёх управленческих ролей. Заглавная буква — сильная роль, строчная — рабочая, прочерк — зона развития.</div>
+    </div>
+
+    <div class="bars-section">${bars}</div>
+
+    <div class="roles-title">Расшифровка ролей</div>
+    <div class="roles-grid">${roleCards}</div>
+
+    ${pathHtml}
+
+    <div style="display:flex;flex-direction:column;gap:0">
+      <button class="btn-save" id="btn-save" onclick="saveResult()">↓ Сохранить результат</button>
+      <button class="btn-restart" onclick="restart()">↺ Пройти заново</button>
+    </div>
+  </div>`;
+}
+
+// ── LOGIC ──
+function startQuiz() {
+  state.screen = 'quiz';
+  state.block = 0;
+  render();
+}
+
+function setScore(blockIdx, rowIdx, score) {
+  const ans = state.answers[blockIdx];
+  const prevScore = ans.row[rowIdx];
+
+  // Toggle off if same, otherwise set new value
+  ans.row[rowIdx] = (prevScore === score) ? null : score;
+
+  // Update visual selection for this row's cells
+  document.querySelectorAll(`.matrix-cell[data-row="${rowIdx}"]`).forEach(cell => {
+    const s = parseInt(cell.dataset.score);
+    cell.classList.toggle('selected', s === ans.row[rowIdx]);
+  });
+
+  // Recalculate everything from scratch
+  refreshMatrix(ans);
+}
+
+function refreshMatrix(ans) {
+  const total = ans.row.reduce((s, v) => s + (v || 0), 0);
+  const allFilled = ans.row.every(v => v !== null);
+  const ready = allFilled && total === 10;
+  const pointsLeft = 10 - total;
+
+  // Update counter
+  const counter = document.getElementById('score-counter');
+  if (counter) {
+    counter.textContent = ready ? '\u2713 10 / 10' : `${total} / 10`;
+    counter.className = ready ? 'score-counter ready' : 'score-counter';
+  }
+  const btn = document.getElementById('btn-next');
+  if (btn) btn.className = ready ? 'btn-next ready' : 'btn-next';
+
+  // For each row independently:
+  // - If row has NO selection: can pick any score s where s <= pointsLeft
+  //   AND enough budget remains for other empty rows (each needs at least 1)
+  //   i.e. s <= pointsLeft - (emptyCount - 1)
+  // - If row HAS a selection (val): can repick any score s where:
+  //   the new total after change is still <= 10
+  //   i.e. s <= val + pointsLeft  (freeing val, spending s)
+  //   BUT also can't leave remaining empty rows unable to fill:
+  //   after this change, pointsLeft becomes (val + pointsLeft - s),
+  //   and emptyCount stays same — so s <= val + pointsLeft - (emptyCount - filledAfter)*1
+  //   Simplified: treat filled rows independently, only constrain by budget
+
+  const emptyCount = ans.row.filter(v => v === null).length;
+
+  for (let r = 0; r < 4; r++) {
+    const rowVal = ans.row[r]; // null or 1-4
+    document.querySelectorAll(`.matrix-cell[data-row="${r}"]`).forEach(cell => {
+      const s = parseInt(cell.dataset.score);
+      let allowed;
+
+      if (rowVal === null) {
+        // Row empty: picking s leaves (pointsLeft - s) for (emptyCount-1) other empty rows
+        // Each needs at least 1, so pointsLeft - s >= emptyCount - 1
+        // i.e. s <= pointsLeft - (emptyCount - 1)
+        const maxForEmpty = pointsLeft - (emptyCount - 1);
+        allowed = s >= 1 && s <= maxForEmpty;
+      } else {
+        // Row has value rowVal: switching to s changes budget by (rowVal - s)
+        // New pointsLeft = pointsLeft + rowVal - s >= 0  =>  s <= pointsLeft + rowVal
+        // Also other empty rows still need at least 1 each:
+        // pointsLeft + rowVal - s >= emptyCount  =>  s <= pointsLeft + rowVal - emptyCount
+        const newBudget = pointsLeft + rowVal;
+        const maxForFilled = newBudget - emptyCount;
+        allowed = s >= 1 && s <= maxForFilled;
+      }
+
+      if (allowed) cell.classList.remove('impossible');
+      else cell.classList.add('impossible');
+    });
+  }
+}
+
+
+function nextBlock() {
+  const ans = state.answers[state.block];
+  const total = ans.row.reduce((s, v) => s + (v || 0), 0);
+  if (total !== 10) return;
+
+  // Tally scores
+  const order = BLOCK_ORDER[state.block];
+  const roles = ['P','A','E','I'];
+  ans.row.forEach((score, rowIdx) => {
+    if (score !== null) {
+      const roleKey = roles[order[rowIdx]];
+      state.scores[roleKey] += score;
+    }
+  });
+
+  if (state.block === 11) {
+    state.screen = 'results';
+    render();
+    setTimeout(animateBars, 100);
+  } else {
+    state.block++;
+    render();
+  }
+}
+
+function animateBars() {
+  document.querySelectorAll('.bar-fill').forEach(bar => {
+    bar.style.width = bar.dataset.w + '%';
+  });
+}
+
+function saveResult() {
+  const btn = document.getElementById('btn-save');
+  if (btn) { btn.disabled = true; btn.textContent = 'Сохраняем...'; }
+
+  const sc = state.scores;
+  const maxScore = 48, minScore = 12, range = maxScore - minScore;
+  function codeLetter(key, val) {
+    if (val >= 30) return key.toUpperCase();
+    if (val >= 20) return key.toLowerCase();
+    return '-';
+  }
+  const code = ['P','A','E','I'].map(k => codeLetter(k, sc[k])).join('');
+
+  const W = 960, H = 540;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#FAF8F4';
+  ctx.fillRect(0, 0, W, H);
+
+  // Top accent line
+  const grad = ctx.createLinearGradient(0,0,W,0);
+  grad.addColorStop(0, '#C31532'); grad.addColorStop(0.5, '#003B48'); grad.addColorStop(1, '#C31532');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, 5);
+
+  // Left dark panel
+  ctx.fillStyle = '#003B48';
+  ctx.fillRect(0, 0, 340, H);
+
+  // Eyebrow
+  ctx.fillStyle = '#C31532';
+  ctx.font = '700 11px Manrope, sans-serif';
+  ctx.letterSpacing = '3px';
+  ctx.fillText('УПРАВЛЕНЧЕСКИЙ КОД · PAEI', 36, 60);
+
+  // Code
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '700 72px "Cormorant Garamond", serif';
+  ctx.fillText(code, 36, 160);
+
+  // Divider
+  ctx.fillStyle = '#C31532';
+  ctx.fillRect(36, 178, 60, 2);
+
+  // Role descriptions
+  const roleNames = { P: 'Producer — Результативник', A: 'Administrator — Администратор', E: 'Entrepreneur — Предприниматель', I: 'Integrator — Интегратор' };
+  const roleColors = { P: '#1A5FA5', A: '#7B3FA0', E: '#B85C00', I: '#1A6B4A' };
+  let yPos = 210;
+  ['P','A','E','I'].forEach(k => {
+    const v = sc[k];
+    const lvl = v >= 30 ? '● Сильная роль' : v >= 20 ? '◐ Рабочая роль' : '○ Зона развития';
+    ctx.fillStyle = v >= 20 ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)';
+    ctx.font = `${v >= 20 ? '600' : '400'} 13px Manrope, sans-serif`;
+    ctx.fillText(`${k}  ${lvl}`, 36, yPos);
+    yPos += 28;
+  });
+
+  // Adizes note
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '400 11px Manrope, sans-serif';
+  ctx.fillText('Модель Ицхака Адизеса', 36, H - 30);
+
+  // Right panel: bars
+  const barX = 380, barMaxW = 500, barH = 14, barGap = 56;
+  ctx.font = '700 11px Manrope, sans-serif';
+  ctx.fillStyle = '#495761';
+  ctx.fillText('РАСПРЕДЕЛЕНИЕ РОЛЕЙ', barX, 55);
+
+  ['P','A','E','I'].forEach((k, i) => {
+    const v = sc[k];
+    const pct = (v - minScore) / range;
+    const bw = Math.round(pct * barMaxW);
+    const y = 80 + i * barGap;
+
+    // Label
+    ctx.fillStyle = '#003B48';
+    ctx.font = '600 13px Manrope, sans-serif';
+    ctx.fillText(roleNames[k], barX, y);
+
+    // Track
+    ctx.fillStyle = '#F0EDE6';
+    roundRect(ctx, barX, y + 8, barMaxW, barH, 7);
+
+    // Fill
+    ctx.fillStyle = roleColors[k];
+    if (bw > 0) roundRect(ctx, barX, y + 8, bw, barH, 7);
+
+    // Score
+    ctx.fillStyle = '#003B48';
+    ctx.font = '700 13px Manrope, sans-serif';
+    ctx.fillText(v, barX + barMaxW + 12, y + 20);
+  });
+
+  // Path bars note
+  const pathItems = ['P','A','E','I'].filter(k => sc[k] < 20);
+  if (pathItems.length > 0) {
+    ctx.fillStyle = '#C31532';
+    ctx.font = '700 11px Manrope, sans-serif';
+    ctx.fillText('ЗОНЫ РИСКА: ' + pathItems.join(', '), barX, H - 30);
+  }
+
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `paei-${code}.png`; a.click();
+    URL.revokeObjectURL(url);
+    if (btn) { btn.disabled = false; btn.textContent = '↓ Сохранить результат'; }
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  if (w < 2*r) r = w/2; if (h < 2*r) r = h/2;
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath(); ctx.fill();
+}
+
+function restart() {
+  state = {
+    screen: 'intro',
+    block: 0,
+    answers: Array.from({length: 12}, () => ({ row: [null,null,null,null] })),
+    scores: { P:0, A:0, E:0, I:0 }
+  };
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
