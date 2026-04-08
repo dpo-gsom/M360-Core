@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Анализатор эмоциональных состояний</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #C31532;
+  --dark: #003B48;
+  --slate: #495761;
+  --cream: #FAF8F4;
+  --sand: #F0EDE6;
+  --border: #DDD8CF;
+  --white: #FFFFFF;
+  --fear:  #7B3FA0;
+  --anger: #C31532;
+  --sad:   #1A5FA5;
+  --joy:   #1A6B4A;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--dark);
+}
+
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
+  z-index: 100;
+}
+
+#app { max-width: 680px; margin: 0 auto; padding: 44px 20px 60px; }
+
+/* ── PAGE HEADER ── */
+.eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 18px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 6vw, 44px); font-weight: 900;
+  color: var(--dark); line-height: 1.15; margin-bottom: 6px;
+}
+.page-title span { color: var(--red); display: block; }
+.divider { width: 50px; height: 2px; background: var(--red); margin: 20px 0; }
+
+/* ── SITUATION INPUT ── */
+.section-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--slate); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.situation-box { margin-bottom: 28px; animation: fadeUp 0.5s ease both; }
+
+.situation-prompt {
+  font-size: 14px; line-height: 1.7; color: var(--slate);
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 10px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 96px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--dark);
+  background: var(--white);
+  resize: vertical;
+  transition: border-color 0.2s;
+  outline: none;
+}
+textarea:focus { border-color: var(--dark); }
+textarea::placeholder { color: #AAB5BB; }
+
+/* ── SLIDERS SECTION ── */
+.sliders-box { margin-bottom: 28px; animation: fadeUp 0.5s ease 0.1s both; }
+
+.slider-row {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px 18px; margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+.slider-row:last-child { margin-bottom: 0; }
+
+.slider-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.slider-name {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 700; color: var(--dark);
+}
+.emotion-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.slider-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700; min-width: 28px; text-align: right;
+  transition: color 0.2s;
+}
+
+.slider-wrap { position: relative; padding-bottom: 18px; }
+
+input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 6px; border-radius: 3px;
+  outline: none; cursor: pointer;
+  background: var(--sand);
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--dark); border: 3px solid var(--white);
+  box-shadow: 0 2px 6px rgba(0,59,72,0.25);
+  cursor: pointer; transition: transform 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+input[type=range]::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--dark); border: 3px solid var(--white);
+  box-shadow: 0 2px 6px rgba(0,59,72,0.25);
+  cursor: pointer;
+}
+
+.slider-ticks {
+  display: flex; justify-content: space-between;
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 0 2px;
+}
+.tick {
+  font-size: 10px; color: var(--border); font-weight: 600;
+  width: 16px; text-align: center;
+}
+.tick.active { color: var(--slate); }
+
+.intensity-hint {
+  font-size: 11px; color: var(--border); margin-top: 6px;
+  display: flex; justify-content: space-between;
+}
+
+/* ── BUTTON ── */
+.btn-analyze {
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 4px; padding: 16px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  margin-bottom: 28px;
+  animation: fadeUp 0.5s ease 0.2s both;
+}
+.btn-analyze:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ── RESULT ── */
+.result-box {
+  border-radius: 12px; padding: 22px 24px; margin-bottom: 20px;
+  animation: resultIn 0.5s cubic-bezier(0.34,1.2,0.64,1) both;
+  display: none;
+}
+.result-box.show { display: block; }
+
+.result-header {
+  display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px;
+}
+.result-icon { font-size: 28px; flex-shrink: 0; line-height: 1; }
+.result-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 4px; opacity: 0.7;
+}
+.result-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
+
+.result-text { font-size: 14px; line-height: 1.75; }
+
+.result-box.calm   { background: #EEF3FB; border: 1.5px solid #9DBAE0; color: #1A3C6A; }
+.result-box.zero   { background: var(--sand); border: 1.5px solid var(--border); color: var(--slate); }
+.result-box.storm  { background: #FEF0F2; border: 1.5px solid #F2A0AC; color: #7A1525; }
+.result-box.drive  { background: #EBF5EF; border: 1.5px solid #A8D5BC; color: #1A4A35; }
+.result-box.neutral { background: var(--sand); border: 1.5px solid var(--border); color: var(--slate); }
+.result-box.warning { background: #FEF3E6; border: 1.5px solid #F0C080; color: #6A3E00; }
+.result-box.info    { background: #EEF3FB; border: 1.5px solid #9DBAE0; color: #1A3C6A; }
+.result-box.sad-fear { background: #F4EDFB; border: 1.5px solid #C9AAEA; color: #4A1D70; }
+
+/* ── EMOTION BARS (in result) ── */
+.emotion-bars { display: flex; gap: 6px; margin-bottom: 16px; }
+.ebar {
+  flex: 1; border-radius: 6px; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center;
+  padding-bottom: 6px;
+}
+.ebar-track { width: 100%; height: 60px; background: rgba(0,0,0,0.06); border-radius: 4px; position: relative; overflow: hidden; margin-bottom: 4px; }
+.ebar-fill { position: absolute; bottom: 0; left: 0; right: 0; border-radius: 4px; transition: height 0.8s cubic-bezier(0.34,1.2,0.64,1); }
+.ebar-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.ebar-num { font-size: 12px; font-weight: 700; }
+
+/* ── RESET ── */
+.btn-reset {
+  background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 4px; padding: 12px 24px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s; display: none;
+}
+.btn-reset.show { display: inline-block; }
+.btn-reset:hover { border-color: var(--dark); background: var(--sand); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+@keyframes resultIn { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+@media (max-width: 420px) {
+  .emotion-bars { gap: 4px; }
+  .ebar-label { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="eyebrow">Инструмент рефлексии</div>
+  <div class="page-title">Анализатор<span>эмоциональных состояний</span></div>
+  <div class="divider"></div>
+
+  <!-- SITUATION -->
+  <div class="situation-box">
+    <div class="section-label">Ситуация</div>
+    <div class="situation-prompt">
+      Вспомните и кратко опишите рабочую ситуацию за последнюю неделю, которая вызвала у вас сильный эмоциональный отклик.
+      <br><em style="color:#AAB5BB;font-size:13px;">Например: коллега сорвал дедлайн, меня не пригласили на важную встречу.</em>
+    </div>
+    <textarea id="situation" placeholder="Опишите ситуацию здесь…"></textarea>
+  </div>
+
+  <!-- SLIDERS -->
+  <div class="sliders-box">
+    <div class="section-label">Интенсивность эмоций</div>
+
+    <div class="slider-row" id="row-fear">
+      <div class="slider-header">
+        <div class="slider-name">
+          <div class="emotion-dot" style="background:var(--fear)"></div>
+          Страх / Тревога
+        </div>
+        <div class="slider-value" id="val-fear" style="color:var(--fear)">0</div>
+      </div>
+      <div class="slider-wrap">
+        <input type="range" id="fear" min="0" max="10" value="0" oninput="updateSlider('fear')">
+        <div class="slider-ticks" id="ticks-fear"></div>
+      </div>
+      <div class="intensity-hint"><span>слабо</span><span>умеренно</span><span>сильно</span></div>
+    </div>
+
+    <div class="slider-row" id="row-anger">
+      <div class="slider-header">
+        <div class="slider-name">
+          <div class="emotion-dot" style="background:var(--anger)"></div>
+          Гнев / Раздражение
+        </div>
+        <div class="slider-value" id="val-anger" style="color:var(--anger)">0</div>
+      </div>
+      <div class="slider-wrap">
+        <input type="range" id="anger" min="0" max="10" value="0" oninput="updateSlider('anger')">
+        <div class="slider-ticks" id="ticks-anger"></div>
+      </div>
+      <div class="intensity-hint"><span>слабо</span><span>умеренно</span><span>сильно</span></div>
+    </div>
+
+    <div class="slider-row" id="row-sad">
+      <div class="slider-header">
+        <div class="slider-name">
+          <div class="emotion-dot" style="background:var(--sad)"></div>
+          Печаль / Разочарование
+        </div>
+        <div class="slider-value" id="val-sad" style="color:var(--sad)">0</div>
+      </div>
+      <div class="slider-wrap">
+        <input type="range" id="sad" min="0" max="10" value="0" oninput="updateSlider('sad')">
+        <div class="slider-ticks" id="ticks-sad"></div>
+      </div>
+      <div class="intensity-hint"><span>слабо</span><span>умеренно</span><span>сильно</span></div>
+    </div>
+
+    <div class="slider-row" id="row-joy">
+      <div class="slider-header">
+        <div class="slider-name">
+          <div class="emotion-dot" style="background:var(--joy)"></div>
+          Радость / Воодушевление
+        </div>
+        <div class="slider-value" id="val-joy" style="color:var(--joy)">0</div>
+      </div>
+      <div class="slider-wrap">
+        <input type="range" id="joy" min="0" max="10" value="0" oninput="updateSlider('joy')">
+        <div class="slider-ticks" id="ticks-joy"></div>
+      </div>
+      <div class="intensity-hint"><span>слабо</span><span>умеренно</span><span>сильно</span></div>
+    </div>
+  </div>
+
+  <!-- ANALYZE BUTTON -->
+  <button class="btn-analyze" onclick="analyze()">Проанализировать →</button>
+
+  <!-- RESULT -->
+  <div class="result-box" id="result-box">
+    <div class="result-header">
+      <div class="result-icon" id="result-icon"></div>
+      <div>
+        <div class="result-label">Ваше состояние</div>
+        <div class="result-title" id="result-title"></div>
+      </div>
+    </div>
+    <div class="emotion-bars" id="emotion-bars"></div>
+    <div class="result-text" id="result-text"></div>
+  </div>
+
+  <button class="btn-reset" id="btn-reset" onclick="reset()">↺ Начать заново</button>
+
+</div>
+
+<script>
+const COLORS = { fear: '#7B3FA0', anger: '#C31532', sad: '#1A5FA5', joy: '#1A6B4A' };
+const LABELS = { fear: 'Страх', anger: 'Гнев', sad: 'Печаль', joy: 'Радость' };
+
+// Build tick marks
+['fear','anger','sad','joy'].forEach(key => {
+  const container = document.getElementById('ticks-' + key);
+  for (let i = 0; i <= 10; i++) {
+    const t = document.createElement('div');
+    t.className = 'tick' + (i === 0 ? ' active' : '');
+    t.id = `tick-${key}-${i}`;
+    t.textContent = i;
+    container.appendChild(t);
+  }
+  updateSlider(key); // init track fill
+});
+
+function updateSlider(key) {
+  const slider = document.getElementById(key);
+  const val = parseInt(slider.value);
+  const valEl = document.getElementById('val-' + key);
+  valEl.textContent = val;
+
+  // Color the track fill
+  const pct = (val / 10) * 100;
+  slider.style.background = `linear-gradient(to right, ${COLORS[key]} 0%, ${COLORS[key]} ${pct}%, var(--sand) ${pct}%)`;
+
+  // Highlight active tick
+  for (let i = 0; i <= 10; i++) {
+    const t = document.getElementById(`tick-${key}-${i}`);
+    if (t) t.className = 'tick' + (i <= val ? ' active' : '');
+  }
+
+  // Pulse the slider row border
+  const row = document.getElementById('row-' + key);
+  if (val > 0) row.style.borderColor = COLORS[key] + '60';
+  else row.style.borderColor = '';
+}
+
+function getValues() {
+  return {
+    fear:  parseInt(document.getElementById('fear').value),
+    anger: parseInt(document.getElementById('anger').value),
+    sad:   parseInt(document.getElementById('sad').value),
+    joy:   parseInt(document.getElementById('joy').value)
+  };
+}
+
+function analyze() {
+  const v = getValues();
+  const result = computeResult(v);
+  showResult(result, v);
+}
+
+function computeResult(v) {
+  const { fear, anger, sad, joy } = v;
+  const all = [fear, anger, sad, joy];
+  const maxVal = Math.max(...all);
+  const highCount = all.filter(x => x >= 7).length;
+
+  // Condition 1: Zero
+  if (fear === 0 && anger === 0 && sad === 0 && joy === 0) {
+    return {
+      type: 'zero',
+      icon: '🔇',
+      title: 'Нет эмоционального отклика',
+      text: 'Вы не отметили ни одной эмоции. Попробуйте прислушаться к себе внимательнее. Возможно, вы подавляете свои чувства, либо ситуация действительно не вызвала у вас никакого отклика.'
+    };
+  }
+
+  // Condition 2: Storm
+  if (highCount >= 3) {
+    return {
+      type: 'storm',
+      icon: '🌪',
+      title: 'Эмоциональный перегруз',
+      text: 'Вы испытываете мощный эмоциональный коктейль. Когда интенсивность сразу нескольких эмоций настолько высока, мозг перегружается. Первое, что вам нужно сделать сейчас — взять паузу и физиологически успокоиться, прежде чем принимать какие-либо управленческие решения.'
+    };
+  }
+
+  // Condition 3: Drive
+  if (joy >= 5 && anger >= 2 && anger <= 5 && fear <= 3 && sad <= 3) {
+    return {
+      type: 'drive',
+      icon: '⚡',
+      title: 'Рабочий драйв',
+      text: 'Согласно теории, сочетание выраженной радости и небольшой доли гнева — это то, что называют «драйвом» или энтузиазмом. Гнев даёт энергию для преодоления препятствий, а радость направляет её в креативное русло. Отличное состояние для старта сложных проектов!'
+    };
+  }
+
+  // Condition 4: Resentment
+  if (anger >= 5 && sad >= 5 && fear < 5 && joy < 5) {
+    return {
+      type: 'warning',
+      icon: '💢',
+      title: 'Обида / Чувство несправедливости',
+      text: 'Гнев в сочетании с печалью часто сигнализирует об обиде или чувстве несправедливости. Гнев требует защитить свои интересы, а печаль говорит о неудовлетворённых потребностях. Задайте себе вопрос: чьи действия нарушили ваши границы и что именно вы потеряли в этой ситуации?'
+    };
+  }
+
+  // Condition 5: Defensive aggression
+  if (anger >= 5 && fear >= 5 && sad < 5 && joy < 5) {
+    return {
+      type: 'warning',
+      icon: '🛡',
+      title: 'Тревожная агрессия / Оборона',
+      text: 'Высокий уровень страха и гнева — это классическая реакция защиты, изначально связанная с выживанием. Страх сигнализирует об угрозе вашей безопасности или статусу, а гнев мобилизует силы для обороны. Подумайте: что именно угрожает вашим позициям в этой ситуации?'
+    };
+  }
+
+  // Condition 6: Anxiety / Helplessness
+  if (fear >= 5 && sad >= 5 && anger < 5 && joy < 5) {
+    return {
+      type: 'sad-fear',
+      icon: '🌧',
+      title: 'Тревога / Бессилие',
+      text: 'Страх и печаль часто сливаются в тревогу и ощущение бессилия. Печаль фокусирует вас на уже случившейся потере или ошибке, а страх заставляет опасаться будущих последствий. Постарайтесь перевести фокус на то, на что вы реально можете повлиять прямо сейчас.'
+    };
+  }
+
+  // Condition 7: Dominant anger
+  if (anger >= 6 && fear < 4 && sad < 4 && joy < 4) {
+    return {
+      type: 'storm',
+      icon: '🔥',
+      title: 'Доминирующий гнев',
+      text: 'Доминирующий гнев. Согласно теории, эта эмоция мотивирует защищать свои интересы. Подумайте, кто или что в этой ситуации нарушило ваши планы? Используйте энергию гнева не для открытого конфликта, а для установления чётких правил работы с коллегами.'
+    };
+  }
+
+  // Condition 8: Dominant fear
+  if (fear >= 6 && anger < 4 && sad < 4 && joy < 4) {
+    return {
+      type: 'sad-fear',
+      icon: '😰',
+      title: 'Доминирующий страх',
+      text: 'Доминирующий страх. Эта эмоция мотивирует думать о безопасности. Чего именно вы опасаетесь в этой ситуации? Попробуйте перевести страх в план управления рисками: выпишите, что самое худшее может случиться и как этого избежать.'
+    };
+  }
+
+  // Condition 9: Dominant sadness
+  if (sad >= 6 && fear < 4 && anger < 4 && joy < 4) {
+    return {
+      type: 'info',
+      icon: '💧',
+      title: 'Доминирующая печаль',
+      text: 'Доминирующая печаль. Печаль помогает сфокусироваться на анализе. Эта эмоция даёт вам сигнал остановиться и переосмыслить ситуацию. Сделайте паузу: что именно пошло не так и какие выводы вы можете сделать на будущее?'
+    };
+  }
+
+  // Condition 10: Dominant joy
+  if (joy >= 6 && fear < 4 && anger < 4 && sad < 4) {
+    return {
+      type: 'drive',
+      icon: '✨',
+      title: 'Доминирующая радость',
+      text: 'Доминирующая радость. Эта эмоция способствует креативному мышлению и выходу за рамки стереотипов. Сигнализирует о том, что ваши потребности удовлетворены. Запомните этот паттерн — какие именно действия привели к такому результату?'
+    };
+  }
+
+  // Condition 11: Low intensity / Calm
+  if (maxVal <= 3) {
+    return {
+      type: 'calm',
+      icon: '🌿',
+      title: 'Спокойствие / Низкая интенсивность',
+      text: 'Интенсивность ваших эмоций низкая (от 1 до 3). Вы находитесь в ровном, спокойном состоянии. Это хорошая база для конструктивного диалога и выполнения рутинной работы, не требующей высоких эмоциональных затрат.'
+    };
+  }
+
+  // Condition 12: Fallback
+  return {
+    type: 'neutral',
+    icon: '🎭',
+    title: 'Сложный эмоциональный коктейль',
+    text: 'Вы испытываете сложный коктейль эмоций. Каждая из них даёт свой сигнал: гнев требует защиты, страх ищет безопасности, печаль анализирует, а радость мотивирует. Попробуйте выделить самую сильную из них и задать себе вопрос: о чём она меня предупреждает?'
+  };
+}
+
+function showResult(result, v) {
+  const box = document.getElementById('result-box');
+  const icon = document.getElementById('result-icon');
+  const title = document.getElementById('result-title');
+  const text = document.getElementById('result-text');
+  const barsEl = document.getElementById('emotion-bars');
+  const resetBtn = document.getElementById('btn-reset');
+
+  // Remove all type classes
+  box.className = 'result-box show ' + result.type;
+  icon.textContent = result.icon;
+  title.textContent = result.title;
+  text.textContent = result.text;
+
+  // Build emotion bars
+  barsEl.innerHTML = ['fear','anger','sad','joy'].map(key => {
+    const val = v[key];
+    const pct = (val / 10) * 100;
+    return `<div class="ebar">
+      <div class="ebar-track">
+        <div class="ebar-fill" id="ebar-${key}" style="height:0%;background:${COLORS[key]}20"></div>
+      </div>
+      <div class="ebar-label" style="color:${COLORS[key]}">${LABELS[key]}</div>
+      <div class="ebar-num" style="color:${COLORS[key]}">${val}</div>
+    </div>`;
+  }).join('');
+
+  // Animate bars
+  setTimeout(() => {
+    ['fear','anger','sad','joy'].forEach(key => {
+      const fill = document.getElementById('ebar-' + key);
+      if (fill) {
+        const pct = (v[key] / 10) * 100;
+        fill.style.height = pct + '%';
+        fill.style.background = COLORS[key];
+      }
+    });
+  }, 80);
+
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  resetBtn.classList.add('show');
+}
+
+function reset() {
+  ['fear','anger','sad','joy'].forEach(key => {
+    document.getElementById(key).value = 0;
+    updateSlider(key);
+  });
+  document.getElementById('situation').value = '';
+  document.getElementById('result-box').className = 'result-box';
+  document.getElementById('btn-reset').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
