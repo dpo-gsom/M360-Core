@@ -909,7 +909,7 @@ function showToast(type, title, body) {
   tBody.textContent = body;
   toast.classList.add('show');
   if (toastTimer) clearTimeout(toastTimer);
-  const dur = type === 'error' || type === 'warning' ? 4200 : 1800;
+  const dur = type === 'error' || type === 'warning' ? 10000 : 8000;
   toastTimer = setTimeout(() => toast.classList.remove('show'), dur);
 }
 
