@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTD: Обработка входящих</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    margin-bottom: 18px;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #495761;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .progress-bar-bg {
+    background: #dde3e7;
+    border-radius: 6px;
+    height: 7px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    background: #C31532;
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s ease;
+  }
+
+  /* CARD */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    box-shadow: 0 2px 12px rgba(0,59,72,0.10);
+    border: 1.5px solid #e2e8ec;
+    transition: all 0.25s;
+  }
+
+  /* SOURCE BADGE */
+  .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0f4f6;
+    border: 1px solid #dde3e7;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #495761;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .source-icon {
+    font-size: 16px;
+  }
+
+  /* MESSAGE BUBBLE */
+  .message-bubble {
+    background: #f7f9fb;
+    border-left: 4px solid #003B48;
+    border-radius: 0 10px 10px 0;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #2a3540;
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+  .message-sender {
+    font-weight: 700;
+    color: #003B48;
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  .message-subject {
+    font-weight: 600;
+    color: #495761;
+    font-size: 12px;
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+
+  /* QUESTION */
+  .question-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #003B48;
+    margin-bottom: 6px;
+  }
+  .question-hint {
+    font-size: 13px;
+    color: #7a8e96;
+    margin-bottom: 18px;
+  }
+
+  /* STEP INDICATOR */
+  .step-indicator {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dde3e7;
+    transition: background 0.3s;
+  }
+  .step-dot.active { background: #C31532; }
+  .step-dot.done { background: #003B48; }
+
+  /* ANSWER BUTTONS */
+  .answers {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .btn-answer {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 2px solid #dde3e7;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    color: #495761;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+  }
+  .btn-answer:hover {
+    border-color: #003B48;
+    color: #003B48;
+    background: #f0f6f8;
+  }
+  .btn-answer.correct {
+    border-color: #1b8c5e;
+    background: #e9f7f0;
+    color: #1b8c5e;
+  }
+  .btn-answer.wrong {
+    border-color: #C31532;
+    background: #fdeaea;
+    color: #C31532;
+  }
+  .btn-answer.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* FOLDER BUTTONS */
+  .folders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .btn-folder {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 2px solid #dde3e7;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    color: #495761;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn-folder:hover {
+    border-color: #003B48;
+    color: #003B48;
+    background: #f0f6f8;
+  }
+  .btn-folder .folder-icon { font-size: 20px; }
+  .btn-folder .folder-label { font-size: 11px; color: #7a8e96; font-weight: 400; }
+  .btn-folder.correct {
+    border-color: #1b8c5e;
+    background: #e9f7f0;
+    color: #1b8c5e;
+  }
+  .btn-folder.wrong {
+    border-color: #C31532;
+    background: #fdeaea;
+    color: #C31532;
+  }
+
+  /* FEEDBACK BOX */
+  .feedback {
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .feedback.correct-fb {
+    background: #e9f7f0;
+    border-left: 4px solid #1b8c5e;
+    color: #155c40;
+    display: block;
+  }
+  .feedback.wrong-fb {
+    background: #fdeaea;
+    border-left: 4px solid #C31532;
+    color: #8a1121;
+    display: block;
+  }
+  .feedback-icon { font-size: 16px; margin-right: 6px; }
+
+  /* OUTCOME BADGE */
+  .outcome-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  /* NEXT BUTTON */
+  .btn-next {
+    width: 100%;
+    padding: 14px;
+    background: #003B48;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s;
+    display: none;
+  }
+  .btn-next:hover { background: #C31532; }
+
+  /* INTRO SCREEN */
+  .intro-screen {
+    text-align: center;
+    padding: 10px 0;
+  }
+  .intro-logo {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+  .intro-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #003B48;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .intro-subtitle {
+    font-size: 15px;
+    color: #495761;
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+  .intro-context {
+    background: #f0f4f6;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 18px 0;
+    text-align: left;
+    font-size: 14px;
+    color: #2a3540;
+    line-height: 1.6;
+  }
+  .intro-context strong { color: #003B48; }
+  .intro-chars {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 14px 0 20px;
+    flex-wrap: wrap;
+  }
+  .char-chip {
+    background: #fff;
+    border: 1.5px solid #dde3e7;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #495761;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-start {
+    background: #C31532;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 40px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s;
+    width: 100%;
+  }
+  .btn-start:hover { background: #a01128; }
+
+  /* FINAL SCREEN */
+  .final-screen { text-align: center; }
+  .final-trophy { font-size: 56px; margin-bottom: 16px; }
+  .final-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #003B48;
+    margin-bottom: 8px;
+  }
+  .final-sub {
+    font-size: 15px;
+    color: #495761;
+    margin-bottom: 22px;
+    line-height: 1.6;
+  }
+  .final-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .stat-card {
+    background: #f0f4f6;
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 800;
+    color: #C31532;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: #7a8e96;
+    margin-top: 2px;
+  }
+  .final-results {
+    text-align: left;
+    background: #f7f9fb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .final-results-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #003B48;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #e2e8ec;
+    font-size: 13px;
+    color: #2a3540;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-icon { font-size: 16px; min-width: 22px; }
+  .result-outcome {
+    font-weight: 700;
+    color: #003B48;
+    min-width: 130px;
+    font-size: 12px;
+  }
+  .btn-restart {
+    background: #003B48;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 30px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s;
+    width: 100%;
+  }
+  .btn-restart:hover { background: #C31532; }
+
+  /* GTD FLOW MINI */
+  .gtd-flow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #7a8e96;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .gtd-step {
+    background: #f0f4f6;
+    border-radius: 6px;
+    padding: 3px 8px;
+    color: #495761;
+    font-weight: 500;
+  }
+  .gtd-step.current {
+    background: #003B48;
+    color: #fff;
+  }
+  .gtd-arrow { color: #aab5bb; font-size: 10px; }
+
+  @media (max-width: 480px) {
+    .card { padding: 20px 16px 18px; }
+    .folders { grid-template-columns: 1fr 1fr; }
+    .final-stats { grid-template-columns: 1fr 1fr; }
+    .intro-title { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const CASES = [
+  {
+    id: 1,
+    source: "📧",
+    sourceLabel: "Email — Автоматическая рассылка",
+    sender: "noreply@soft-vendor.com",
+    subject: "Вебинар: Как ИИ меняет рынок!",
+    text: "Зарегистрируйтесь сегодня, чтобы узнать тренды 2026 года.",
+    outcome: "trash",
+    outcomeLabel: "🗑️ В мусор",
+    outcomeColor: "#8a8a8a",
+    steps: [
+      {
+        question: "Шаг 1: Требует ли это сообщение действия от вас?",
+        hint: "Нужно ли что-то сделать лично вам?",
+        options: ["Да, требует", "Нет"],
+        correct: 1,
+        wrongFeedback: "Это автоматическая рассылка. Никакого действия от вас не ожидается — только маркетинговый шум.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Куда отправить это сообщение?",
+        hint: "Выберите подходящую папку",
+        isFolderPicker: true,
+        correct: "trash",
+        wrongFeedback: "Это информационный шум без связи с вашими целями. Единственное место для него — корзина.",
+        gtdStep: 1
+      }
+    ],
+    comment: "Верно. Это не имеет отношения к вашим целям. Безжалостно удаляйте инфошум, чтобы он не отвлекал внимание."
+  },
+  {
+    id: 2,
+    source: "💬",
+    sourceLabel: "Telegram — Личное сообщение",
+    sender: "Катя (Новичок)",
+    text: "Шеф, я тут подумала... А может нам в отдел купить настольный футбол или пуфики? Увидела у айтишников, так классно!",
+    outcome: "someday",
+    outcomeLabel: "💡 В список «Может быть»",
+    outcomeColor: "#7a5af8",
+    steps: [
+      {
+        question: "Шаг 1: Требует ли это сообщение действия прямо сейчас?",
+        hint: "Есть ли срочность? Нужно ли реагировать немедленно?",
+        options: ["Да, надо сделать", "Нет, не срочно"],
+        correct: 1,
+        wrongFeedback: "Сейчас нет ни бюджета, ни времени. Это не срочная инициатива — не нужно действовать немедленно.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Куда отправить эту идею?",
+        hint: "Инициатива неплохая, но не сейчас",
+        isFolderPicker: true,
+        correct: "someday",
+        wrongFeedback: "Идею не стоит выбрасывать — она может пригодиться. Но и срочности нет. Правильное место — список «Может быть».",
+        gtdStep: 1
+      }
+    ],
+    comment: "Отлично. Вы не убили инициативу отказом, но и не стали тратить время сейчас. Запишите в идеи — обсудите перед новогодним корпоративом."
+  },
+  {
+    id: 3,
+    source: "🏢",
+    sourceLabel: "Корпоративный портал — Уведомление",
+    sender: "Отдел HR",
+    text: "Утверждён график отпусков и производственный календарь на следующий год. Во вложении обновлённый шаблон заявлений на отгул. Сохраните себе.",
+    outcome: "archive",
+    outcomeLabel: "🗂️ В архив",
+    outcomeColor: "#0ea5a0",
+    steps: [
+      {
+        question: "Шаг 1: Требует ли это сообщение каких-либо действий?",
+        hint: "Нужно что-то сделать или просто сохранить?",
+        options: ["Да, нужно действие", "Нет, это справочная информация"],
+        correct: 1,
+        wrongFeedback: "Здесь нет задачи — только информация для хранения. Действие — 'сохранить', а не задача в системе.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Куда сохранить эти документы?",
+        hint: "Они понадобятся позже как справочник",
+        isFolderPicker: true,
+        correct: "archive",
+        wrongFeedback: "Это справочная информация — её нужно сохранить, чтобы найти, когда сотрудник придёт за отпуском.",
+        gtdStep: 1
+      }
+    ],
+    comment: "Правильно. Информацию нужно сохранить в папку «Справочное», чтобы быстро найти, когда Алексей или Катя придут просить отпуск."
+  },
+  {
+    id: 4,
+    source: "💼",
+    sourceLabel: "Корпоративный мессенджер (Slack / MS Teams)",
+    sender: "Алексей (Ветеран)",
+    text: "Я скинул тебе в личку ссылку на доступ к серверу аналитики для нового стажёра. Нажми «Одобрить», иначе он сидит без дела уже час.",
+    outcome: "do_now",
+    outcomeLabel: "⚡ Выполнить сразу",
+    outcomeColor: "#C31532",
+    steps: [
+      {
+        question: "Шаг 1: Требуется действие?",
+        hint: "Нужно что-то сделать?",
+        options: ["Да", "Нет"],
+        correct: 0,
+        wrongFeedback: "Коллега ждёт разблокировки. Это чёткий запрос на конкретное действие.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Это займёт больше 2 минут?",
+        hint: "Оцените реальное время на выполнение",
+        options: ["Да, больше 2 минут", "Нет, меньше 2 минут"],
+        correct: 1,
+        wrongFeedback: "Нажать одну кнопку «Одобрить» — это буквально 30 секунд. Откладывать не стоит.",
+        gtdStep: 2
+      }
+    ],
+    comment: "Бинго! Нажать одну кнопку — 30 секунд. Откладывать такие задачи — значит создавать «узкое горлышко» и тормозить работу всей команды."
+  },
+  {
+    id: 5,
+    source: "📧",
+    sourceLabel: "Email — Пометка «Срочно»",
+    sender: "Босс",
+    text: "Иван, мы сейчас на созвоне с клиентом. Срочно перешли мне ту эксельку с расчётами по «Альфе», которую мы смотрели в пятницу!",
+    outcome: "do_now",
+    outcomeLabel: "⚡ Выполнить сразу",
+    outcomeColor: "#C31532",
+    steps: [
+      {
+        question: "Шаг 1: Требуется действие?",
+        hint: "Да или нет?",
+        options: ["Да", "Нет"],
+        correct: 0,
+        wrongFeedback: "Это срочный запрос от руководителя в разгар созвона с клиентом. Действие однозначно требуется.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Это займёт больше 2 минут?",
+        hint: "Найти письмо в «Отправленных» и переслать",
+        options: ["Да, больше 2 минут", "Нет, меньше 2 минут"],
+        correct: 1,
+        wrongFeedback: "Найти письмо в «Отправленных» и переслать — это максимум 1 минута. Записывать в список — значит подвести босса и клиента.",
+        gtdStep: 2
+      }
+    ],
+    comment: "Верно. Найти письмо в «Отправленных» и переслать — это 1 минута. Если вы запишете это в ежедневник, клиент уже уйдёт со звонка."
+  },
+  {
+    id: 6,
+    source: "📋",
+    sourceLabel: "Таск-трекер (Jira / Asana)",
+    sender: "Финансовый директор",
+    text: "Необходимо выгрузить исторические данные по всем продажам за 3 года, очистить от дублей и свести в сводную таблицу к четвергу.",
+    outcome: "delegate",
+    outcomeLabel: "👤 Делегировать",
+    outcomeColor: "#e08a00",
+    steps: [
+      {
+        question: "Шаг 1: Требуется действие?",
+        hint: "Нужно ли что-то сделать?",
+        options: ["Да", "Нет"],
+        correct: 0,
+        wrongFeedback: "Задача от ФД с конкретным дедлайном — это явное требование действия.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Займёт больше 2 минут?",
+        hint: "Это большая аналитическая задача",
+        options: ["Да, точно больше", "Нет, быстро"],
+        correct: 0,
+        wrongFeedback: "Выгрузка и обработка данных за 3 года — это многочасовая работа.",
+        gtdStep: 2
+      },
+      {
+        question: "Шаг 3: Нужно делать это самостоятельно?",
+        hint: "Подумайте: у кого в команде есть нужная экспертиза?",
+        options: ["Да, сам(а)", "Нет, делегировать"],
+        correct: 1,
+        wrongFeedback: "У вас есть сильный аналитик Алексей. Сбор сырых данных — не задача руководителя.",
+        gtdStep: 3
+      }
+    ],
+    comment: "Отличный выбор. Вы руководитель, ваше время стоит дорого. Сбор сырых данных нужно поручить эксперту-аналитику (Алексею)."
+  },
+  {
+    id: 7,
+    source: "💬",
+    sourceLabel: "Telegram — Сообщение от смежника",
+    sender: "Офис-менеджер",
+    text: "Привет! Нам нужно до конца недели собрать размеры футболок со всех твоих сотрудников (15 человек) для заказа мерча на корпоратив.",
+    outcome: "delegate",
+    outcomeLabel: "👤 Делегировать",
+    outcomeColor: "#e08a00",
+    steps: [
+      {
+        question: "Шаг 1: Требуется действие?",
+        hint: "Нужно ли реагировать?",
+        options: ["Да", "Нет"],
+        correct: 0,
+        wrongFeedback: "Есть чёткий запрос с дедлайном «до конца недели». Игнорировать нельзя.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Займёт больше 2 минут?",
+        hint: "Нужно опросить 15 человек",
+        options: ["Да, займёт время", "Нет, быстро"],
+        correct: 0,
+        wrongFeedback: "Обойти 15 человек и собрать данные — это не 2 минуты.",
+        gtdStep: 2
+      },
+      {
+        question: "Шаг 3: Нужно делать это самому руководителю?",
+        hint: "Это можно поручить кому-то из команды?",
+        options: ["Да, сам(а)", "Нет, делегировать"],
+        correct: 1,
+        wrongFeedback: "Сбор размеров футболок — не задача руководителя. Это идеальное безопасное задание для новичка.",
+        gtdStep: 3
+      }
+    ],
+    comment: "Верно! Сбор размеров футболок — идеальная безопасная задача для новичка (Кати). Она прокачает коммуникацию с отделом, а вы освободите себе полчаса."
+  },
+  {
+    id: 8,
+    source: "📒",
+    sourceLabel: "Личный блокнот — Ваша заметка",
+    sender: "Ваша мысль",
+    text: "Алексей вчера агрессивно ответил на совещании. Нужно провести с ним встречу тет-а-тет (1-on-1), разобраться в причинах недовольства и дать обратную связь.",
+    outcome: "calendar",
+    outcomeLabel: "📅 Запланировать",
+    outcomeColor: "#1b8c5e",
+    steps: [
+      {
+        question: "Шаг 1: Требуется действие?",
+        hint: "Нужно ли что-то предпринять?",
+        options: ["Да", "Нет"],
+        correct: 0,
+        wrongFeedback: "Ситуацию в команде нельзя игнорировать. Это явная задача для руководителя.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Займёт больше 2 минут?",
+        hint: "Встреча 1-on-1 — это серьёзный разговор",
+        options: ["Да, 40-60 минут", "Нет, быстро"],
+        correct: 0,
+        wrongFeedback: "Полноценная встреча с обратной связью занимает минимум 40-60 минут.",
+        gtdStep: 2
+      },
+      {
+        question: "Шаг 3: Можно делегировать?",
+        hint: "Кто должен давать обратную связь сотруднику?",
+        options: ["Да, делегировать", "Нет, только я"],
+        correct: 1,
+        wrongFeedback: "Обратная связь и работа с настроением в команде — это прямая задача руководителя. Делегировать нельзя.",
+        gtdStep: 3
+      },
+      {
+        question: "Шаг 4: Это многошаговый проект или одно событие?",
+        hint: "Сколько отдельных действий нужно?",
+        options: ["Проект (много шагов)", "Одно событие"],
+        correct: 1,
+        wrongFeedback: "Встреча 1-on-1 — это одно конкретное событие, а не проект. Нужно просто выбрать время.",
+        gtdStep: 4
+      }
+    ],
+    comment: "Точно. Такие вещи нельзя держать в голове. Выбираем слот в календаре (например, завтра в 15:00) и отправляем инвайт Алексею."
+  },
+  {
+    id: 9,
+    source: "📧",
+    sourceLabel: "Email — От партнёра",
+    sender: "VIP-Клиент «Альфа»",
+    text: "Добрый день. Мы готовы обсудить условия контракта на следующий год. Сможете организовать Zoom-звонок на следующей неделе во вторник или среду в первой половине дня?",
+    outcome: "calendar",
+    outcomeLabel: "📅 Запланировать",
+    outcomeColor: "#1b8c5e",
+    steps: [
+      {
+        question: "Шаг 1: Требуется действие?",
+        hint: "Клиент ожидает ответа",
+        options: ["Да", "Нет"],
+        correct: 0,
+        wrongFeedback: "VIP-клиент написал с конкретным предложением. Это требует ответа и планирования.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Займёт больше 2 минут?",
+        hint: "Учтите сам звонок и подготовку к нему",
+        options: ["Да, займёт время", "Нет, быстро"],
+        correct: 0,
+        wrongFeedback: "Сам звонок и подготовка к нему займут значительно больше 2 минут.",
+        gtdStep: 2
+      },
+      {
+        question: "Шаг 3: Кто должен провести этот звонок?",
+        hint: "Это VIP-клиент по контракту на год",
+        options: ["Делегировать команде", "Только я, лично"],
+        correct: 1,
+        wrongFeedback: "VIP-клиент, обсуждение годового контракта — это уровень руководителя, не делегируется.",
+        gtdStep: 3
+      },
+      {
+        question: "Шаг 4: Это одно событие или многошаговый проект?",
+        hint: "Сколько действий нужно для выполнения?",
+        options: ["Многошаговый проект", "Одно событие — звонок"],
+        correct: 1,
+        wrongFeedback: "Само действие — это один конкретный звонок. Нужно забронировать время в календаре.",
+        gtdStep: 4
+      }
+    ],
+    comment: "Верно. Это жёстко привязанное ко времени событие. Открываем календарь, бронируем слот во вторник и отправляем ссылку клиенту."
+  },
+  {
+    id: 10,
+    source: "📱",
+    sourceLabel: "СМС / Мессенджер",
+    sender: "Бухгалтер Мария",
+    text: "Зайди ко мне в 304 кабинет на 3 этаже, нужно поставить живую подпись и печать на закрывающих актах по подрядчикам до конца недели.",
+    outcome: "next_action",
+    outcomeLabel: "✅ В список задач (Next Actions)",
+    outcomeColor: "#1878c8",
+    steps: [
+      {
+        question: "Шаг 1: Требуется действие?",
+        hint: "Нужно что-то сделать?",
+        options: ["Да", "Нет"],
+        correct: 0,
+        wrongFeedback: "Право подписи — это ваша задача с конкретным дедлайном.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Займёт больше 2 минут?",
+        hint: "Нужно дойти до 3 этажа и подписать стопку актов",
+        options: ["Да", "Нет"],
+        correct: 0,
+        wrongFeedback: "Поход на другой этаж и подпись документов — это больше 2 минут.",
+        gtdStep: 2
+      },
+      {
+        question: "Шаг 3: Можно делегировать?",
+        hint: "Кто имеет право подписи?",
+        options: ["Да, делегировать", "Нет, только я"],
+        correct: 1,
+        wrongFeedback: "Право подписи есть только у вас. Делегировать невозможно.",
+        gtdStep: 3
+      },
+      {
+        question: "Шаг 4: Это проект или одно действие?",
+        hint: "Сколько шагов нужно?",
+        options: ["Проект (много шагов)", "Одно действие — подписать"],
+        correct: 1,
+        wrongFeedback: "Это одно конкретное действие — дойти и подписать.",
+        gtdStep: 4
+      },
+      {
+        question: "Шаг 5: Нужно жёстко бронировать время в календаре?",
+        hint: "Есть ли конкретный час или можно сделать попутно?",
+        options: ["Да, в календарь", "Нет, сделаю попутно"],
+        correct: 1,
+        wrongFeedback: "Бухгалтерия открыта весь день. Это задача «сделать, когда буду проходить мимо» — без жёсткой привязки ко времени.",
+        gtdStep: 5
+      }
+    ],
+    comment: "Супер. Вы добавили это в список «Сделать, когда буду проходить мимо бухгалтерии». Нет смысла жёстко бронировать под это время в календаре, это делается попутно."
+  },
+  {
+    id: 11,
+    source: "📧",
+    sourceLabel: "Email — От Босса",
+    sender: "Босс",
+    text: "В этом квартале твой отдел должен полностью перейти на новую CRM-систему. Подготовь план миграции, обеспечь обучение команды и настрой новые дашборды.",
+    outcome: "project",
+    outcomeLabel: "🗂 В список проектов",
+    outcomeColor: "#495761",
+    steps: [
+      {
+        question: "Шаг 1: Требуется действие?",
+        hint: "Есть ли здесь задача для вас?",
+        options: ["Да", "Нет"],
+        correct: 0,
+        wrongFeedback: "Это квартальная цель от руководителя — явная задача.",
+        gtdStep: 0
+      },
+      {
+        question: "Шаг 2: Займёт больше 2 минут?",
+        hint: "Миграция CRM — это серьёзная работа",
+        options: ["Да, значительно", "Нет"],
+        correct: 0,
+        wrongFeedback: "Миграция целого отдела на новую систему — это многонедельная работа.",
+        gtdStep: 2
+      },
+      {
+        question: "Шаг 3: Нужно делать самому или делегировать?",
+        hint: "Кто отвечает за организацию перехода отдела?",
+        options: ["Делегировать всё", "Организовывать самому(й)"],
+        correct: 1,
+        wrongFeedback: "Организация процесса перехода отдела — задача руководителя. Отдельные части можно делегировать, но общее управление — ваше.",
+        gtdStep: 3
+      },
+      {
+        question: "Шаг 4: Это одно действие или несколько шагов?",
+        hint: "Миграция, обучение, дашборды — это...",
+        options: ["Одно действие", "Несколько связанных шагов"],
+        correct: 1,
+        wrongFeedback: "Миграция данных, обучение команды и настройка дашбордов — это три разных направления. Это проект.",
+        gtdStep: 4
+      }
+    ],
+    comment: "Отлично. Эту задачу нельзя просто «сделать». Это полноценный проект. Вы заносите его в список проектов и первым делом планируете Следующий шаг — например, «Запросить доступы у IT»."
+  }
+];
+
+const FOLDERS = [
+  { id: "trash",      label: "В мусор",          sub: "Trash",           icon: "🗑️" },
+  { id: "someday",    label: "Может быть",        sub: "Someday/Maybe",   icon: "💡" },
+  { id: "archive",    label: "В архив",           sub: "Reference",       icon: "🗂️" },
+  { id: "do_now",     label: "Выполнить сразу",   sub: "2 минуты",        icon: "⚡" },
+  { id: "delegate",   label: "Делегировать",      sub: "Delegate",        icon: "👤" },
+  { id: "calendar",   label: "Запланировать",     sub: "Calendar",        icon: "📅" },
+  { id: "next_action",label: "Список задач",      sub: "Next Actions",    icon: "✅" },
+  { id: "project",    label: "В проекты",         sub: "Projects",        icon: "📁" },
+];
+
+const GTD_STEPS = [
+  "Входящее", "Требует действия?", "2 минуты?", "Делегировать?", "Один шаг?", "В календарь?"
+];
+
+const OUTCOME_INFO = {
+  trash:       { label: "🗑️ В мусор",           desc: "Информационный шум" },
+  someday:     { label: "💡 Может быть",         desc: "Инициатива без срочности" },
+  archive:     { label: "🗂️ В архив",            desc: "Справочная информация" },
+  do_now:      { label: "⚡ Сразу",              desc: "Правило 2 минут" },
+  delegate:    { label: "👤 Делегировать",       desc: "Не моя задача" },
+  calendar:    { label: "📅 Календарь",          desc: "Конкретное время" },
+  next_action: { label: "✅ Список задач",       desc: "Контекстная задача" },
+  project:     { label: "📁 Проект",             desc: "Многошаговая цель" },
+};
+
+let state = {
+  screen: 'intro',
+  caseIdx: 0,
+  stepIdx: 0,
+  answered: false,
+  totalCorrect: 0,
+  firstTryCorrect: 0,
+  completedOutcomes: []
+};
+
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'intro') { app.innerHTML = renderIntro(); return; }
+  if (state.screen === 'final') { app.innerHTML = renderFinal(); return; }
+  app.innerHTML = renderCase();
+}
+
+function renderIntro() {
+  return `
+  <div class="card intro-screen">
+    <div class="intro-logo">📥</div>
+    <div class="intro-title">Inbox Zero:<br>Обработка входящих по GTD</div>
+    <div class="intro-subtitle">Интерактивный тренажёр для руководителей</div>
+    <div class="intro-context">
+      <strong>Контекст:</strong> Вы — Иван, руководитель отдела. Утро понедельника. 
+      В вашем inbox накопилось <strong>11 непрочитанных сообщений</strong> из разных каналов.<br><br>
+      Ваша задача — применить метод GTD и принять правильное решение по каждому сообщению: 
+      выбросить, сохранить, делегировать, запланировать или действовать прямо сейчас.
+    </div>
+    <div class="intro-chars">
+      <div class="char-chip">👔 Алексей — ветеран</div>
+      <div class="char-chip">🌟 Катя — новичок</div>
+      <div class="char-chip">👑 Босс</div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;font-size:13px;color:#495761;">
+      <span>📋 11 кейсов</span>
+      <span>🎯 8 исходов GTD</span>
+      <span>⏱ ~10 минут</span>
+    </div>
+    <button class="btn-start" onclick="startGame()">Начать обработку inbox →</button>
+  </div>`;
+}
+
+function renderFinal() {
+  const pct = Math.round((state.firstTryCorrect / 11) * 100);
+  const rows = state.completedOutcomes.map(o => {
+    const inf = OUTCOME_INFO[o.outcome] || {};
+    return `<div class="result-row">
+      <span class="result-icon">${inf.label ? inf.label.split(' ')[0] : '✓'}</span>
+      <span class="result-outcome">${inf.label || o.outcome}</span>
+      <span style="color:#7a8e96;font-size:12px;">${inf.desc || ''}</span>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="card final-screen">
+    <div class="final-trophy">🏆</div>
+    <div class="final-title">Inbox Zero достигнут!</div>
+    <div class="final-sub">Вы успешно обработали все входящие.<br>Паника отменена, фокус восстановлен.</div>
+    <div class="final-stats">
+      <div class="stat-card">
+        <div class="stat-num">${state.firstTryCorrect}</div>
+        <div class="stat-label">из 11 с первой попытки</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${pct}%</div>
+        <div class="stat-label">точность GTD-мышления</div>
+      </div>
+    </div>
+    <div class="final-results">
+      <div class="final-results-title">Что вы сделали с входящими:</div>
+      ${rows}
+    </div>
+    <div style="background:#f7f9fb;border-radius:12px;padding:14px 16px;margin-bottom:18px;text-align:left;font-size:13px;color:#2a3540;line-height:1.7;">
+      <strong style="color:#003B48;">Результат:</strong> Вы спасли Алексея от простоя (2 мин) · Сняли с себя рутинные задачи (делегирование) · Забронировали важные встречи · Сохранили фокус на глобальной цели по CRM.
+    </div>
+    <button class="btn-restart" onclick="restartGame()">🔄 Пройти ещё раз</button>
+  </div>`;
+}
+
+function renderCase() {
+  const c = CASES[state.caseIdx];
+  const step = c.steps[state.stepIdx];
+  const progress = (state.caseIdx / CASES.length) * 100;
+  const isLastStep = state.stepIdx === c.steps.length - 1;
+
+  let gtdFlow = '';
+  const flowSteps = ['Входящее','Действие?','2 мин?','Делегировать?','Один шаг?','Время?'];
+  const maxGtd = c.steps.length;
+  const flowHtml = flowSteps.slice(0, maxGtd + 1).map((s, i) => {
+    const cls = i === step.gtdStep ? 'gtd-step current' : 'gtd-step';
+    return `<span class="${cls}">${s}</span>${i < maxGtd ? '<span class="gtd-arrow">▶</span>' : ''}`;
+  }).join('');
+
+  let stepDots = c.steps.map((_, i) => {
+    let cls = 'step-dot';
+    if (i < state.stepIdx) cls += ' done';
+    else if (i === state.stepIdx) cls += ' active';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+
+  let buttonsHtml = '';
+  if (step.isFolderPicker) {
+    buttonsHtml = `<div class="folders">${FOLDERS.map(f =>
+      `<button class="btn-folder" id="folder-${f.id}" onclick="answerFolder('${f.id}')">
+        <span class="folder-icon">${f.icon}</span>
+        <span>${f.label}</span>
+        <span class="folder-label">${f.sub}</span>
+      </button>`
+    ).join('')}</div>`;
+  } else {
+    buttonsHtml = `<div class="answers">${step.options.map((opt, i) =>
+      `<button class="btn-answer" id="opt-${i}" onclick="answerOption(${i})">${opt}</button>`
+    ).join('')}</div>`;
+  }
+
+  let senderHtml = '';
+  if (c.sender) senderHtml = `<div class="message-sender">${c.sender}</div>`;
+  if (c.subject) senderHtml += `<div class="message-subject">Тема: ${c.subject}</div>`;
+
+  return `
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Кейс ${state.caseIdx + 1} из ${CASES.length}</span>
+      <span style="color:#C31532;font-weight:700;">${Math.round(progress)}%</span>
+    </div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${progress}%"></div></div>
+  </div>
+  <div class="card">
+    <div class="source-badge"><span class="source-icon">${c.source}</span>${c.sourceLabel}</div>
+    <div class="message-bubble">
+      ${senderHtml}
+      ${c.text}
+    </div>
+    <div class="gtd-flow">${flowHtml}</div>
+    <div class="step-indicator">${stepDots}</div>
+    <div class="question-text">${step.question}</div>
+    <div class="question-hint">${step.hint}</div>
+    ${buttonsHtml}
+    <div class="feedback" id="feedback"></div>
+    <button class="btn-next" id="btn-next" onclick="nextStep()">
+      ${isLastStep && state.answered ? 'Следующий кейс →' : 'Продолжить →'}
+    </button>
+  </div>`;
+}
+
+function answerOption(idx) {
+  if (state.answered) return;
+  const c = CASES[state.caseIdx];
+  const step = c.steps[state.stepIdx];
+  const isCorrect = idx === step.correct;
+  state.answered = true;
+
+  document.querySelectorAll('.btn-answer').forEach((b, i) => {
+    b.classList.add('disabled');
+    if (i === step.correct) b.classList.add('correct');
+    if (i === idx && !isCorrect) b.classList.add('wrong');
+  });
+
+  showFeedback(isCorrect, step, c);
+  if (isCorrect && state.stepIdx === 0 && state.caseIdx < CASES.length) {
+    // track first-step correctness per case
+  }
+  document.getElementById('btn-next').style.display = 'block';
+}
+
+function answerFolder(folderId) {
+  if (state.answered) return;
+  const c = CASES[state.caseIdx];
+  const step = c.steps[state.stepIdx];
+  const isCorrect = folderId === step.correct;
+  state.answered = true;
+
+  document.querySelectorAll('.btn-folder').forEach(b => {
+    b.classList.add('disabled');
+    b.onclick = null;
+  });
+  const correctBtn = document.getElementById('folder-' + step.correct);
+  if (correctBtn) correctBtn.classList.add('correct');
+  if (!isCorrect) {
+    const wrongBtn = document.getElementById('folder-' + folderId);
+    if (wrongBtn) wrongBtn.classList.add('wrong');
+  }
+
+  showFeedback(isCorrect, step, c);
+  document.getElementById('btn-next').style.display = 'block';
+}
+
+function showFeedback(isCorrect, step, c) {
+  const isLastStep = state.stepIdx === c.steps.length - 1;
+  const fb = document.getElementById('feedback');
+  if (!fb) return;
+
+  if (isCorrect) {
+    if (isLastStep) {
+      fb.className = 'feedback correct-fb';
+      fb.innerHTML = `<span class="feedback-icon">✅</span><strong>Верно!</strong> ${c.comment}`;
+      // Track first-try (simplified: track if no wrong answers given in this case)
+      state.firstTryCorrect++;
+      state.completedOutcomes.push({ outcome: c.outcome });
+    } else {
+      fb.className = 'feedback correct-fb';
+      fb.innerHTML = `<span class="feedback-icon">✅</span>Правильно! Идём дальше по дереву решений.`;
+    }
+  } else {
+    fb.className = 'feedback wrong-fb';
+    fb.innerHTML = `<span class="feedback-icon">❌</span>${step.wrongFeedback} Попробуйте ещё раз.`;
+    // Re-enable buttons after delay for retry
+    setTimeout(() => {
+      state.answered = false;
+      if (step.isFolderPicker) {
+        document.querySelectorAll('.btn-folder').forEach(b => {
+          b.classList.remove('disabled','correct','wrong');
+          const fid = b.id.replace('folder-','');
+          b.onclick = () => answerFolder(fid);
+        });
+      } else {
+        document.querySelectorAll('.btn-answer').forEach((b, i) => {
+          b.classList.remove('disabled','correct','wrong');
+          b.onclick = () => answerOption(i);
+        });
+      }
+      document.getElementById('btn-next').style.display = 'none';
+      if (fb) fb.className = 'feedback';
+    }, 2200);
+  }
+}
+
+function nextStep() {
+  if (!state.answered) return;
+  const c = CASES[state.caseIdx];
+  const isLastStep = state.stepIdx === c.steps.length - 1;
+
+  if (isLastStep) {
+    state.caseIdx++;
+    state.stepIdx = 0;
+    if (state.caseIdx >= CASES.length) {
+      state.screen = 'final';
+    }
+  } else {
+    state.stepIdx++;
+  }
+  state.answered = false;
+  render();
+}
+
+function startGame() {
+  state.screen = 'game';
+  render();
+}
+
+function restartGame() {
+  state = { screen: 'intro', caseIdx: 0, stepIdx: 0, answered: false, totalCorrect: 0, firstTryCorrect: 0, completedOutcomes: [] };
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

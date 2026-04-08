@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карьерный компас</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #C31532;
+  --dark: #003B48;
+  --slate: #495761;
+  --cream: #FAF8F4;
+  --sand: #F0EDE6;
+  --border: #DDD8CF;
+  --white: #FFFFFF;
+  --gold: #B8963E;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--dark);
+  overflow-x: hidden;
+}
+
+/* ─── DECORATIVE LINES ─── */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
+  z-index: 100;
+}
+
+/* ─── LAYOUT ─── */
+#app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 60px;
+}
+
+/* ─── INTRO SCREEN ─── */
+.intro {
+  text-align: center;
+  animation: fadeUp 0.6s ease both;
+}
+
+.intro-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 20px;
+}
+
+.intro-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 7vw, 60px);
+  font-weight: 900;
+  color: var(--dark);
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.intro-title span {
+  color: var(--red);
+  display: block;
+}
+
+.intro-divider {
+  width: 60px;
+  height: 2px;
+  background: var(--red);
+  margin: 24px auto;
+}
+
+.intro-desc {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--slate);
+  max-width: 480px;
+  margin: 0 auto 32px;
+}
+
+.intro-meta {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.intro-meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.intro-meta-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.intro-meta-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--slate);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--dark);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  padding: 16px 36px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-primary:hover { background: var(--red); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+.intro-author {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--slate);
+  letter-spacing: 0.5px;
+}
+
+/* ─── QUIZ SCREEN ─── */
+.quiz { animation: fadeUp 0.5s ease both; }
+
+.quiz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+
+.quiz-counter {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--slate);
+  white-space: nowrap;
+}
+
+.quiz-counter span { color: var(--red); }
+
+.progress-track {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.quiz-question-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 12px;
+}
+
+.quiz-instruction {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(18px, 4vw, 24px);
+  font-weight: 700;
+  color: var(--dark);
+  line-height: 1.35;
+  margin-bottom: 32px;
+}
+
+.cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.choice-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 24px 20px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+}
+
+.choice-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--dark);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.2s;
+}
+
+.choice-card:hover {
+  border-color: var(--dark);
+  background: var(--sand);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,59,72,0.10);
+}
+
+.choice-card:hover::before { transform: scaleY(1); }
+
+.choice-card.selected {
+  border-color: var(--red);
+  background: #FEF3F4;
+}
+
+.choice-card.selected::before {
+  background: var(--red);
+  transform: scaleY(1);
+}
+
+.choice-card.other-selected {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.card-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sand);
+  border: 1.5px solid var(--border);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--slate);
+  margin-bottom: 14px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.choice-card.selected .card-letter {
+  background: var(--red);
+  color: var(--white);
+  border-color: var(--red);
+}
+
+.card-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--slate);
+  margin-bottom: 14px;
+}
+
+.choice-card.selected .card-text { color: var(--dark); }
+
+.card-anchor {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--border);
+  transition: color 0.2s;
+}
+
+.choice-card.selected .card-anchor { color: var(--red); }
+
+.quiz-hint {
+  text-align: center;
+  font-size: 12px;
+  color: var(--border);
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+
+/* ─── RESULTS SCREEN ─── */
+.results { animation: fadeUp 0.6s ease both; }
+
+.results-hero {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+
+.results-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 16px;
+}
+
+.results-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 5vw, 38px);
+  font-weight: 900;
+  color: var(--dark);
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.anchors-highlight {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.anchor-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.anchor-pill.primary {
+  background: var(--dark);
+  color: var(--white);
+}
+
+.anchor-pill.secondary {
+  background: var(--sand);
+  border: 1.5px solid var(--border);
+  color: var(--dark);
+}
+
+/* ─── SCORES BAR CHART ─── */
+.scores-section {
+  margin-bottom: 36px;
+}
+
+.scores-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 20px;
+}
+
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.score-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark);
+  min-width: 180px;
+}
+
+.score-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: var(--sand);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.score-bar {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--border);
+  transition: width 1s ease;
+}
+
+.score-bar.top { background: var(--red); }
+.score-bar.second { background: var(--dark); }
+
+.score-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--slate);
+  min-width: 20px;
+  text-align: right;
+}
+
+/* ─── ANCHOR DESCRIPTIONS ─── */
+.descriptions-section { margin-bottom: 36px; }
+
+.descriptions-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 20px;
+}
+
+.desc-card {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 22px;
+  margin-bottom: 12px;
+  background: var(--white);
+  position: relative;
+}
+
+.desc-card.highlighted {
+  border-color: var(--red);
+  background: #FEF3F4;
+}
+
+.desc-card.highlighted-2 {
+  border-color: var(--dark);
+  background: #F0F5F6;
+}
+
+.desc-num {
+  position: absolute;
+  top: -12px;
+  left: 18px;
+  background: var(--white);
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--border);
+}
+
+.desc-card.highlighted .desc-num { color: var(--red); background: #FEF3F4; }
+.desc-card.highlighted-2 .desc-num { color: var(--dark); background: #F0F5F6; }
+
+.desc-anchor-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+.desc-text {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--slate);
+}
+
+/* ─── ACTIONS ─── */
+.actions-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  color: var(--dark);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 13px 24px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-secondary:hover { border-color: var(--dark); background: var(--sand); }
+
+/* ─── CANVAS FOR SAVE ─── */
+#save-canvas { display: none; }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-enter {
+  animation: fadeUp 0.35s ease both;
+}
+
+/* ─── SCHEIN FOOTER NOTE ─── */
+.theory-note {
+  margin-top: 32px;
+  padding: 16px 20px;
+  background: var(--sand);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--slate);
+  border-left: 3px solid var(--gold);
+}
+
+@media (max-width: 520px) {
+  .cards-row { grid-template-columns: 1fr; }
+  .actions-row { flex-direction: column; }
+  .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+  .score-label { min-width: 130px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<canvas id="save-canvas"></canvas>
+<div id="app"></div>
+
+<script>
+const PAIRS = [
+  {
+    a: { text: "Возглавить крупное подразделение и отвечать за достижение ключевых бизнес-показателей всей структуры.", anchor: "Менеджмент", key: "management" },
+    b: { text: "Стать признанным экспертом в своей узкой области, к которому обращаются за решением самых сложных профессиональных задач.", anchor: "Техническая компетентность", key: "technical" }
+  },
+  {
+    a: { text: "Работать в условиях полной свободы действий, самостоятельно определяя график, методы и стандарты выполнения своих задач.", anchor: "Автономия", key: "autonomy" },
+    b: { text: "Работать в стабильной компании с чёткими регламентами, понятной системой льгот и гарантией долгосрочной занятости.", anchor: "Безопасность", key: "security" }
+  },
+  {
+    a: { text: "Создать внутри организации принципиально новый проект или продукт, который станет вашим личным достижением и визитной карточкой.", anchor: "Предпринимательство", key: "entrepreneurship" },
+    b: { text: "Получить вызов в виде критически сложной, почти невыполнимой задачи, решение которой потребует предельной концентрации усилий.", anchor: "Вызов", key: "challenge" }
+  },
+  {
+    a: { text: "Иметь возможность гибко совмещать работу и личные интересы, сохраняя достаточно времени на семью и хобби.", anchor: "Стиль жизни", key: "lifestyle" },
+    b: { text: "Заниматься работой, которая позволяет реализовывать ваши личные ценности и приносить реальную пользу обществу или коллегам.", anchor: "Служение / Увлечённость", key: "service" }
+  },
+  {
+    a: { text: "Управлять процессами и бюджетами, координируя работу разных функциональных блоков для успеха всей организации.", anchor: "Менеджмент", key: "management" },
+    b: { text: "Реализовать идею собственного внутреннего стартапа, самостоятельно подбирая команду и выводя продукт на рынок.", anchor: "Предпринимательство", key: "entrepreneurship" }
+  },
+  {
+    a: { text: "Постоянно совершенствовать своё мастерство в выбранной профессии, становясь всё более ценным специалистом-практиком.", anchor: "Техническая компетентность", key: "technical" },
+    b: { text: "Работать в организации, где выстроена надёжная система социального обеспечения и предсказуемый карьерный путь на годы вперёд.", anchor: "Безопасность", key: "security" }
+  },
+  {
+    a: { text: "Выполнять задачи своим способом, без жёсткого контроля со стороны руководства и привязки к офисному распорядку.", anchor: "Автономия", key: "autonomy" },
+    b: { text: "Регулярно браться за решение проблем, с которыми никто в компании не смог справиться до вас.", anchor: "Вызов", key: "challenge" }
+  },
+  {
+    a: { text: "Вкладывать силы в проекты, которые делают жизнь людей лучше или решают важные экологические и социальные проблемы.", anchor: "Служение / Увлечённость", key: "service" },
+    b: { text: "Занять высокую административную должность, которая даёт статус и право влиять на стратегические решения всей компании.", anchor: "Менеджмент", key: "management" }
+  },
+  {
+    a: { text: "Выбирать место работы в зависимости от того, насколько корпоративная культура уважает границы личного времени сотрудника.", anchor: "Стиль жизни", key: "lifestyle" },
+    b: { text: "Совершенствовать свои навыки до уровня, когда вы сможете решать профессиональные задачи любой степени сложности.", anchor: "Техническая компетентность", key: "technical" }
+  },
+  {
+    a: { text: "Иметь долгосрочный контракт и уверенность в завтрашнем дне, даже если работа со временем станет рутинной.", anchor: "Безопасность", key: "security" },
+    b: { text: "Рискнуть стабильностью ради возможности запустить новое направление бизнеса с неочевидными перспективами.", anchor: "Предпринимательство", key: "entrepreneurship" }
+  }
+];
+
+const ANCHOR_INFO = {
+  management:     { name: "Менеджмент",               num: 1, desc: "Способность видеть организацию как единое целое, связывать разрозненные функциональные блоки, управлять бизнес-процессом. Ключевые ценности — возможности для лидерства, повышение ответственности и вклад в успех своей организации." },
+  technical:      { name: "Техническая компетентность", num: 2, desc: "Фокус на своей профессиональной области. Стремление быть мастером своего дела, развивать и совершенствовать навыки, решать самые сложные задачи в своей специализации." },
+  autonomy:       { name: "Автономия / Независимость", num: 3, desc: "Сложно следовать установленным правилам и процедурам. Эти люди любят выполнять работу своим способом и по собственным стандартам, склонны организовывать собственные проекты." },
+  entrepreneurship:{ name: "Предпринимательство",      num: 4, desc: "Нравится создавать стартапы, начинать новые проекты внутри организации. Выводить на рынок новые товары и услуги, которые могут быть отождествлены с их личными усилиями." },
+  service:        { name: "Служение / Увлечённость",   num: 5, desc: "Вовлечённость в работу, любовь к своему делу. Реализация в работе личных ценностей — желание приносить реальную пользу обществу, коллегам или конкретным людям." },
+  lifestyle:      { name: "Стиль жизни",               num: 6, desc: "Карьера ассоциируется с общим стилем жизни. Важен баланс работы и личной жизни, уважение работодателя к личным и семейным потребностям сотрудника." },
+  challenge:      { name: "Вызов",                     num: 7, desc: "Готовность к сложным задачам и преодолению препятствий. Вызовы воспринимаются не как угроза, а как возможность проявить себя. Скука — главный враг этих людей." },
+  security:       { name: "Безопасность",              num: 8, desc: "Ценность стабильности и предсказуемости. Поиск постоянной занятости с минимальной вероятностью увольнения. Потребность в безопасности может ограничивать карьерный выбор, но даёт устойчивость." }
+};
+
+let state = {
+  screen: 'intro',
+  currentPair: 0,
+  scores: { management: 0, technical: 0, autonomy: 0, entrepreneurship: 0, service: 0, lifestyle: 0, challenge: 0, security: 0 },
+  answers: [],
+  transitioning: false
+};
+
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'intro') app.innerHTML = renderIntro();
+  else if (state.screen === 'quiz') app.innerHTML = renderQuiz();
+  else if (state.screen === 'results') app.innerHTML = renderResults();
+}
+
+function renderIntro() {
+  return `<div class="intro">
+    <div class="intro-eyebrow">Диагностика · Теория Э. Шейна</div>
+    <div class="intro-title">Карьерный<span>Компас</span></div>
+    <div class="intro-divider"></div>
+    <p class="intro-desc">Узнайте, какие внутренние мотивы управляют вашими карьерными решениями. 10 пар утверждений помогут выявить ваши ведущие карьерные якоря.</p>
+    <div class="intro-meta">
+      <div class="intro-meta-item">
+        <div class="intro-meta-num">10</div>
+        <div class="intro-meta-label">пар выборов</div>
+      </div>
+      <div class="intro-meta-item">
+        <div class="intro-meta-num">8</div>
+        <div class="intro-meta-label">якорей карьеры</div>
+      </div>
+      <div class="intro-meta-item">
+        <div class="intro-meta-num">5</div>
+        <div class="intro-meta-label">минут</div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Начать диагностику →</button>
+    <div class="intro-author">По методологии Эдгара Шейна · Career Anchors</div>
+  </div>`;
+}
+
+function renderQuiz() {
+  const pair = PAIRS[state.currentPair];
+  const pct = (state.currentPair / PAIRS.length) * 100;
+  const answered = state.answers[state.currentPair];
+
+  const cardA = answered
+    ? `choice-card ${answered === 'a' ? 'selected' : 'other-selected'}`
+    : 'choice-card';
+  const cardB = answered
+    ? `choice-card ${answered === 'b' ? 'selected' : 'other-selected'}`
+    : 'choice-card';
+
+  return `<div class="quiz">
+    <div class="quiz-header">
+      <div class="quiz-counter">Пара <span>${state.currentPair + 1}</span> из ${PAIRS.length}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="quiz-question-label">Выберите ближе к вам</div>
+    <div class="quiz-instruction">Какой из вариантов отражает то, что важно лично вам?</div>
+    <div class="cards-row card-enter">
+      <div class="${cardA}" onclick="choose('a')" id="card-a">
+        <div class="card-letter">А</div>
+        <div class="card-text">${pair.a.text}</div>
+        <div class="card-anchor">${pair.a.anchor}</div>
+      </div>
+      <div class="${cardB}" onclick="choose('b')" id="card-b">
+        <div class="card-letter">Б</div>
+        <div class="card-text">${pair.b.text}</div>
+        <div class="card-anchor">${pair.b.anchor}</div>
+      </div>
+    </div>
+    <div class="quiz-hint">Оба варианта равноценны — выбирайте то, что ближе именно вам</div>
+  </div>`;
+}
+
+function renderResults() {
+  const sorted = Object.entries(state.scores)
+    .map(([k, v]) => ({ key: k, val: v, ...ANCHOR_INFO[k] }))
+    .sort((a, b) => b.val - a.val);
+
+  const top1 = sorted[0];
+  const top2 = sorted[1];
+  const maxVal = sorted[0].val || 1;
+
+  const barsHtml = sorted.map((item, i) => {
+    const cls = i === 0 ? 'top' : i === 1 ? 'second' : '';
+    const w = Math.round((item.val / maxVal) * 100);
+    return `<div class="score-row">
+      <div class="score-label">${item.name}</div>
+      <div class="score-bar-wrap">
+        <div class="score-bar ${cls}" id="bar-${item.key}" style="width:0%" data-w="${w}"></div>
+      </div>
+      <div class="score-num">${item.val}</div>
+    </div>`;
+  }).join('');
+
+  const descHtml = sorted.slice(0, 4).map((item, i) => {
+    const cls = i === 0 ? 'desc-card highlighted' : i === 1 ? 'desc-card highlighted-2' : 'desc-card';
+    const label = i === 0 ? 'Ведущий якорь' : i === 1 ? 'Второй якорь' : `Якорь ${i+1}`;
+    return `<div class="${cls}">
+      <div class="desc-num">${label}</div>
+      <div class="desc-anchor-name">${item.name}</div>
+      <div class="desc-text">${item.desc}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="results" id="results-block">
+    <div class="results-hero">
+      <div class="results-eyebrow">Ваш результат</div>
+      <div class="results-title">Ведущие карьерные ориентиры</div>
+      <div class="anchors-highlight">
+        <div class="anchor-pill primary">✦ ${top1.name}</div>
+        <div class="anchor-pill secondary">◇ ${top2.name}</div>
+      </div>
+    </div>
+
+    <div class="scores-section">
+      <div class="scores-title">Распределение по якорям</div>
+      ${barsHtml}
+    </div>
+
+    <div class="descriptions-section">
+      <div class="descriptions-title">Что это означает для вас</div>
+      ${descHtml}
+    </div>
+
+    <div class="theory-note">
+      <strong>О методологии:</strong> Концепция карьерных якорей разработана профессором МТИ Эдгаром Шейном. Якорь — это та ценность или мотив, от которого человек не готов отказаться при принятии карьерных решений. Диагностика помогает осознать свои приоритеты и строить карьеру в согласии с внутренними ценностями.
+    </div>
+
+    <div class="actions-row" style="margin-top:28px;">
+      <button class="btn-primary" onclick="saveResult()">↓ Сохранить результат</button>
+      <button class="btn-secondary" onclick="restartQuiz()">↺ Пройти заново</button>
+    </div>
+  </div>`;
+}
+
+function startQuiz() {
+  state.screen = 'quiz';
+  state.currentPair = 0;
+  render();
+}
+
+function choose(choice) {
+  if (state.transitioning) return;
+  const pair = PAIRS[state.currentPair];
+  const selected = choice === 'a' ? pair.a : pair.b;
+
+  state.answers[state.currentPair] = choice;
+  state.scores[selected.key]++;
+
+  // Show selection visually
+  const cardA = document.getElementById('card-a');
+  const cardB = document.getElementById('card-b');
+  if (!cardA || !cardB) return;
+
+  if (choice === 'a') {
+    cardA.className = 'choice-card selected';
+    cardB.className = 'choice-card other-selected';
+  } else {
+    cardB.className = 'choice-card selected';
+    cardA.className = 'choice-card other-selected';
+  }
+
+  state.transitioning = true;
+  setTimeout(() => {
+    state.transitioning = false;
+    state.currentPair++;
+    if (state.currentPair >= PAIRS.length) {
+      state.screen = 'results';
+      render();
+      setTimeout(animateBars, 100);
+    } else {
+      render();
+    }
+  }, 520);
+}
+
+function animateBars() {
+  document.querySelectorAll('.score-bar').forEach(bar => {
+    const w = bar.getAttribute('data-w');
+    bar.style.width = w + '%';
+  });
+}
+
+function restartQuiz() {
+  state = {
+    screen: 'intro',
+    currentPair: 0,
+    scores: { management: 0, technical: 0, autonomy: 0, entrepreneurship: 0, service: 0, lifestyle: 0, challenge: 0, security: 0 },
+    answers: [],
+    transitioning: false
+  };
+  render();
+}
+
+function saveResult() {
+  const sorted = Object.entries(state.scores)
+    .map(([k, v]) => ({ key: k, val: v, ...ANCHOR_INFO[k] }))
+    .sort((a, b) => b.val - a.val);
+
+  const top1 = sorted[0];
+  const top2 = sorted[1];
+
+  const canvas = document.getElementById('save-canvas');
+  const W = 1000, H = 600;
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#FAF8F4';
+  ctx.fillRect(0, 0, W, H);
+
+  // Red top bar
+  ctx.fillStyle = '#C31532';
+  ctx.fillRect(0, 0, W, 6);
+
+  // Left dark block
+  ctx.fillStyle = '#003B48';
+  ctx.fillRect(0, 0, 320, H);
+
+  // Left text
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.fillText('ДИАГНОСТИКА · Э. ШЕЙН', 36, 60);
+
+  ctx.font = 'bold 42px serif';
+  ctx.fillText('Карьерный', 36, 120);
+  ctx.fillStyle = '#C31532';
+  ctx.fillText('Компас', 36, 168);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fillRect(36, 192, 60, 2);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = '13px sans-serif';
+  ctx.fillText('Ваши ведущие ориентиры', 36, 230);
+
+  // Anchor pills
+  ctx.fillStyle = '#C31532';
+  roundRect(ctx, 36, 252, 248, 40, 6);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = 'bold 14px sans-serif';
+  ctx.fillText('✦ ' + top1.name, 52, 277);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  roundRect(ctx, 36, 304, 248, 40, 6);
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = 'bold 14px sans-serif';
+  ctx.fillText('◇ ' + top2.name, 52, 329);
+
+  // Footer on left
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = '11px sans-serif';
+  ctx.fillText('Карьерные якоря по методологии Шейна', 36, H - 30);
+
+  // Right side: bar chart
+  const chartX = 360;
+  const barMaxW = 560;
+  const barH = 24;
+  const gap = 18;
+  let y = 70;
+  const maxV = sorted[0].val || 1;
+
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillStyle = '#495761';
+  ctx.fillText('РАСПРЕДЕЛЕНИЕ ПО ЯКОРЯМ', chartX, y - 16);
+
+  sorted.forEach((item, i) => {
+    const bw = Math.max((item.val / maxV) * barMaxW, 4);
+    const barColor = i === 0 ? '#C31532' : i === 1 ? '#003B48' : '#DDD8CF';
+
+    ctx.fillStyle = '#F0EDE6';
+    roundRect(ctx, chartX, y, barMaxW, barH, 4);
+
+    ctx.fillStyle = barColor;
+    roundRect(ctx, chartX, y, bw, barH, 4);
+
+    ctx.fillStyle = i < 2 ? '#003B48' : '#495761';
+    ctx.font = (i < 2 ? 'bold ' : '') + '12px sans-serif';
+    ctx.fillText(item.name, chartX, y - 6);
+
+    ctx.fillStyle = '#495761';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText(item.val, chartX + barMaxW + 10, y + 16);
+
+    y += barH + gap + 12;
+  });
+
+  const link = document.createElement('a');
+  link.download = 'career-compass-result.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+render();
+</script>
+</body>
+</html>

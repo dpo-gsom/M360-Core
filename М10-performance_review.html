@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #C31532;
+  --dark: #003B48;
+  --slate: #495761;
+  --cream: #FAF8F4;
+  --sand: #F0EDE6;
+  --border: #DDD8CF;
+  --white: #FFFFFF;
+  --green: #1A6B4A;
+  --green-bg: #EBF5EF;
+  --green-border: #A8D5BC;
+  --red-bg: #FEF0F2;
+  --red-border: #F2A0AC;
+  --amber: #8A6200;
+  --amber-bg: #FFF8E6;
+  --amber-border: #E8C96A;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--dark);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
+  z-index: 200;
+}
+
+#app { max-width: 680px; margin: 0 auto; padding: 44px 20px 60px; }
+
+/* ── SHARED ── */
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 18px; }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(26px,6vw,44px); font-weight: 900; color: var(--dark); line-height: 1.15; margin-bottom: 6px; }
+.page-title span { color: var(--red); display: block; }
+.divider { width: 50px; height: 2px; background: var(--red); margin: 20px 0; }
+
+/* ── INTRO ── */
+.intro { animation: fadeUp 0.5s ease both; }
+.legend-box {
+  background: var(--dark); color: var(--white);
+  border-radius: 10px; padding: 20px 22px; margin: 24px 0;
+  font-size: 14px; line-height: 1.7;
+}
+.legend-tag {
+  display: inline-block; background: var(--red); color: var(--white);
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 3px; margin-bottom: 12px;
+}
+.team-preview {
+  display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0 28px;
+}
+.team-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--dark);
+}
+.team-chip-av {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--sand); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--slate);
+}
+.btn-start {
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  background: var(--dark); color: var(--white); border: none; border-radius: 4px;
+  padding: 15px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-start:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ── PROGRESS ── */
+.progress-wrap { margin-bottom: 24px; }
+.progress-top { display: flex; justify-content: space-between; margin-bottom: 7px; }
+.progress-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); }
+.progress-pct { font-size: 11px; font-weight: 700; color: var(--red); }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--red); border-radius: 2px; transition: width 0.5s ease; }
+
+/* ── REVIEW CARD ── */
+.review { animation: cardIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both; }
+
+.employee-header {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 20px 22px; margin-bottom: 16px;
+}
+.emp-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.emp-avatar-lg {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--sand); border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: var(--slate); flex-shrink: 0;
+}
+.emp-name-lg { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--dark); }
+.emp-period { font-size: 12px; color: var(--slate); margin-top: 2px; }
+
+.results-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 10px; }
+
+.results-list { display: flex; flex-direction: column; gap: 8px; }
+.result-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; color: var(--slate); }
+.result-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dark); flex-shrink: 0; margin-top: 6px; }
+.result-kpi {
+  display: inline-flex; align-items: center;
+  background: var(--green-bg); border: 1px solid var(--green-border);
+  border-radius: 6px; padding: 4px 10px; font-size: 13px; font-weight: 700;
+  color: var(--green); margin-bottom: 10px;
+}
+.result-kpi.neutral { background: var(--sand); border-color: var(--border); color: var(--slate); }
+.result-kpi.warn { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber); }
+
+/* ── OPTIONS ── */
+.options-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 10px; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+
+.opt {
+  background: var(--white); border: 2px solid var(--border);
+  border-radius: 10px; padding: 14px 16px; cursor: pointer;
+  transition: all 0.18s; display: flex; align-items: flex-start; gap: 12px;
+  font-size: 13px; line-height: 1.55; color: var(--slate);
+  text-align: left;
+}
+.opt:hover { border-color: var(--dark); background: var(--sand); transform: translateY(-1px); }
+.opt.disabled { pointer-events: none; }
+
+.opt-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; background: var(--white);
+  transition: all 0.18s;
+}
+.opt.correct { border-color: var(--green); background: var(--green-bg); }
+.opt.correct .opt-dot { background: var(--green); border-color: var(--green); color: var(--white); }
+.opt.correct .opt-text { color: #1A4A35; }
+
+.opt.wrong { border-color: var(--red); background: var(--red-bg); }
+.opt.wrong .opt-dot { background: var(--red); border-color: var(--red); color: var(--white); }
+.opt.wrong .opt-text { color: #7A1525; }
+
+.opt.neutral { opacity: 0.4; }
+
+/* ── FEEDBACK ── */
+.feedback-box {
+  border-radius: 10px; padding: 16px 18px; margin-bottom: 14px;
+  font-size: 14px; line-height: 1.65; display: none;
+  animation: fadeUp 0.3s ease both;
+}
+.feedback-box.show { display: block; }
+.feedback-box.correct { background: var(--green-bg); border-left: 4px solid var(--green); color: #1A4A35; }
+.feedback-box.wrong   { background: var(--red-bg);   border-left: 4px solid var(--red);   color: #7A1525; }
+.feedback-head { font-weight: 700; margin-bottom: 6px; font-size: 13px; }
+
+.btn-next {
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 6px; padding: 14px;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; display: none;
+}
+.btn-next:hover { background: var(--red); }
+.btn-next.show { display: block; }
+
+/* ── FINAL ── */
+.final { animation: fadeUp 0.5s ease both; }
+
+.final-hero {
+  background: var(--dark); border-radius: 14px;
+  padding: 32px 24px; text-align: center; margin-bottom: 28px;
+}
+.final-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(195,21,50,0.3); color: var(--white);
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 20px; margin-bottom: 18px;
+}
+.final-title { font-family: 'Playfair Display', serif; font-size: clamp(22px,5vw,34px); font-weight: 900; color: var(--white); margin-bottom: 12px; line-height: 1.2; }
+.final-sub { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.75); max-width: 500px; margin: 0 auto; }
+
+.dept-stats {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px; text-align: center;
+}
+.stat-icon { font-size: 20px; margin-bottom: 8px; }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 900; color: var(--dark); }
+.stat-label { font-size: 11px; color: var(--slate); margin-top: 3px; letter-spacing: 0.5px; }
+
+.decisions-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 14px; }
+
+.decision-row {
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: flex-start; gap: 12px;
+  animation: fadeUp 0.3s ease both;
+}
+.decision-row.ok  { background: var(--green-bg); border: 1px solid var(--green-border); }
+.decision-row.err { background: var(--red-bg);   border: 1px solid var(--red-border); }
+.decision-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.ok  .decision-icon { background: var(--green); color: #fff; }
+.err .decision-icon { background: var(--red);   color: #fff; }
+.decision-name { font-weight: 700; color: var(--dark); font-size: 13px; margin-bottom: 3px; }
+.decision-text { font-size: 12px; line-height: 1.5; }
+.ok  .decision-text { color: var(--green); }
+.err .decision-text { color: var(--red); }
+
+.score-summary {
+  background: var(--sand); border-radius: 10px; padding: 16px 18px;
+  margin-bottom: 24px; font-size: 13px; line-height: 1.65; color: var(--slate);
+}
+.score-summary strong { color: var(--dark); }
+
+.btn-restart {
+  width: 100%; background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 6px; padding: 14px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.btn-restart:hover { border-color: var(--dark); background: var(--sand); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes cardIn { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+@media (max-width: 440px) {
+  .dept-stats { grid-template-columns: 1fr 1fr; }
+  .team-preview { gap: 8px; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const REVIEWS = [
+  {
+    id: 'alexey',
+    initials: 'АЛ',
+    name: 'Алексей',
+    period: 'Performance Review · 100 дней',
+    kpi: '115%',
+    kpiClass: '',
+    results: [
+      'KPI выполнен на 115%',
+      'Провёл успешную адаптацию Игоря — новичок вышел на самостоятельную работу в срок',
+      'В ходе проекта проявил выраженные лидерские качества'
+    ],
+    options: [
+      {
+        id: 'a',
+        text: 'Перевод на должность ведущего эксперта с расширением зоны ответственности и увеличением оклада.',
+        correct: true,
+        feedbackCorrect: 'Алексей перерос свою текущую позицию. Признание через рост должности и вознаграждения — это именно то, что удержит его и даст новый стимул. Без этого шага высок риск потери ключевого специалиста.'
+      },
+      {
+        id: 'b',
+        text: 'Оставить в текущей должности без изменений, чтобы не рисковать стабильностью аналитического блока.',
+        correct: false,
+        feedbackWrong: 'Ошибка оценки. Заморозка карьеры при явно сильных результатах — прямой путь к демотивации. Алексей начнёт искать признание там, где его дадут — у конкурентов.'
+      },
+      {
+        id: 'c',
+        text: 'Направить на базовый тренинг по аналитике для закрепления знаний.',
+        correct: false,
+        feedbackWrong: 'Нецелевое использование бюджета. Сотрудник с результатом 115% уже обладает избыточными знаниями для своего уровня. Такое решение воспринимается как сигнал: «мы не видим тебя».'
+      }
+    ]
+  },
+  {
+    id: 'katya',
+    initials: 'КА',
+    name: 'Катя',
+    period: 'Performance Review · 100 дней',
+    kpi: '98%',
+    kpiClass: 'warn',
+    results: [
+      'KPI выполнен на 98%',
+      'Высокая исполнительность в рамках поставленных задач',
+      'Регулярные задержки в принятии самостоятельных решений, частые запросы на подтверждение'
+    ],
+    options: [
+      {
+        id: 'a',
+        text: 'Включить в план обучения курс по принятию решений и управлению проектами.',
+        correct: true,
+        feedbackCorrect: 'Точечное развитие — верный подход. Катя лояльна и эффективна в операционном плане. Её слабое место — уверенность при принятии решений. Целевое обучение устранит этот зазор без лишнего давления.'
+      },
+      {
+        id: 'b',
+        text: 'Назначить руководителем нового направления, чтобы проверить её в деле.',
+        correct: false,
+        feedbackWrong: 'Преждевременное решение. Бросать неуверенного сотрудника в руководящую роль без подготовки — значит программировать провал. Результат: выгорание Кати и сорванный проект.'
+      },
+      {
+        id: 'c',
+        text: 'Расторгнуть трудовой договор в связи с неполным соответствием занимаемой должности.',
+        correct: false,
+        feedbackWrong: 'Ошибка оценки. KPI в 98% — это не несоответствие, это потенциал. Лояльный и исполнительный сотрудник с одной зоной роста — ценный актив, а не кандидат на увольнение.'
+      }
+    ]
+  },
+  {
+    id: 'igor',
+    initials: 'ИГ',
+    name: 'Игорь',
+    period: 'Performance Review · Итоги испытательного срока',
+    kpi: null,
+    kpiClass: 'neutral',
+    results: [
+      'Испытательный срок пройден — критерии выполнены',
+      'Базовые задачи выполняет без ошибок',
+      'Требуется дальнейшее погружение в специфику компании'
+    ],
+    options: [
+      {
+        id: 'a',
+        text: 'Завершить испытательный срок и перевести в штат на позицию специалиста.',
+        correct: true,
+        feedbackCorrect: 'Логичное и справедливое решение. Игорь выполнил условия — перевод в штат закрепляет его лояльность и даёт ориентир для дальнейшего роста. Дополнительный испытательный срок без оснований только снизит доверие.'
+      },
+      {
+        id: 'b',
+        text: 'Продлить испытательный срок ещё на два месяца для дополнительной проверки.',
+        correct: false,
+        feedbackWrong: 'Необоснованное решение. Сотрудник выполнил все критерии прохождения. Затягивание без чётких новых условий воспринимается как недоверие — демотивирует и снижает лояльность.'
+      },
+      {
+        id: 'c',
+        text: 'Предложить Игорю возглавить крупный проект вместо Алексея.',
+        correct: false,
+        feedbackWrong: 'Критическая ошибка. У новичка нет ни авторитета, ни опыта для управления сложными процессами. Это провалит проект и подорвёт доверие всей команды к системе принятия решений.'
+      }
+    ]
+  },
+  {
+    id: 'boris',
+    initials: 'БО',
+    name: 'Борис',
+    period: 'Performance Review · 100 дней',
+    kpi: '110%',
+    kpiClass: '',
+    results: [
+      'KPI выполнен на 110%',
+      'Успешно реализовал автономный проект в срок и в рамках бюджета',
+      'Открыто заявляет о необходимости расширения полномочий'
+    ],
+    options: [
+      {
+        id: 'a',
+        text: 'Предоставить роль руководителя технологического направления с правом формирования своей микро-команды.',
+        correct: true,
+        feedbackCorrect: 'Борис доказал, что умеет работать автономно и брать ответственность. Роль с расширенными полномочиями и правом строить собственную команду — именно то, что соответствует его мотивации и результатам.'
+      },
+      {
+        id: 'b',
+        text: 'Ввести еженедельную детальную отчётность по каждому шагу для контроля качества.',
+        correct: false,
+        feedbackWrong: 'Микроменеджмент для сотрудника с результатом 110% — сигнал недоверия. Борис воспримет это как личное оскорбление. Высокая вероятность конфликта или потери ценного специалиста.'
+      },
+      {
+        id: 'c',
+        text: 'Направить на обязательный курс по корпоративной лояльности и командному взаимодействию.',
+        correct: false,
+        feedbackWrong: 'Формальный подход не по адресу. Борису нужен масштаб и результат, а не теоретические курсы по мягким навыкам. Это решение покажет ему, что компания не понимает его ценность.'
+      }
+    ]
+  },
+  {
+    id: 'marina',
+    initials: 'МА',
+    name: 'Марина',
+    period: 'Performance Review · 100 дней',
+    kpi: '100%',
+    kpiClass: 'neutral',
+    results: [
+      'KPI выполнен ровно на 100% — план без превышений',
+      'Стабильное выполнение рутинных операций, без нареканий по качеству',
+      'Отказ от участия в дополнительных проектах и программах обучения'
+    ],
+    options: [
+      {
+        id: 'a',
+        text: 'Сохранить в текущей должности с фокусом на операционную эффективность.',
+        correct: true,
+        feedbackCorrect: 'Принятие сотрудника таким, какой он есть — тоже управленческое решение. Марина стабильно выполняет свою часть работы. Попытки принудительно развить её вовлечённость дадут обратный эффект.'
+      },
+      {
+        id: 'b',
+        text: 'Назначить Марину наставником для следующего потока новичков.',
+        correct: false,
+        feedbackWrong: 'Ошибка выбора наставника. Сотрудник с установкой на минимизацию усилий передаст именно эту модель поведения новичкам. Наставник должен транслировать вовлечённость, а не избегание.'
+      },
+      {
+        id: 'c',
+        text: 'Установить амбициозный OKR на прорыв в инновациях, чтобы повысить её вовлечённость.',
+        correct: false,
+        feedbackWrong: 'Несоответствие инструмента профилю. OKR — инструмент для тех, кто хочет расти. Для сотрудника с ориентацией на стабильность амбициозные цели станут источником стресса, а не мотивации.'
+      }
+    ]
+  }
+];
+
+let state = {
+  screen: 'intro',
+  idx: 0,
+  answered: false,
+  correctCount: 0,
+  results: []
+};
+
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'intro') app.innerHTML = renderIntro();
+  else if (state.screen === 'review') app.innerHTML = renderReview();
+  else if (state.screen === 'final') app.innerHTML = renderFinal();
+}
+
+function renderIntro() {
+  const chips = REVIEWS.map(r =>
+    `<div class="team-chip"><div class="team-chip-av">${r.initials}</div>${r.name}</div>`
+  ).join('');
+  return `<div class="intro">
+    <div class="eyebrow">Финальный модуль</div>
+    <div class="page-title">Performance<span>Review</span></div>
+    <div class="divider"></div>
+    <div class="legend-box">
+      <div class="legend-tag">Контекст</div>
+      Прошло 100 дней. Пришло время подвести итоги работы команды и принять управленческие решения по каждому сотруднику.<br><br>
+      Для каждого из пяти человек вы увидите результаты и должны будете выбрать <strong>верное управленческое решение</strong>.
+    </div>
+    <div class="team-preview">${chips}</div>
+    <button class="btn-start" onclick="startReview()">Начать Performance Review →</button>
+  </div>`;
+}
+
+function renderReview() {
+  const rev = REVIEWS[state.idx];
+  const pct = Math.round((state.idx / REVIEWS.length) * 100);
+  const res = state.results[state.idx];
+  const answered = state.answered;
+
+  const kpiHtml = rev.kpi
+    ? `<div class="result-kpi ${rev.kpiClass || ''}">KPI: ${rev.kpi}</div>`
+    : `<div class="result-kpi neutral">Испытательный срок</div>`;
+
+  const resultItems = rev.results.map(r =>
+    `<div class="result-item"><div class="result-dot"></div><span>${r}</span></div>`
+  ).join('');
+
+  const opts = rev.options.map((o, i) => {
+    let cls = 'opt';
+    if (answered) {
+      if (o.correct) cls += ' correct disabled';
+      else if (res && res.chosenId === o.id) cls += ' wrong disabled';
+      else cls += ' neutral disabled';
+    }
+    const dotContent = answered && o.correct ? '✓' : answered && res && res.chosenId === o.id ? '✕' : '';
+    return `<button class="${cls}" onclick="choose('${o.id}')">
+      <div class="opt-dot">${dotContent}</div>
+      <div class="opt-text">${o.text}</div>
+    </button>`;
+  }).join('');
+
+  let fbHtml = '';
+  if (answered) {
+    const chosenOpt = rev.options.find(o => o.id === res.chosenId);
+    const isCorrect = res.isCorrect;
+    const fbCls = isCorrect ? 'correct' : 'wrong';
+    const fbText = isCorrect
+      ? chosenOpt.feedbackCorrect
+      : `${chosenOpt.feedbackWrong}<br><br><strong style="color:var(--dark)">Верное решение:</strong> ${rev.options.find(o=>o.correct).text}`;
+    fbHtml = `<div class="feedback-box ${fbCls} show">
+      <div class="feedback-head">${isCorrect ? '✓ Верное решение' : '✕ Ошибка оценки'}</div>
+      ${fbText}
+    </div>`;
+  }
+
+  const isLast = state.idx + 1 >= REVIEWS.length;
+
+  return `<div class="review">
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <div class="progress-label">Сотрудник ${state.idx + 1} из ${REVIEWS.length}</div>
+        <div class="progress-pct">${pct}%</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="employee-header">
+      <div class="emp-row">
+        <div class="emp-avatar-lg">${rev.initials}</div>
+        <div>
+          <div class="emp-name-lg">${rev.name}</div>
+          <div class="emp-period">${rev.period}</div>
+        </div>
+      </div>
+      ${kpiHtml}
+      <div class="results-label">Результаты за период</div>
+      <div class="results-list">${resultItems}</div>
+    </div>
+
+    <div class="options-label">Выберите управленческое решение</div>
+    <div class="options">${opts}</div>
+    ${fbHtml}
+    <button class="btn-next ${answered ? 'show' : ''}" onclick="nextReview()">
+      ${isLast ? 'Завершить Review →' : 'Следующий сотрудник →'}
+    </button>
+  </div>`;
+}
+
+function renderFinal() {
+  const correct = state.correctCount;
+  const total = REVIEWS.length;
+  const pct = Math.round((correct / total) * 100);
+  const isIdeal = correct === total;
+
+  let insight;
+  if (pct === 100) insight = 'Все решения приняты верно. Каждый сотрудник получил именно то, что соответствует его результатам и мотивационному профилю. Ваша команда готова к следующему циклу.';
+  else if (pct >= 60) insight = 'Большинство решений верны. Проверьте ошибки — именно в таких пограничных ситуациях и рождается управленческая зрелость.';
+  else insight = 'Несколько ключевых ошибок могут дорого обойтись отделу. Обратите внимание на мотивационные профили сотрудников — они подсказывают правильное решение.';
+
+  const rowsHtml = state.results.map((r, i) => {
+    const rev = REVIEWS[i];
+    const chosen = rev.options.find(o => o.id === r.chosenId);
+    return `<div class="decision-row ${r.isCorrect ? 'ok' : 'err'}" style="animation-delay:${i*0.06}s">
+      <div class="decision-icon">${r.isCorrect ? '✓' : '✕'}</div>
+      <div>
+        <div class="decision-name">${rev.name}</div>
+        <div class="decision-text">${r.isCorrect
+          ? chosen.text.split('.')[0]
+          : `${chosen.text.split('.')[0]} → ${rev.options.find(o=>o.correct).text.split('.')[0]}`
+        }</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const statProd = isIdeal ? '100%' : `${70 + correct * 6}%`;
+  const statTurn = correct >= 4 ? '0%' : `${(total - correct) * 8}%`;
+  const climate = isIdeal ? 'Стабильный' : correct >= 3 ? 'Рабочий' : 'Напряжённый';
+
+  return `<div class="final">
+    <div class="final-hero">
+      <div class="final-badge">Программа завершена</div>
+      <div class="final-title">${isIdeal ? 'Сбалансированная команда выстроена' : 'Управленческий цикл завершён'}</div>
+      <div class="final-sub">${insight}<br><br>Вы прошли путь от эксперта-исполнителя до руководителя, который умеет читать команду и принимать точечные решения.</div>
+    </div>
+
+    <div class="dept-stats">
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-num">${statProd}</div>
+        <div class="stat-label">Продуктивность</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔄</div>
+        <div class="stat-num">${statTurn}</div>
+        <div class="stat-label">Текучесть</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🌡</div>
+        <div class="stat-num" style="font-size:18px;padding-top:4px">${climate}</div>
+        <div class="stat-label">Климат в команде</div>
+      </div>
+    </div>
+
+    <div class="decisions-title">Решения по сотрудникам</div>
+    ${rowsHtml}
+
+    <div class="score-summary" style="margin-top:16px">
+      <strong>Итог:</strong> ${correct} из ${total} верных решений · ${pct}% точность.${isIdeal ? ' Продуктивность: 100%. Текучесть: 0%. Командный климат: Стабильный.' : ''}
+    </div>
+
+    <button class="btn-restart" onclick="restart()">↺ Пройти заново</button>
+  </div>`;
+}
+
+function startReview() {
+  state = { screen: 'review', idx: 0, answered: false, correctCount: 0, results: [] };
+  render();
+}
+
+function choose(optId) {
+  if (state.answered) return;
+  state.answered = true;
+  const rev = REVIEWS[state.idx];
+  const opt = rev.options.find(o => o.id === optId);
+  const isCorrect = opt.correct;
+  if (isCorrect) state.correctCount++;
+  state.results[state.idx] = { chosenId: optId, isCorrect };
+  render();
+}
+
+function nextReview() {
+  state.idx++;
+  state.answered = false;
+  if (state.idx >= REVIEWS.length) state.screen = 'final';
+  render();
+}
+
+function restart() {
+  state = { screen: 'intro', idx: 0, answered: false, correctCount: 0, results: [] };
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

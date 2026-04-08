@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Типы мотивации по Герчикову</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #C31532;
+  --dark: #003B48;
+  --slate: #495761;
+  --cream: #FAF8F4;
+  --sand: #F0EDE6;
+  --border: #DDD8CF;
+  --white: #FFFFFF;
+  --green: #1A6B4A;
+  --green-bg: #EBF5EF;
+  --green-border: #A8D5BC;
+  --red-bg: #FEF0F2;
+  --red-border: #F2A0AC;
+
+  --t-instr: #1A5FA5;
+  --t-instr-bg: #EEF3FB;
+  --t-instr-border: #9DBAE0;
+  --t-prof: #7B3FA0;
+  --t-prof-bg: #F4EDFB;
+  --t-prof-border: #C9AAEA;
+  --t-pat: #1A6B4A;
+  --t-pat-bg: #EBF5EF;
+  --t-pat-border: #A8D5BC;
+  --t-own: #B85C00;
+  --t-own-bg: #FEF3E6;
+  --t-own-border: #F0C080;
+  --t-avoid: #7A7A7A;
+  --t-avoid-bg: #F2F2F2;
+  --t-avoid-border: #C8C8C8;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--dark);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
+  z-index: 200;
+}
+
+#app { max-width: 680px; margin: 0 auto; padding: 44px 20px 60px; }
+
+/* ── SHARED ── */
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 18px; }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(26px, 6vw, 44px); font-weight: 900; color: var(--dark); line-height: 1.15; margin-bottom: 6px; }
+.page-title span { color: var(--red); display: block; }
+.divider { width: 50px; height: 2px; background: var(--red); margin: 20px 0; }
+
+/* ── INTRO ── */
+.intro { animation: fadeUp 0.5s ease both; }
+
+.legend-box {
+  background: var(--dark); color: var(--white);
+  border-radius: 10px; padding: 20px 22px; margin: 24px 0;
+  font-size: 14px; line-height: 1.7;
+}
+.legend-tag {
+  display: inline-block; background: var(--red); color: var(--white);
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 3px; margin-bottom: 12px;
+}
+
+.types-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0 28px;
+}
+.type-chip {
+  border-radius: 8px; padding: 12px 14px; border: 1.5px solid;
+}
+.type-chip.instr { background: var(--t-instr-bg); border-color: var(--t-instr-border); }
+.type-chip.prof  { background: var(--t-prof-bg);  border-color: var(--t-prof-border); }
+.type-chip.pat   { background: var(--t-pat-bg);   border-color: var(--t-pat-border); }
+.type-chip.own   { background: var(--t-own-bg);   border-color: var(--t-own-border); }
+.type-chip.avoid { background: var(--t-avoid-bg); border-color: var(--t-avoid-border); grid-column: span 2; }
+
+.type-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.instr .type-name { color: var(--t-instr); }
+.prof  .type-name { color: var(--t-prof); }
+.pat   .type-name { color: var(--t-pat); }
+.own   .type-name { color: var(--t-own); }
+.avoid .type-name { color: var(--t-avoid); }
+.type-desc { font-size: 12px; color: var(--slate); line-height: 1.45; }
+
+.btn-start {
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  background: var(--dark); color: var(--white); border: none; border-radius: 4px;
+  padding: 15px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-start:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ── PROGRESS ── */
+.progress-wrap { margin-bottom: 28px; }
+.progress-top { display: flex; justify-content: space-between; margin-bottom: 7px; }
+.progress-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); }
+.progress-pct { font-size: 11px; font-weight: 700; color: var(--red); }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--red); border-radius: 2px; transition: width 0.5s ease; }
+
+/* ── SITUATION CARD ── */
+.situation { animation: cardIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both; }
+
+.situation-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; overflow: hidden; margin-bottom: 18px;
+}
+
+.situation-header { padding: 16px 20px 0; }
+.situation-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
+.situation-context { font-size: 12px; color: var(--slate); font-style: italic; margin-bottom: 12px; }
+
+.speech-bubble {
+  margin: 0 20px 20px;
+  background: var(--sand);
+  border-radius: 10px;
+  padding: 16px 18px;
+  position: relative;
+}
+.speech-bubble::before {
+  content: '';
+  position: absolute; top: -8px; left: 22px;
+  width: 0; height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--sand);
+}
+.speaker-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.speaker-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--border); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--slate); flex-shrink: 0;
+}
+.speaker-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+.speaker-role { font-size: 11px; color: var(--slate); }
+.speech-text { font-size: 14px; line-height: 1.7; color: var(--dark); font-style: italic; }
+.speech-text::before { content: '\201C'; }
+.speech-text::after  { content: '\201D'; }
+
+/* ── SELECT ── */
+.select-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 10px; }
+
+.type-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+
+.type-opt {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-radius: 10px; border: 2px solid var(--border);
+  background: var(--white); cursor: pointer; font-size: 13px; font-weight: 600;
+  color: var(--slate); transition: all 0.18s; text-align: left;
+}
+.type-opt:hover { border-color: var(--dark); background: var(--sand); transform: translateY(-1px); }
+.type-opt.disabled { pointer-events: none; }
+
+.type-opt-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; border: 2px solid var(--border);
+  background: transparent; transition: all 0.18s;
+}
+
+.type-opt.correct { border-color: var(--green); background: var(--green-bg); }
+.type-opt.correct .type-opt-dot { background: var(--green); border-color: var(--green); }
+.type-opt.correct .type-opt-label { color: var(--green); }
+
+.type-opt.wrong { border-color: var(--red); background: var(--red-bg); }
+.type-opt.wrong .type-opt-dot { background: var(--red); border-color: var(--red); }
+.type-opt.wrong .type-opt-label { color: var(--red); }
+
+.type-opt.neutral { opacity: 0.4; }
+
+.type-opt-label { font-weight: 700; font-size: 13px; }
+.type-opt-hint { font-size: 11px; color: var(--slate); margin-left: auto; font-weight: 400; }
+
+/* ── FEEDBACK ── */
+.feedback-box {
+  border-radius: 10px; padding: 16px 18px; margin-bottom: 16px;
+  font-size: 14px; line-height: 1.65; display: none;
+  animation: fadeUp 0.3s ease both;
+}
+.feedback-box.show { display: block; }
+.feedback-box.correct { background: var(--green-bg); border-left: 4px solid var(--green); color: #1A4A35; }
+.feedback-box.wrong   { background: var(--red-bg);   border-left: 4px solid var(--red);   color: #7A1525; }
+.feedback-head { font-weight: 700; margin-bottom: 6px; font-size: 13px; }
+
+.btn-next {
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 6px; padding: 14px;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; display: none;
+}
+.btn-next:hover { background: var(--red); }
+.btn-next.show { display: block; }
+
+/* ── FINAL ── */
+.final { animation: fadeUp 0.5s ease both; }
+
+.final-hero {
+  background: var(--dark); color: var(--white);
+  border-radius: 12px; padding: 28px 24px; text-align: center; margin-bottom: 24px;
+}
+.final-icon { font-size: 44px; margin-bottom: 14px; }
+.final-title { font-family: 'Playfair Display', serif; font-size: clamp(20px,5vw,30px); font-weight: 900; margin-bottom: 10px; }
+.final-sub { font-size: 14px; line-height: 1.65; color: rgba(255,255,255,0.75); }
+
+.score-row { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+.score-chip { flex: 1; min-width: 80px; background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+.score-chip-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: var(--dark); }
+.score-chip-label { font-size: 11px; color: var(--slate); margin-top: 2px; }
+
+.results-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 14px; }
+
+.result-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px; border-radius: 10px; margin-bottom: 8px; font-size: 13px;
+  animation: fadeUp 0.3s ease both;
+}
+.result-row.ok  { background: var(--green-bg); border: 1px solid var(--green-border); }
+.result-row.err { background: var(--red-bg);   border: 1px solid var(--red-border); }
+.result-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.ok  .result-icon { background: var(--green); color: #fff; }
+.err .result-icon { background: var(--red);   color: #fff; }
+.result-name { font-weight: 700; color: var(--dark); font-size: 12px; margin-bottom: 2px; }
+.result-answer { font-size: 12px; }
+.ok  .result-answer { color: var(--green); font-weight: 600; }
+.err .result-answer { color: var(--red); }
+
+.type-legend-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin: 24px 0 12px; }
+.type-legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+.type-legend-item { border-radius: 8px; padding: 10px 12px; border: 1.5px solid; font-size: 12px; line-height: 1.5; }
+.type-legend-item.instr { background: var(--t-instr-bg); border-color: var(--t-instr-border); }
+.type-legend-item.prof  { background: var(--t-prof-bg);  border-color: var(--t-prof-border); }
+.type-legend-item.pat   { background: var(--t-pat-bg);   border-color: var(--t-pat-border); }
+.type-legend-item.own   { background: var(--t-own-bg);   border-color: var(--t-own-border); }
+.type-legend-item.avoid { background: var(--t-avoid-bg); border-color: var(--t-avoid-border); grid-column: span 2; }
+.type-legend-name { font-weight: 700; margin-bottom: 2px; font-size: 12px; }
+.instr .type-legend-name { color: var(--t-instr); }
+.prof  .type-legend-name { color: var(--t-prof); }
+.pat   .type-legend-name { color: var(--t-pat); }
+.own   .type-legend-name { color: var(--t-own); }
+.avoid .type-legend-name { color: var(--t-avoid); }
+.type-legend-tip { color: var(--slate); font-size: 11px; }
+
+.btn-restart {
+  width: 100%; background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 6px; padding: 14px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.btn-restart:hover { border-color: var(--dark); background: var(--sand); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes cardIn { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+@media (max-width: 460px) {
+  .types-grid { grid-template-columns: 1fr; }
+  .type-chip.avoid { grid-column: span 1; }
+  .type-legend-grid { grid-template-columns: 1fr; }
+  .type-legend-item.avoid { grid-column: span 1; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const TYPE_META = {
+  instr: { label: 'Инструментальный', cls: 'instr' },
+  prof:  { label: 'Профессиональный', cls: 'prof'  },
+  pat:   { label: 'Патриотический',   cls: 'pat'   },
+  own:   { label: 'Хозяйский',        cls: 'own'   },
+  avoid: { label: 'Избегательный',    cls: 'avoid' }
+};
+
+const SITUATIONS = [
+  {
+    id: 1,
+    speaker: 'Игорь',
+    role: 'Специалист',
+    initials: 'ИГ',
+    quote: 'Подскажите, за этот проект предусмотрена отдельная выплата или он будет включён в расчёт квартального бонуса как дополнительный коэффициент?',
+    correct: 'instr',
+    options: ['prof', 'instr', 'own'],
+    feedbackCorrect: 'Интерес к конкретной материальной выгоде и условиям оплаты — маркер инструментальной мотивации. Для Игоря труд — инструмент получения справедливого вознаграждения.',
+    feedbackWrong: {
+      prof:  'Профессионала интересовало бы содержание задачи, её сложность или новизна технологии. Игорь же сразу спрашивает про деньги — это инструментальный тип.',
+      own:   'Хозяйский тип думает об ответственности за результат и автономии, а не об условиях оплаты. Вопрос Игоря сфокусирован именно на вознаграждении.'
+    }
+  },
+  {
+    id: 2,
+    speaker: 'Алексей',
+    role: 'Ведущий аналитик',
+    initials: 'АЛ',
+    quote: 'Я посмотрю вводные. Если там будет возможность использовать обновлённую архитектуру, которую мы ещё не внедряли, то мне интересно за это взяться.',
+    correct: 'prof',
+    options: ['prof', 'pat', 'avoid'],
+    feedbackCorrect: 'Приоритет на содержание задачи, её сложность и возможность профессионального роста — признаки профессионального типа. Алексей берётся за работу только если она даёт развитие.',
+    feedbackWrong: {
+      pat:   'Патриот прежде всего думает о команде и общих целях. Алексей же смотрит на техническую сторону задачи — он хочет профессионально вырасти, а не помочь отделу.',
+      avoid: 'Избегательный тип старается минимизировать усилия и не брать лишнего. Алексей наоборот — сам проявляет инициативу, если задача интересна.'
+    }
+  },
+  {
+    id: 3,
+    speaker: 'Катя',
+    role: 'Аккаунт-менеджер',
+    initials: 'КА',
+    quote: 'Нам важно сейчас не подвести департамент. Если мы не успеем, у всего управления будут проблемы с годовым рейтингом. Я сделаю свою часть до выходных.',
+    correct: 'pat',
+    options: ['pat', 'prof', 'own'],
+    feedbackCorrect: 'Готовность брать нагрузку ради успеха команды и общих целей организации — характерная черта патриотического типа. Катя думает о коллективе, а не о личной выгоде.',
+    feedbackWrong: {
+      prof:  'Профессионал оценивал бы сложность и интересность задачи. Катя же говорит о команде и рейтинге департамента — это про принадлежность и общую ответственность.',
+      own:   'Хозяйский тип хочет автономии и единоличной ответственности за результат. Катя говорит о коллективном успехе — это другая мотивация.'
+    }
+  },
+  {
+    id: 4,
+    speaker: 'Борис',
+    role: 'Старший специалист',
+    initials: 'БО',
+    quote: 'Я готов взять этот проект под свою ответственность. Только дайте мне свободу в принятии решений по составу команды и архитектуре. Контрольные точки — раз в две недели, этого достаточно.',
+    correct: 'own',
+    options: ['own', 'instr', 'pat'],
+    feedbackCorrect: 'Стремление к полной автономии, единоличной ответственности за результат и минимальному контролю — классический хозяйский тип. Борис хочет быть «хозяином» своего участка.',
+    feedbackWrong: {
+      instr: 'Инструментальный тип сразу бы спросил про оплату. Борис вообще не упоминает деньги — его интересует свобода действий и зона ответственности.',
+      pat:   'Патриот думает о команде и коллективном результате. Борис же фокусируется на личной автономии и контроле над своим участком — это хозяйский тип.'
+    }
+  },
+  {
+    id: 5,
+    speaker: 'Марина',
+    role: 'Специалист',
+    initials: 'МА',
+    quote: 'У меня сейчас очень плотный график по текущим задачам. Не хотелось бы брать что-то дополнительное и потом не успеть нигде. Может, лучше кому-то другому отдать?',
+    correct: 'avoid',
+    options: ['avoid', 'prof', 'instr'],
+    feedbackCorrect: 'Стремление избежать дополнительной нагрузки, переложить ответственность и не рисковать — маркеры избегательного типа. Марина не отказывает прямо, но ищет способ уклониться.',
+    feedbackWrong: {
+      prof:  'Профессионал либо согласился бы с интересом, либо отказал из-за неинтересного содержания. Марина же вообще не оценивает содержание задачи — она избегает любой дополнительной нагрузки.',
+      instr: 'Инструментальный тип уточнил бы условия оплаты и мог бы согласиться за дополнительное вознаграждение. Марина не интересуется деньгами — она хочет просто не брать лишнего.'
+    }
+  }
+];
+
+const TYPE_TIPS = {
+  instr: 'Мотивируйте прозрачной и справедливой системой оплаты. Чёткая связь результата с вознаграждением.',
+  prof:  'Давайте сложные, нестандартные задачи. Обеспечьте возможность обучения и профессионального роста.',
+  pat:   'Акцентируйте важность вклада в общее дело. Признание заслуг и командный успех — лучшие стимулы.',
+  own:   'Делегируйте с полной ответственностью. Минимальный контроль, максимальная свобода принятия решений.',
+  avoid: 'Чёткие инструкции, стабильность и предсказуемость. Избегайте неопределённости и размытых ожиданий.'
+};
+
+let state = {
+  screen: 'intro',
+  idx: 0,
+  answered: false,
+  correctCount: 0,
+  results: []
+};
+
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'intro') app.innerHTML = renderIntro();
+  else if (state.screen === 'quiz') app.innerHTML = renderQuiz();
+  else if (state.screen === 'final') app.innerHTML = renderFinal();
+}
+
+function renderIntro() {
+  return `<div class="intro">
+    <div class="eyebrow">Теория Герчикова</div>
+    <div class="page-title">Типы<span>мотивации</span></div>
+    <div class="divider"></div>
+
+    <div class="legend-box">
+      <div class="legend-tag">Контекст</div>
+      В отделе обсуждается запуск внепланового проекта с жёсткими сроками. Сотрудники реагируют по-разному.<br><br>
+      Ваша задача — по реплике определить <strong>ведущий тип мотивации</strong> каждого сотрудника по классификации Герчикова.
+    </div>
+
+    <div class="types-grid">
+      <div class="type-chip instr">
+        <div class="type-name">Инструментальный</div>
+        <div class="type-desc">Труд — средство заработка. Главное — справедливая и прозрачная оплата.</div>
+      </div>
+      <div class="type-chip prof">
+        <div class="type-name">Профессиональный</div>
+        <div class="type-desc">Важны сложность задачи, рост мастерства и профессиональное признание.</div>
+      </div>
+      <div class="type-chip pat">
+        <div class="type-name">Патриотический</div>
+        <div class="type-desc">Мотивирует причастность к общему делу и успех команды / организации.</div>
+      </div>
+      <div class="type-chip own">
+        <div class="type-name">Хозяйский</div>
+        <div class="type-desc">Нужна полная автономия и личная ответственность за результат.</div>
+      </div>
+      <div class="type-chip avoid">
+        <div class="type-name">Избегательный</div>
+        <div class="type-desc">Стремится минимизировать нагрузку и уклониться от лишней ответственности.</div>
+      </div>
+    </div>
+
+    <button class="btn-start" onclick="startQuiz()">Начать диагностику →</button>
+  </div>`;
+}
+
+function renderQuiz() {
+  const sit = SITUATIONS[state.idx];
+  const pct = Math.round((state.idx / SITUATIONS.length) * 100);
+  const res = state.results[state.idx];
+  const answered = state.answered;
+
+  const optHtml = sit.options.map(key => {
+    const meta = TYPE_META[key];
+    let cls = 'type-opt';
+    if (answered) {
+      if (key === sit.correct) cls += ' correct disabled';
+      else if (res && res.chosen === key) cls += ' wrong disabled';
+      else cls += ' neutral disabled';
+    }
+    return `<button class="${cls}" onclick="choose('${key}')">
+      <div class="type-opt-dot"></div>
+      <span class="type-opt-label">${meta.label}</span>
+    </button>`;
+  }).join('');
+
+  const fbCls = answered ? (res.isCorrect ? 'feedback-box correct show' : 'feedback-box wrong show') : 'feedback-box';
+  let fbText = '';
+  if (answered) {
+    if (res.isCorrect) {
+      fbText = `<div class="feedback-head">✓ Верно</div>${sit.feedbackCorrect}`;
+    } else {
+      const wrongExplain = sit.feedbackWrong[res.chosen] || '';
+      fbText = `<div class="feedback-head">✕ Не совсем</div>${wrongExplain}<br><br><strong style="color:var(--dark)">Правильный ответ — ${TYPE_META[sit.correct].label}:</strong> ${sit.feedbackCorrect}`;
+    }
+  }
+
+  return `<div class="situation">
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <div class="progress-label">Сотрудник ${state.idx + 1} из ${SITUATIONS.length}</div>
+        <div class="progress-pct">${pct}%</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="situation-card">
+      <div class="situation-header">
+        <div class="situation-eyebrow">Реплика на обсуждении проекта</div>
+      </div>
+      <div class="speech-bubble">
+        <div class="speaker-row">
+          <div class="speaker-avatar">${sit.initials}</div>
+          <div>
+            <div class="speaker-name">${sit.speaker}</div>
+            <div class="speaker-role">${sit.role}</div>
+          </div>
+        </div>
+        <div class="speech-text">${sit.quote}</div>
+      </div>
+    </div>
+
+    <div class="select-label">Определите тип мотивации</div>
+    <div class="type-options">${optHtml}</div>
+
+    <div class="${fbCls}" id="fb">${fbText}</div>
+    <button class="btn-next ${answered ? 'show' : ''}" onclick="nextSituation()">
+      ${state.idx + 1 >= SITUATIONS.length ? 'Посмотреть итоги →' : 'Следующий сотрудник →'}
+    </button>
+  </div>`;
+}
+
+function renderFinal() {
+  const correct = state.correctCount;
+  const total = SITUATIONS.length;
+  const pct = Math.round((correct / total) * 100);
+
+  let insight = '';
+  if (pct === 100) insight = 'Отличный результат. Вы точно считываете мотивационные сигналы. Это ключевой навык для персонализированного управления командой.';
+  else if (pct >= 60) insight = 'Хороший результат. Основные типы вы различаете. Обратите внимание на ошибки — там, где паттерны похожи, важны детали формулировки.';
+  else insight = 'Типы мотивации легко перепутать без практики. Вернитесь к описаниям в начале и попробуйте ещё раз — с каждым разом картина станет чище.';
+
+  const rowsHtml = state.results.map((r, i) => {
+    const sit = SITUATIONS[i];
+    const isOk = r.isCorrect;
+    return `<div class="result-row ${isOk ? 'ok' : 'err'}" style="animation-delay:${i*0.05}s">
+      <div class="result-icon">${isOk ? '✓' : '✕'}</div>
+      <div>
+        <div class="result-name">${sit.speaker}</div>
+        <div class="result-answer">${isOk
+          ? TYPE_META[sit.correct].label
+          : `${TYPE_META[r.chosen].label} → правильно: ${TYPE_META[sit.correct].label}`
+        }</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const legendHtml = Object.entries(TYPE_META).map(([key, meta]) =>
+    `<div class="type-legend-item ${meta.cls}">
+      <div class="type-legend-name">${meta.label}</div>
+      <div class="type-legend-tip">${TYPE_TIPS[key]}</div>
+    </div>`
+  ).join('');
+
+  return `<div class="final">
+    <div class="final-hero">
+      <div class="final-icon">🎯</div>
+      <div class="final-title">Диагностика завершена</div>
+      <div class="final-sub">${insight}</div>
+    </div>
+
+    <div class="score-row">
+      <div class="score-chip">
+        <div class="score-chip-num">${correct}<span style="font-size:18px;color:var(--slate)">/${total}</span></div>
+        <div class="score-chip-label">верных ответов</div>
+      </div>
+      <div class="score-chip">
+        <div class="score-chip-num">${pct}%</div>
+        <div class="score-chip-label">точность</div>
+      </div>
+    </div>
+
+    <div class="results-title">Разбор по сотрудникам</div>
+    ${rowsHtml}
+
+    <div class="type-legend-title">Как работать с каждым типом</div>
+    <div class="type-legend-grid">${legendHtml}</div>
+
+    <button class="btn-restart" onclick="restartQuiz()">↺ Пройти заново</button>
+  </div>`;
+}
+
+function startQuiz() {
+  state = { screen: 'quiz', idx: 0, answered: false, correctCount: 0, results: [] };
+  render();
+}
+
+function choose(key) {
+  if (state.answered) return;
+  state.answered = true;
+  const sit = SITUATIONS[state.idx];
+  const isCorrect = key === sit.correct;
+  if (isCorrect) state.correctCount++;
+  state.results[state.idx] = { chosen: key, isCorrect };
+  render();
+}
+
+function nextSituation() {
+  state.idx++;
+  state.answered = false;
+  if (state.idx >= SITUATIONS.length) state.screen = 'final';
+  render();
+}
+
+function restartQuiz() {
+  state = { screen: 'intro', idx: 0, answered: false, correctCount: 0, results: [] };
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

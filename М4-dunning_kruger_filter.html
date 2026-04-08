@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фильтр обратной связи</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #C31532;
+  --dark: #003B48;
+  --slate: #495761;
+  --cream: #FAF8F4;
+  --sand: #F0EDE6;
+  --border: #DDD8CF;
+  --white: #FFFFFF;
+  --green: #1A6B4A;
+  --green-bg: #EBF5EF;
+  --green-border: #A8D5BC;
+  --red-bg: #FEF0F2;
+  --red-border: #F2A0AC;
+  --amber: #8A6200;
+  --amber-bg: #FFF8E6;
+  --amber-border: #E8C96A;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--dark);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
+  z-index: 200;
+}
+
+#app {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 44px 20px 60px;
+}
+
+/* ── SHARED ── */
+.eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 18px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 6vw, 46px);
+  font-weight: 900; color: var(--dark); line-height: 1.15; margin-bottom: 6px;
+}
+.page-title span { color: var(--red); display: block; }
+.divider { width: 50px; height: 2px; background: var(--red); margin: 20px 0; }
+
+/* ── INTRO ── */
+.intro { animation: fadeUp 0.5s ease both; }
+
+.intro-legend {
+  background: var(--dark);
+  color: var(--white);
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin: 24px 0;
+  font-size: 14px;
+  line-height: 1.7;
+  position: relative;
+}
+.intro-legend-tag {
+  display: inline-block;
+  background: var(--red);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin-bottom: 12px;
+}
+
+.dk-curve {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 24px;
+  display: block;
+}
+
+.intro-rules {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 28px;
+}
+.intro-rules-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--slate); margin-bottom: 14px;
+}
+.rule-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 10px; font-size: 13px; line-height: 1.55; color: var(--slate);
+}
+.rule-row:last-child { margin-bottom: 0; }
+.rule-badge {
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 700; padding: 3px 10px;
+  border-radius: 3px; letter-spacing: 0.5px;
+}
+.rule-badge.accept { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.rule-badge.reject { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+
+.btn-start {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--dark); color: var(--white);
+  border: none; border-radius: 4px; padding: 15px 36px;
+  font-family: 'Manrope', sans-serif; font-size: 13px;
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; transition: background 0.2s, transform 0.15s; width: 100%;
+  justify-content: center;
+}
+.btn-start:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ── PROGRESS ── */
+.progress-wrap { margin-bottom: 24px; }
+.progress-top {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px;
+}
+.progress-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); }
+.progress-right { display: flex; align-items: center; gap: 12px; }
+.progress-pct { font-size: 11px; font-weight: 700; color: var(--red); }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--red); border-radius: 2px; transition: width 0.4s ease; }
+
+/* ── TIMER ── */
+.timer-wrap {
+  display: flex; align-items: center; gap: 8px;
+}
+.timer-ring {
+  position: relative; width: 32px; height: 32px;
+}
+.timer-ring svg { transform: rotate(-90deg); }
+.timer-ring circle {
+  fill: none; stroke-width: 2.5;
+}
+.timer-bg { stroke: var(--border); }
+.timer-fg {
+  stroke: var(--red);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s;
+}
+.timer-num {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--dark);
+}
+
+/* ── CARD AREA ── */
+.card-area {
+  position: relative;
+  min-height: 280px;
+  margin-bottom: 20px;
+}
+
+.swipe-card {
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 22px;
+  position: relative;
+  animation: cardIn 0.4s cubic-bezier(0.34,1.3,0.64,1) both;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+  transition: border-color 0.2s;
+}
+
+.swipe-card.dragging { cursor: grabbing; transition: none; }
+.swipe-card.tilt-left  { border-color: var(--red-border); background: var(--red-bg); }
+.swipe-card.tilt-right { border-color: var(--green-border); background: var(--green-bg); }
+
+.sender-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+}
+.sender-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--sand); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: var(--slate);
+  flex-shrink: 0;
+}
+.sender-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+.sender-role { font-size: 11px; color: var(--slate); }
+
+.card-message {
+  font-size: 14px; line-height: 1.7; color: var(--slate);
+  border-left: 3px solid var(--border);
+  padding-left: 14px;
+  margin-bottom: 6px;
+}
+
+/* Swipe direction hint overlays */
+.swipe-hint {
+  position: absolute;
+  top: 18px;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.swipe-hint.left  { left: 18px;  background: var(--red-bg);   color: var(--red);   border: 1.5px solid var(--red-border); }
+.swipe-hint.right { right: 18px; background: var(--green-bg); color: var(--green); border: 1.5px solid var(--green-border); }
+
+/* ── ACTION BUTTONS ── */
+.action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.btn-action {
+  padding: 14px 10px;
+  border-radius: 8px;
+  border: 2px solid;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-action:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+.btn-action:active { transform: translateY(0); }
+
+.btn-reject {
+  background: var(--red-bg); color: var(--red); border-color: var(--red-border);
+}
+.btn-reject:hover { background: #FDE8EB; border-color: var(--red); }
+
+.btn-accept {
+  background: var(--green-bg); color: var(--green); border-color: var(--green-border);
+}
+.btn-accept:hover { background: #D6EEE3; border-color: var(--green); }
+
+.swipe-tip {
+  text-align: center; font-size: 11px; color: var(--border);
+  letter-spacing: 0.5px; font-weight: 600;
+}
+
+/* ── FEEDBACK OVERLAY ── */
+.feedback-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,30,40,0.55);
+  z-index: 300;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 0 16px 24px;
+  animation: overlayIn 0.25s ease both;
+}
+
+.feedback-sheet {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 24px 22px;
+  max-width: 640px;
+  width: 100%;
+  animation: sheetUp 0.3s cubic-bezier(0.34,1.2,0.64,1) both;
+}
+
+.feedback-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.feedback-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.feedback-icon.correct { background: var(--green-bg); }
+.feedback-icon.wrong   { background: var(--red-bg); }
+
+.feedback-verdict {
+  font-size: 15px; font-weight: 700;
+}
+.feedback-verdict.correct { color: var(--green); }
+.feedback-verdict.wrong   { color: var(--red); }
+
+.feedback-text {
+  font-size: 14px; line-height: 1.65; color: var(--slate);
+  margin-bottom: 18px;
+}
+
+.feedback-correct-answer {
+  background: var(--sand);
+  border-left: 3px solid var(--dark);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--dark);
+  margin-bottom: 18px;
+  display: none;
+}
+.feedback-correct-answer.show { display: block; }
+.feedback-correct-answer strong { font-weight: 700; }
+
+.btn-next {
+  width: 100%;
+  background: var(--dark); color: var(--white);
+  border: none; border-radius: 6px; padding: 14px;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.5px;
+  transition: background 0.2s;
+}
+.btn-next:hover { background: var(--red); }
+
+/* ── FINAL ── */
+.final { animation: fadeUp 0.5s ease both; }
+
+.score-hero {
+  text-align: center;
+  background: var(--dark);
+  border-radius: 14px;
+  padding: 32px 24px;
+  margin-bottom: 24px;
+  color: var(--white);
+}
+
+.score-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 72px; font-weight: 900;
+  line-height: 1;
+  color: var(--white);
+}
+.score-num span { color: var(--red); }
+.score-label { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; }
+
+.score-badges {
+  display: flex; gap: 10px; justify-content: center; margin-top: 16px; flex-wrap: wrap;
+}
+.score-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+}
+.score-badge.correct-b { background: var(--green-bg); color: var(--green); }
+.score-badge.wrong-b   { background: var(--red-bg);   color: var(--red); }
+
+.final-insight {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 20px 22px; margin-bottom: 16px;
+  font-size: 14px; line-height: 1.7; color: var(--slate);
+}
+.final-insight-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--dark); margin-bottom: 10px;
+}
+
+.results-list { margin-bottom: 24px; }
+.results-list-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--slate); margin-bottom: 12px;
+}
+
+.result-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: 8px; margin-bottom: 8px;
+  font-size: 13px; line-height: 1.5;
+  animation: fadeUp 0.3s ease both;
+}
+.result-row.ok  { background: var(--green-bg); border: 1px solid var(--green-border); }
+.result-row.err { background: var(--red-bg);   border: 1px solid var(--red-border); }
+.result-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0; margin-top: 1px;
+}
+.ok  .result-dot { background: var(--green); color: #fff; }
+.err .result-dot { background: var(--red);   color: #fff; }
+.result-sender { font-weight: 700; color: var(--dark); margin-bottom: 2px; font-size: 12px; }
+.result-action { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+.ok  .result-action { color: var(--green); }
+.err .result-action { color: var(--red); }
+
+.btn-restart {
+  width: 100%;
+  background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 6px; padding: 14px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+}
+.btn-restart:hover { border-color: var(--dark); background: var(--sand); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes overlayIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes sheetUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes cardFlyLeft {
+  to { transform: translateX(-120%) rotate(-18deg); opacity: 0; }
+}
+@keyframes cardFlyRight {
+  to { transform: translateX(120%) rotate(18deg); opacity: 0; }
+}
+.fly-left  { animation: cardFlyLeft  0.35s ease forwards !important; }
+.fly-right { animation: cardFlyRight 0.35s ease forwards !important; }
+
+@media (max-width: 400px) {
+  .action-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const CARDS = [
+  {
+    id: 1,
+    sender: "IT-архитектор",
+    initials: "IT",
+    text: "Новая система не поддерживает исторические данные за прошлый год в текущем формате. Нам потребуется минимум 10 дней на написание конвертера, иначе вы потеряете старую базу.",
+    correct: "accept",
+    feedback: "Это критический риск интеграции, который самоуверенные новички часто упускают. Сроки проекта придётся пересмотреть."
+  },
+  {
+    id: 2,
+    sender: "Алексей (вед. менеджер)",
+    initials: "АМ",
+    text: "Шрифт в этой вашей новой программе слишком мелкий, глаза болят. Зачем ломать то, что работает? Верните старые добрые таблицы Excel, я буду работать только в них!",
+    correct: "reject",
+    feedback: "Классическое эмоциональное сопротивление изменениям. Менять архитектуру проекта из-за привычек одного сотрудника нельзя."
+  },
+  {
+    id: 3,
+    sender: "Служба безопасности",
+    initials: "СБ",
+    text: "В вашем ТЗ для подрядчика отсутствует требование о настройке двухфакторной аутентификации. Если запустим систему в таком виде — отдел получит выговор за нарушение регламента ИБ.",
+    correct: "accept",
+    feedback: "На этапе «Пика глупости» руководители часто забывают про комплаенс и безопасность, считая это бюрократией. Смежников игнорировать нельзя."
+  },
+  {
+    id: 4,
+    sender: "Отдел маркетинга",
+    initials: "МК",
+    text: "Слушайте, а давайте к этой системе сразу прикрутим модуль искусственного интеллекта для прогнозирования? Это же сейчас в тренде, будет смотреться очень круто на презентации!",
+    correct: "reject",
+    feedback: "Избыточный функционал — это Scope Creep. ИИ выглядит привлекательно, но раздует сроки и бюджет. Сначала нужно запустить базовую версию."
+  },
+  {
+    id: 5,
+    sender: "Катя (сотрудник)",
+    initials: "КС",
+    text: "Я попробовала заполнить новую форму, как вы просили. Из-за дополнительных полей это занимает 15 минут вместо 5. Если выкатить на всех — скорость обработки заявок упадёт втрое.",
+    correct: "accept",
+    feedback: "Это ценная обратная связь от конечного пользователя. Трудозатраты на рутину были недооценены. Процесс нужно оптимизировать до запуска."
+  },
+  {
+    id: 6,
+    sender: "Босс",
+    initials: "БС",
+    text: "Я посмотрел твой план-график. Ты не заложил ни одного дня на обучение сотрудников. Какой бы хорошей ни была программа — без обучения процесс встанет.",
+    correct: "accept",
+    feedback: "Типичная ошибка планирования: новички-руководители фокусируются на технической стороне задачи, забывая про человеческий фактор."
+  },
+  {
+    id: 7,
+    sender: "Смежный отдел",
+    initials: "СО",
+    text: "Опять вы внедряете какие-то инновации! Нам теперь придётся переучивать своих людей, чтобы читать ваши отчёты. Вы просто хотите выслужиться перед руководством.",
+    correct: "reject",
+    feedback: "Чистое обесценивание без конструктивной критики. Никакого actionable-содержания здесь нет — это эмоциональный шум."
+  },
+  {
+    id: 8,
+    sender: "Руководитель отдела N",
+    initials: "РО",
+    text: "Мы пробовали внедрить похожий процесс год назад. Люди массово саботировали ввод данных. У меня есть разбор наших ошибок — могу скинуть, чтобы вы на те же грабли не наступили.",
+    correct: "accept",
+    feedback: "Чужой опыт помогает сгладить прохождение «Долины отчаяния». Отказываться от такой помощи — одна из ловушек эффекта Даннинга-Крюгера."
+  },
+  {
+    id: 9,
+    sender: "Младший аналитик",
+    initials: "МА",
+    text: "Я нажал кнопку выгрузки, и экран завис! Система сломана, мы потеряем все контракты, надо срочно всё отменять и возвращаться к старой схеме!",
+    correct: "reject",
+    feedback: "Разовый баг — не повод сворачивать весь проект. Паника — это эмоциональный шум. Нужно зафиксировать ошибку и передать в техподдержку."
+  },
+  {
+    id: 10,
+    sender: "Юридический отдел",
+    initials: "ЮО",
+    text: "Подрядчик прислал договор на лицензии. Пункт 4.2 составлен так, что мы не сможем расторгнуть контракт в одностороннем порядке. Нужно приостановить внедрение и уйти на пересогласование.",
+    correct: "accept",
+    feedback: "Юридические риски способны похоронить любой проект. На «Пике глупости» внимание к подобным деталям обычно ослаблено из-за излишней уверенности."
+  }
+];
+
+const TOTAL_TIME = 10;
+const CIRCUMFERENCE = 2 * Math.PI * 13; // r=13
+
+let state = {
+  screen: 'intro',
+  idx: 0,
+  timeLeft: TOTAL_TIME,
+  timerInterval: null,
+  results: [],
+  feedback: null,
+  dragging: false,
+  dragStartX: 0,
+  dragCurrentX: 0
+};
+
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'intro') { app.innerHTML = renderIntro(); return; }
+  if (state.screen === 'quiz')  { app.innerHTML = renderQuiz();  bindCard(); return; }
+  if (state.screen === 'final') { app.innerHTML = renderFinal(); return; }
+}
+
+// ── INTRO ──
+function renderIntro() {
+  return `<div class="intro">
+    <div class="eyebrow">Эффект Даннинга — Крюгера</div>
+    <div class="page-title">Фильтр<span>обратной связи</span></div>
+    <div class="divider"></div>
+
+    <div class="intro-legend">
+      <div class="intro-legend-tag">Легенда</div>
+      Вы недавно стали руководителем и запускаете важный процесс — перевод отчётности отдела в новую систему. Вы уверены, что всё продумали, и задача займёт неделю.<br><br>
+      Именно в такой момент начинающие руководители рискуют оказаться на «Пике глупости» — когда уверенность в своей правоте максимальна, а реальная картина ещё не видна. <strong>Ваша задача — не допустить этого.</strong> Коллеги начинают присылать комментарии — прислушайтесь к тем, кто действительно помогает.
+    </div>
+
+    ${renderDKCurve()}
+
+    <div class="intro-rules">
+      <div class="intro-rules-title">Правила</div>
+      <div class="rule-row">
+        <div class="rule-badge accept">Принять</div>
+        <span>Реальный риск или слепое пятно, которое вы недооценили</span>
+      </div>
+      <div class="rule-row">
+        <div class="rule-badge reject">Отклонить</div>
+        <span>Эмоциональное сопротивление, паника или инфошум</span>
+      </div>
+      <div class="rule-row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+        <span style="font-size:12px;color:var(--slate);">⏱ У вас <strong>10 секунд</strong> на каждое сообщение. Потом карточка засчитывается как ошибка.</span>
+      </div>
+    </div>
+
+    <button class="btn-start" onclick="startQuiz()">Начать →</button>
+  </div>`;
+}
+
+function renderDKCurve() {
+  return `<svg class="dk-curve" viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="cg" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#C31532" stop-opacity="0.15"/>
+        <stop offset="40%" stop-color="#C31532" stop-opacity="0.05"/>
+        <stop offset="100%" stop-color="#003B48" stop-opacity="0.1"/>
+      </linearGradient>
+    </defs>
+    <path d="M20,130 C60,130 80,20 120,18 C160,16 170,90 200,85 C230,80 260,40 320,35 C360,32 380,50 390,55" fill="none" stroke="#DDD8CF" stroke-width="2"/>
+    <path d="M20,130 C60,130 80,20 120,18 L120,150 L20,150 Z" fill="url(#cg)"/>
+    <circle cx="120" cy="18" r="6" fill="#C31532"/>
+    <text x="120" y="10" text-anchor="middle" font-size="9" font-weight="700" fill="#C31532" font-family="Manrope,sans-serif">ВЫ ЗДЕСЬ</text>
+    <text x="120" y="38" text-anchor="middle" font-size="8" fill="#C31532" font-family="Manrope,sans-serif" font-weight="600">Пик глупости</text>
+    <text x="20" y="148" font-size="8" fill="#495761" font-family="Manrope,sans-serif">Старт</text>
+    <text x="200" y="100" text-anchor="middle" font-size="8" fill="#495761" font-family="Manrope,sans-serif">Долина</text>
+    <text x="200" y="110" text-anchor="middle" font-size="8" fill="#495761" font-family="Manrope,sans-serif">отчаяния</text>
+    <text x="350" y="30" text-anchor="middle" font-size="8" fill="#003B48" font-family="Manrope,sans-serif" font-weight="600">Плато</text>
+    <text x="350" y="40" text-anchor="middle" font-size="8" fill="#003B48" font-family="Manrope,sans-serif" font-weight="600">компетентности</text>
+  </svg>`;
+}
+
+// ── QUIZ ──
+function renderQuiz() {
+  const card = CARDS[state.idx];
+  const pct = Math.round((state.idx / CARDS.length) * 100);
+  const r = 13;
+  const offset = CIRCUMFERENCE * (1 - state.timeLeft / TOTAL_TIME);
+  const timerColor = state.timeLeft <= 3 ? '#C31532' : state.timeLeft <= 6 ? '#B8963E' : '#1A6B4A';
+
+  return `<div class="quiz-screen">
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <div class="progress-label">Сообщение ${state.idx + 1} / ${CARDS.length}</div>
+        <div class="progress-right">
+          <div class="timer-wrap">
+            <div class="timer-ring">
+              <svg width="32" height="32" viewBox="0 0 32 32">
+                <circle class="timer-bg" cx="16" cy="16" r="${r}" stroke-dasharray="${CIRCUMFERENCE}" stroke-dashoffset="0"/>
+                <circle class="timer-fg" id="timer-fg" cx="16" cy="16" r="${r}"
+                  stroke="${timerColor}"
+                  stroke-dasharray="${CIRCUMFERENCE}"
+                  stroke-dashoffset="${offset}"/>
+              </svg>
+              <div class="timer-num" id="timer-num">${state.timeLeft}</div>
+            </div>
+          </div>
+          <div class="progress-pct">${pct}%</div>
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="card-area" id="card-area">
+      <div class="swipe-card" id="swipe-card">
+        <div class="swipe-hint left" id="hint-left">✕ Отклонить</div>
+        <div class="swipe-hint right" id="hint-right">✓ Принять</div>
+        <div class="sender-row">
+          <div class="sender-avatar">${card.initials}</div>
+          <div>
+            <div class="sender-name">${card.sender}</div>
+            <div class="sender-role">входящее сообщение</div>
+          </div>
+        </div>
+        <div class="card-message">${card.text}</div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-action btn-reject" onclick="answer('reject')">✕ Отклонить</button>
+      <button class="btn-action btn-accept" onclick="answer('accept')">✓ Принять</button>
+    </div>
+    <div class="swipe-tip">Или свайпните карточку влево / вправо</div>
+
+    ${state.feedback ? renderFeedbackOverlay() : ''}
+  </div>`;
+}
+
+function renderFeedbackOverlay() {
+  const fb = state.feedback;
+  const isTimeout = fb.isTimeout;
+  const isCorrect = fb.isCorrect;
+  const correctLabel = fb.correct === 'accept' ? '✓ Принять в работу' : '✕ Отклонить';
+
+  if (isTimeout) {
+    return `<div class="feedback-overlay" id="feedback-overlay">
+      <div class="feedback-sheet">
+        <div class="feedback-header">
+          <div class="feedback-icon wrong">⏱</div>
+          <div class="feedback-verdict wrong">Время вышло</div>
+        </div>
+        <div class="feedback-text">${fb.feedbackText}</div>
+        <div class="feedback-correct-answer show">
+          <strong>Правильное действие:</strong> ${correctLabel}
+        </div>
+        <button class="btn-next" onclick="nextCard()">${state.idx + 1 >= CARDS.length ? 'Посмотреть итоги →' : 'Следующее сообщение →'}</button>
+      </div>
+    </div>`;
+  }
+
+  return `<div class="feedback-overlay" id="feedback-overlay">
+    <div class="feedback-sheet">
+      <div class="feedback-header">
+        <div class="feedback-icon ${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? '✓' : '✕'}</div>
+        <div class="feedback-verdict ${isCorrect ? 'correct' : 'wrong'}">
+          ${isCorrect ? 'Верное решение' : 'Неверное решение'}
+        </div>
+      </div>
+      <div class="feedback-text">${fb.feedbackText}</div>
+      <div class="feedback-correct-answer ${isCorrect ? '' : 'show'}">
+        <strong>Правильное действие:</strong> ${correctLabel}
+      </div>
+      <button class="btn-next" onclick="nextCard()">${state.idx + 1 >= CARDS.length ? 'Посмотреть итоги →' : 'Следующее сообщение →'}</button>
+    </div>
+  </div>`;
+}
+
+// ── FINAL ──
+function renderFinal() {
+  const correct = state.results.filter(r => r.isCorrect).length;
+  const wrong = CARDS.length - correct;
+  const pct = Math.round((correct / CARDS.length) * 100);
+
+  let insight = '';
+  if (pct >= 80) {
+    insight = 'Отличный результат. Вы умеете отличать реальные сигналы от шума. Эффект Даннинга-Крюгера удалось преодолеть — вы слышите команду и учитываете риски, которые сами не видите.';
+  } else if (pct >= 50) {
+    insight = 'Неплохо, но есть над чем работать. Часть важных сигналов прошла мимо. Помните: на «Пике глупости» самый опасный враг — собственная уверенность в том, что вы всё предусмотрели.';
+  } else {
+    insight = 'Результат показывает высокую уязвимость к эффекту Даннинга-Крюгера. Большинство критических рисков были проигнорированы или, напротив, вы реагировали на эмоциональный шум. Важно выработать привычку проверять свои решения через коллег.';
+  }
+
+  const rowsHtml = state.results.map((r, i) => {
+    const card = CARDS[i];
+    const actionLabel = r.chosen === 'timeout' ? '⏱ Время вышло' : r.chosen === 'accept' ? '✓ Принято' : '✕ Отклонено';
+    return `<div class="result-row ${r.isCorrect ? 'ok' : 'err'}" style="animation-delay:${i * 0.04}s">
+      <div class="result-dot">${r.isCorrect ? '✓' : '✕'}</div>
+      <div>
+        <div class="result-sender">${card.sender}</div>
+        <div class="result-action">${actionLabel}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="final">
+    <div class="score-hero">
+      <div class="score-num">${correct}<span>/${CARDS.length}</span></div>
+      <div class="score-label">правильных решений · ${pct}%</div>
+      <div class="score-badges">
+        <div class="score-badge correct-b">✓ Принято верно: ${state.results.filter(r => r.isCorrect && r.chosen === 'accept').length}</div>
+        <div class="score-badge correct-b">✕ Отклонено верно: ${state.results.filter(r => r.isCorrect && r.chosen === 'reject').length}</div>
+        ${wrong > 0 ? `<div class="score-badge wrong-b">Ошибок: ${wrong}</div>` : ''}
+      </div>
+    </div>
+
+    <div class="final-insight">
+      <div class="final-insight-title">Вывод</div>
+      ${insight}
+    </div>
+
+    <div class="results-list">
+      <div class="results-list-title">Детали по каждому сообщению</div>
+      ${rowsHtml}
+    </div>
+
+    <button class="btn-restart" onclick="restartQuiz()">↺ Пройти заново</button>
+  </div>`;
+}
+
+// ── LOGIC ──
+function startQuiz() {
+  state.screen = 'quiz';
+  state.idx = 0;
+  state.results = [];
+  state.feedback = null;
+  render();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(state.timerInterval);
+  state.timeLeft = TOTAL_TIME;
+  updateTimerUI();
+  state.timerInterval = setInterval(() => {
+    state.timeLeft--;
+    updateTimerUI();
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerInterval);
+      handleTimeout();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const numEl = document.getElementById('timer-num');
+  const fgEl  = document.getElementById('timer-fg');
+  if (!numEl || !fgEl) return;
+  numEl.textContent = state.timeLeft;
+  const offset = CIRCUMFERENCE * (1 - state.timeLeft / TOTAL_TIME);
+  fgEl.style.strokeDashoffset = offset;
+  const color = state.timeLeft <= 3 ? '#C31532' : state.timeLeft <= 6 ? '#B8963E' : '#1A6B4A';
+  fgEl.style.stroke = color;
+}
+
+function handleTimeout() {
+  const card = CARDS[state.idx];
+  state.results.push({ chosen: 'timeout', correct: card.correct, isCorrect: false });
+  state.feedback = {
+    isTimeout: true,
+    correct: card.correct,
+    feedbackText: card.feedback
+  };
+  renderFeedbackInPlace();
+}
+
+function answer(choice) {
+  clearInterval(state.timerInterval);
+  const card = CARDS[state.idx];
+  const isCorrect = choice === card.correct;
+  state.results.push({ chosen: choice, correct: card.correct, isCorrect });
+  state.feedback = {
+    isCorrect,
+    correct: card.correct,
+    feedbackText: card.feedback
+  };
+
+  // Fly animation
+  const swipeCard = document.getElementById('swipe-card');
+  if (swipeCard) {
+    swipeCard.classList.add(choice === 'reject' ? 'fly-left' : 'fly-right');
+  }
+
+  setTimeout(() => renderFeedbackInPlace(), 280);
+}
+
+function renderFeedbackInPlace() {
+  const qs = document.querySelector('.quiz-screen');
+  if (!qs) return;
+  const existing = document.getElementById('feedback-overlay');
+  if (existing) existing.remove();
+  qs.insertAdjacentHTML('beforeend', renderFeedbackOverlay());
+}
+
+function nextCard() {
+  state.idx++;
+  state.feedback = null;
+  if (state.idx >= CARDS.length) {
+    state.screen = 'final';
+    render();
+    return;
+  }
+  render();
+  startTimer();
+}
+
+function restartQuiz() {
+  clearInterval(state.timerInterval);
+  state = { screen: 'intro', idx: 0, timeLeft: TOTAL_TIME, timerInterval: null, results: [], feedback: null, dragging: false, dragStartX: 0, dragCurrentX: 0 };
+  render();
+}
+
+// ── SWIPE / DRAG ──
+function bindCard() {
+  const card = document.getElementById('swipe-card');
+  if (!card) return;
+
+  // Mouse
+  card.addEventListener('mousedown', dragStart);
+  document.addEventListener('mousemove', dragMove);
+  document.addEventListener('mouseup', dragEnd);
+
+  // Touch
+  card.addEventListener('touchstart', e => dragStart(e.touches[0]), { passive: true });
+  document.addEventListener('touchmove', e => dragMove(e.touches[0]), { passive: true });
+  document.addEventListener('touchend', e => dragEnd(e.changedTouches[0]));
+}
+
+function dragStart(e) {
+  if (state.feedback) return;
+  state.dragging = true;
+  state.dragStartX = e.clientX;
+  state.dragCurrentX = e.clientX;
+  const card = document.getElementById('swipe-card');
+  if (card) card.classList.add('dragging');
+}
+
+function dragMove(e) {
+  if (!state.dragging) return;
+  state.dragCurrentX = e.clientX;
+  const dx = state.dragCurrentX - state.dragStartX;
+  const card = document.getElementById('swipe-card');
+  if (!card) return;
+  card.style.transform = `translateX(${dx}px) rotate(${dx * 0.04}deg)`;
+
+  const hintL = document.getElementById('hint-left');
+  const hintR = document.getElementById('hint-right');
+  if (dx < -30) { if (hintL) hintL.style.opacity = Math.min(1, Math.abs(dx) / 80); if (hintR) hintR.style.opacity = 0; card.classList.add('tilt-left'); card.classList.remove('tilt-right'); }
+  else if (dx > 30) { if (hintR) hintR.style.opacity = Math.min(1, dx / 80); if (hintL) hintL.style.opacity = 0; card.classList.add('tilt-right'); card.classList.remove('tilt-left'); }
+  else { if (hintL) hintL.style.opacity = 0; if (hintR) hintR.style.opacity = 0; card.classList.remove('tilt-left','tilt-right'); }
+}
+
+function dragEnd(e) {
+  if (!state.dragging) return;
+  state.dragging = false;
+  const dx = (e ? e.clientX : state.dragCurrentX) - state.dragStartX;
+  const card = document.getElementById('swipe-card');
+  if (card) { card.classList.remove('dragging'); card.style.transform = ''; }
+
+  if (dx < -60) answer('reject');
+  else if (dx > 60) answer('accept');
+  else if (card) { card.classList.remove('tilt-left','tilt-right'); const hL = document.getElementById('hint-left'); const hR = document.getElementById('hint-right'); if(hL) hL.style.opacity=0; if(hR) hR.style.opacity=0; }
+}
+
+render();
+</script>
+</body>
+</html>

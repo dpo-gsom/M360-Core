@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Система целей: MBO, KPI, OKR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #C31532;
+  --dark: #003B48;
+  --slate: #495761;
+  --cream: #FAF8F4;
+  --sand: #F0EDE6;
+  --border: #DDD8CF;
+  --white: #FFFFFF;
+  --green: #1A6B4A;
+  --green-bg: #EBF5EF;
+  --green-border: #A8D5BC;
+  --red-bg: #FEF0F2;
+  --red-border: #F2A0AC;
+  --kpi-color: #003B48;
+  --kpi-bg: #E6F0F2;
+  --kpi-border: #8BBAC4;
+  --mbo-color: #6B3FA0;
+  --mbo-bg: #F3EDFB;
+  --mbo-border: #C4A8E8;
+  --okr-color: #B85C00;
+  --okr-bg: #FEF3E6;
+  --okr-border: #F0C080;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--dark);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
+  z-index: 200;
+}
+
+#app { max-width: 680px; margin: 0 auto; padding: 44px 20px 60px; }
+
+/* ── SHARED ── */
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 18px; }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(26px, 6vw, 44px); font-weight: 900; color: var(--dark); line-height: 1.15; margin-bottom: 6px; }
+.page-title span { color: var(--red); display: block; }
+.divider { width: 50px; height: 2px; background: var(--red); margin: 20px 0; }
+
+/* ── INTRO ── */
+.intro { animation: fadeUp 0.5s ease both; }
+
+.legend-box {
+  background: var(--dark); color: var(--white);
+  border-radius: 10px; padding: 20px 22px; margin: 24px 0;
+  font-size: 14px; line-height: 1.7;
+}
+.legend-tag {
+  display: inline-block; background: var(--red); color: var(--white);
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 3px; margin-bottom: 12px;
+}
+
+.tools-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0 28px;
+}
+.tool-card {
+  border-radius: 8px; padding: 14px 12px; border: 1.5px solid;
+  text-align: center;
+}
+.tool-card.kpi { background: var(--kpi-bg); border-color: var(--kpi-border); }
+.tool-card.mbo { background: var(--mbo-bg); border-color: var(--mbo-border); }
+.tool-card.okr { background: var(--okr-bg); border-color: var(--okr-border); }
+.tool-name { font-size: 16px; font-weight: 900; margin-bottom: 4px; font-family: 'Playfair Display', serif; }
+.kpi .tool-name { color: var(--kpi-color); }
+.mbo .tool-name { color: var(--mbo-color); }
+.okr .tool-name { color: var(--okr-color); }
+.tool-desc { font-size: 11px; line-height: 1.5; color: var(--slate); }
+
+.btn-start {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 4px; padding: 15px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-start:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ── PROGRESS ── */
+.progress-wrap { margin-bottom: 28px; }
+.progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.progress-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); }
+.progress-pct { font-size: 11px; font-weight: 700; color: var(--red); }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--red); border-radius: 2px; transition: width 0.5s ease; }
+
+/* ── SITUATION CARD ── */
+.situation-wrap { animation: cardIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both; }
+
+.situation-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 22px 22px 20px; margin-bottom: 16px;
+}
+.situation-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 6px;
+}
+.situation-title {
+  font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700;
+  color: var(--dark); margin-bottom: 14px;
+}
+.situation-body { font-size: 14px; line-height: 1.7; color: var(--slate); }
+
+/* ── SELECT AREA ── */
+.select-area { margin-bottom: 12px; }
+.select-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 10px; }
+
+.tool-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+.tool-btn {
+  padding: 14px 10px; border-radius: 8px; border: 2px solid;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  text-align: center; letter-spacing: 0.5px;
+}
+.tool-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+.tool-btn:active { transform: translateY(0); }
+.tool-btn.disabled { pointer-events: none; opacity: 0.45; }
+
+.tool-btn.kpi { background: var(--kpi-bg); border-color: var(--kpi-border); color: var(--kpi-color); }
+.tool-btn.mbo { background: var(--mbo-bg); border-color: var(--mbo-border); color: var(--mbo-color); }
+.tool-btn.okr { background: var(--okr-bg); border-color: var(--okr-border); color: var(--okr-color); }
+
+.tool-btn.kpi:hover { background: #c8dde2; border-color: var(--kpi-color); }
+.tool-btn.mbo:hover { background: #e2d0f5; border-color: var(--mbo-color); }
+.tool-btn.okr:hover { background: #fce3c0; border-color: var(--okr-color); }
+
+.tool-btn.selected-correct {
+  border-width: 2.5px;
+  box-shadow: 0 0 0 3px rgba(26,107,74,0.15);
+}
+.tool-btn.kpi.selected-correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.tool-btn.mbo.selected-correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.tool-btn.okr.selected-correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+
+.tool-btn.selected-wrong {
+  border-color: var(--red); background: var(--red-bg); color: var(--red); border-width: 2.5px;
+}
+
+/* ── FEEDBACK ── */
+.feedback-box {
+  border-radius: 10px; padding: 16px 18px; margin-bottom: 16px;
+  font-size: 14px; line-height: 1.65;
+  animation: fadeUp 0.3s ease both;
+  display: none;
+}
+.feedback-box.show { display: block; }
+.feedback-box.correct { background: var(--green-bg); border-left: 4px solid var(--green); color: #1A4A35; }
+.feedback-box.wrong   { background: var(--red-bg);   border-left: 4px solid var(--red);   color: #7A1525; }
+
+.feedback-header { font-weight: 700; margin-bottom: 6px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+
+.btn-next {
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 6px; padding: 14px;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; display: none;
+}
+.btn-next:hover { background: var(--red); }
+.btn-next.show { display: block; }
+
+/* ── FINAL DASHBOARD ── */
+.final { animation: fadeUp 0.5s ease both; }
+
+.final-hero {
+  background: var(--dark); color: var(--white);
+  border-radius: 12px; padding: 28px 24px; text-align: center; margin-bottom: 24px;
+}
+.final-icon { font-size: 44px; margin-bottom: 14px; }
+.final-title { font-family: 'Playfair Display', serif; font-size: clamp(20px,5vw,30px); font-weight: 900; margin-bottom: 10px; line-height: 1.2; }
+.final-sub { font-size: 14px; line-height: 1.65; color: rgba(255,255,255,0.75); max-width: 480px; margin: 0 auto; }
+
+.dashboard-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 14px; }
+
+.dashboard { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px; }
+
+.dash-col { border-radius: 10px; padding: 16px 14px; border: 1.5px solid; }
+.dash-col.kpi { background: var(--kpi-bg); border-color: var(--kpi-border); }
+.dash-col.mbo { background: var(--mbo-bg); border-color: var(--mbo-border); }
+.dash-col.okr { background: var(--okr-bg); border-color: var(--okr-border); }
+
+.dash-col-title { font-size: 15px; font-weight: 900; margin-bottom: 4px; font-family: 'Playfair Display', serif; }
+.kpi .dash-col-title { color: var(--kpi-color); }
+.mbo .dash-col-title { color: var(--mbo-color); }
+.okr .dash-col-title { color: var(--okr-color); }
+
+.dash-col-sub { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; opacity: 0.6; }
+.kpi .dash-col-sub { color: var(--kpi-color); }
+.mbo .dash-col-sub { color: var(--mbo-color); }
+.okr .dash-col-sub { color: var(--okr-color); }
+
+.dash-item {
+  font-size: 12px; line-height: 1.5; color: var(--slate);
+  padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.dash-item:last-child { border-bottom: none; padding-bottom: 0; }
+.dash-item-name { font-weight: 700; color: var(--dark); font-size: 11px; margin-bottom: 2px; }
+
+.score-row {
+  display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.score-chip {
+  flex: 1; min-width: 80px; background: var(--white);
+  border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 12px; text-align: center;
+}
+.score-chip-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: var(--dark); }
+.score-chip-label { font-size: 11px; color: var(--slate); margin-top: 2px; }
+
+.btn-restart {
+  width: 100%; background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 6px; padding: 14px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.btn-restart:hover { border-color: var(--dark); background: var(--sand); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes cardIn { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+@media (max-width: 440px) {
+  .tools-grid { grid-template-columns: 1fr; }
+  .tool-options { grid-template-columns: 1fr; }
+  .dashboard { grid-template-columns: 1fr; }
+  .score-row { flex-direction: row; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const SITUATIONS = [
+  {
+    id: 1,
+    label: '\u0421\u0438\u0442\u0443\u0430\u0446\u0438\u044f 1 \u00b7 \u041e\u043f\u0435\u0440\u0430\u0446\u0438\u043e\u043d\u043d\u0430\u044f \u0441\u0442\u0430\u0431\u0438\u043b\u044c\u043d\u043e\u0441\u0442\u044c',
+    title: '\u041e\u043f\u0435\u0440\u0430\u0446\u0438\u043e\u043d\u043d\u0430\u044f \u0441\u0442\u0430\u0431\u0438\u043b\u044c\u043d\u043e\u0441\u0442\u044c',
+    text: '\u0412 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u043c \u043a\u0432\u0430\u0440\u0442\u0430\u043b\u0435 \u0443\u0447\u0430\u0441\u0442\u0438\u043b\u0438\u0441\u044c \u0436\u0430\u043b\u043e\u0431\u044b \u043e\u0442 \u0432\u043d\u0443\u0442\u0440\u0435\u043d\u043d\u0438\u0445 \u0437\u0430\u043a\u0430\u0437\u0447\u0438\u043a\u043e\u0432 \u043d\u0430 \u0441\u0440\u044b\u0432 \u0441\u0440\u043e\u043a\u043e\u0432 \u043f\u043e \u0442\u0435\u043a\u0443\u0449\u0438\u043c \u043f\u0440\u043e\u0435\u043a\u0442\u0430\u043c. \u0421\u0440\u0435\u0434\u043d\u044f\u044f \u0437\u0430\u0434\u0435\u0440\u0436\u043a\u0430 \u0441\u043e\u0441\u0442\u0430\u0432\u043b\u044f\u0435\u0442 5 \u0440\u0430\u0431\u043e\u0447\u0438\u0445 \u0434\u043d\u0435\u0439. \u042d\u0442\u043e\u0442 \u043f\u0440\u043e\u0446\u0435\u0441\u0441 \u043d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u043e \u0432\u0437\u044f\u0442\u044c \u043f\u043e\u0434 \u0436\u0451\u0441\u0442\u043a\u0438\u0439 \u043a\u043e\u043d\u0442\u0440\u043e\u043b\u044c, \u0442\u0430\u043a \u043a\u0430\u043a \u043e\u043d \u0432\u043b\u0438\u044f\u0435\u0442 \u043d\u0430 \u0440\u0435\u043f\u0443\u0442\u0430\u0446\u0438\u044e \u043e\u0442\u0434\u0435\u043b\u0430.',
+    correct: 'KPI',
+    feedbackCorrect: '\u0420\u0435\u0447\u044c \u0438\u0434\u0451\u0442 \u043e \u043a\u043e\u043d\u0442\u0440\u043e\u043b\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u044e\u0449\u0435\u0433\u043e, \u043f\u043e\u0432\u0442\u043e\u0440\u044f\u044e\u0449\u0435\u0433\u043e\u0441\u044f \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u0430. \u0423\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0430 \u0435\u0436\u0435\u043c\u0435\u0441\u044f\u0447\u043d\u043e\u0433\u043e KPI \u00ab\u0421\u0440\u0435\u0434\u043d\u0435\u0435 \u043e\u0442\u043a\u043b\u043e\u043d\u0435\u043d\u0438\u0435 \u043e\u0442 \u043f\u043b\u0430\u043d\u043e\u0432\u044b\u0445 \u0441\u0440\u043e\u043a\u043e\u0432 \u2014 \u043d\u0435 \u0431\u043e\u043b\u0435\u0435 1 \u0434\u043d\u044f\u00bb \u043f\u043e\u043c\u043e\u0436\u0435\u0442 \u0441\u0442\u0430\u0431\u0438\u043b\u0438\u0437\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0441\u0438\u0442\u0443\u0430\u0446\u0438\u044e \u0438 \u0441\u0442\u0430\u043d\u0435\u0442 \u043e\u0441\u043d\u043e\u0432\u0430\u043d\u0438\u0435\u043c \u0434\u043b\u044f \u0435\u0436\u0435\u043c\u0435\u0441\u044f\u0447\u043d\u043e\u0439 \u043f\u0440\u0435\u043c\u0438\u0438.',
+    feedbackWrong: {
+      MBO: 'MBO \u043f\u043e\u0434\u0445\u043e\u0434\u0438\u0442 \u0434\u043b\u044f \u0440\u0430\u0437\u0432\u0438\u0432\u0430\u044e\u0449\u0438\u0445 \u0438\u043b\u0438 \u043f\u0440\u043e\u0435\u043a\u0442\u043d\u044b\u0445 \u0446\u0435\u043b\u0435\u0439, \u0430 \u043d\u0435 \u0434\u043b\u044f \u043c\u043e\u043d\u0438\u0442\u043e\u0440\u0438\u043d\u0433\u0430 \u043e\u043f\u0435\u0440\u0430\u0446\u0438\u043e\u043d\u043d\u043e\u0439 \u0434\u0438\u0441\u0446\u0438\u043f\u043b\u0438\u043d\u044b \u0432 \u0440\u0435\u0436\u0438\u043c\u0435 \u0440\u0435\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.',
+      OKR: 'OKR \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f \u0434\u043b\u044f \u0430\u043c\u0431\u0438\u0446\u0438\u043e\u0437\u043d\u044b\u0445 \u043f\u0440\u043e\u0440\u044b\u0432\u043d\u044b\u0445 \u0446\u0435\u043b\u0435\u0439, \u0430 \u043d\u0435 \u0434\u043b\u044f \u043a\u043e\u043d\u0442\u0440\u043e\u043b\u044f \u043e\u043f\u0435\u0440\u0430\u0446\u0438\u043e\u043d\u043d\u043e\u0439 \u0434\u0438\u0441\u0446\u0438\u043f\u043b\u0438\u043d\u044b. \u0423\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0430 OKR \u043d\u0430 \u044d\u0442\u0443 \u0437\u0430\u0434\u0430\u0447\u0443 \u0434\u0435\u043c\u043e\u0442\u0438\u0432\u0438\u0440\u0443\u0435\u0442 \u043a\u043e\u043c\u0430\u043d\u0434\u0443.'
+    }
+  },
+  {
+    id: 2,
+    label: '\u0421\u0438\u0442\u0443\u0430\u0446\u0438\u044f 2 \u00b7 \u0420\u0430\u0437\u0432\u0438\u0442\u0438\u0435 \u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u043a\u0430',
+    title: '\u0420\u0430\u0437\u0432\u0438\u0442\u0438\u0435 \u043a\u043b\u044e\u0447\u0435\u0432\u043e\u0433\u043e \u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u043a\u0430',
+    text: '\u0412\u0430\u0448 \u0432\u0435\u0434\u0443\u0449\u0438\u0439 \u0430\u043d\u0430\u043b\u0438\u0442\u0438\u043a \u0410\u043b\u0435\u043a\u0441\u0435\u0439 \u2014 \u043d\u0435\u0437\u0430\u043c\u0435\u043d\u0438\u043c\u044b\u0439 \u0442\u0435\u0445\u043d\u0438\u0447\u0435\u0441\u043a\u0438\u0439 \u0441\u043f\u0435\u0446\u0438\u0430\u043b\u0438\u0441\u0442. \u041e\u0434\u043d\u0430\u043a\u043e \u0434\u043b\u044f \u0434\u0430\u043b\u044c\u043d\u0435\u0439\u0448\u0435\u0433\u043e \u043a\u0430\u0440\u044c\u0435\u0440\u043d\u043e\u0433\u043e \u0440\u043e\u0441\u0442\u0430 \u0435\u043c\u0443 \u043d\u0435 \u0445\u0432\u0430\u0442\u0430\u0435\u0442 \u043d\u0430\u0432\u044b\u043a\u043e\u0432 \u0443\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u044f \u043b\u044e\u0434\u044c\u043c\u0438. \u0412\u044b \u0445\u043e\u0442\u0438\u0442\u0435 \u043f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u0438\u0442\u044c \u0435\u0433\u043e \u043a \u0440\u043e\u043b\u0438 \u0442\u0438\u043c\u043b\u0438\u0434\u0430 \u0432 \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u043c \u0433\u043e\u0434\u0443.',
+    correct: 'MBO',
+    feedbackCorrect: '\u042d\u0442\u043e \u043a\u043b\u0430\u0441\u0441\u0438\u0447\u0435\u0441\u043a\u0430\u044f \u0433\u043e\u0434\u043e\u0432\u0430\u044f \u0446\u0435\u043b\u044c \u043f\u043e \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u044e, \u043d\u0430\u043f\u0440\u044f\u043c\u0443\u044e \u0441\u0432\u044f\u0437\u0430\u043d\u043d\u0430\u044f \u0441\u043e \u0441\u0442\u0440\u0430\u0442\u0435\u0433\u0438\u0435\u0439 \u0443\u0434\u0435\u0440\u0436\u0430\u043d\u0438\u044f \u0442\u0430\u043b\u0430\u043d\u0442\u043e\u0432. \u0426\u0435\u043b\u044c \u043f\u043e MBO: \u043f\u0440\u043e\u0439\u0442\u0438 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u0443 \u043a\u0430\u0434\u0440\u043e\u0432\u043e\u0433\u043e \u0440\u0435\u0437\u0435\u0440\u0432\u0430 \u0438 \u0432\u0437\u044f\u0442\u044c \u043d\u0430 \u043c\u0435\u043d\u0442\u043e\u0440\u0441\u0442\u0432\u043e \u043e\u0434\u043d\u043e\u0433\u043e \u0441\u0442\u0430\u0436\u0451\u0440\u0430 \u0441 \u0443\u0441\u043f\u0435\u0448\u043d\u044b\u043c \u043f\u0440\u043e\u0445\u043e\u0436\u0434\u0435\u043d\u0438\u0435\u043c \u0438\u043c \u0438\u0441\u043f\u044b\u0442\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0433\u043e \u0441\u0440\u043e\u043a\u0430. \u0414\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u0435 \u0441\u0442\u0430\u043d\u0435\u0442 \u043e\u0441\u043d\u043e\u0432\u0430\u043d\u0438\u0435\u043c \u0434\u043b\u044f \u0433\u043e\u0434\u043e\u0432\u043e\u0433\u043e \u0431\u043e\u043d\u0443\u0441\u0430 \u0438\u043b\u0438 \u043f\u043e\u0432\u044b\u0448\u0435\u043d\u0438\u044f.',
+    feedbackWrong: {
+      KPI: '\u041d\u0430\u0432\u044b\u043a\u0438 \u043c\u0435\u043d\u0442\u043e\u0440\u0441\u0442\u0432\u0430 \u0441\u043b\u043e\u0436\u043d\u043e \u0438\u0437\u043c\u0435\u0440\u0438\u0442\u044c \u0435\u0436\u0435\u0434\u043d\u0435\u0432\u043d\u044b\u043c KPI. \u042d\u0442\u043e \u0434\u043e\u043b\u0433\u043e\u0441\u0440\u043e\u0447\u043d\u0430\u044f \u0440\u0430\u0437\u0432\u0438\u0432\u0430\u044e\u0449\u0430\u044f \u0446\u0435\u043b\u044c \u2014 \u0435\u0451 \u0433\u043e\u0440\u0438\u0437\u043e\u043d\u0442 \u0433\u043e\u0434, \u0430 \u043d\u0435 \u043c\u0435\u0441\u044f\u0446.',
+      OKR: 'OKR \u0437\u0430\u0434\u0430\u0451\u0442\u0441\u044f \u043d\u0430 \u043a\u0432\u0430\u0440\u0442\u0430\u043b \u0438 \u043d\u0430\u0446\u0435\u043b\u0435\u043d \u043d\u0430 \u043f\u0440\u043e\u0440\u044b\u0432. \u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0430 \u043a \u0440\u043e\u043b\u0438 \u0442\u0438\u043c\u043b\u0438\u0434\u0430 \u2014 \u044d\u0442\u043e \u043f\u043b\u0430\u043d\u043e\u0432\u043e\u0435 \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u0435, \u0430 \u043d\u0435 \u044d\u043a\u0441\u043f\u0435\u0440\u0438\u043c\u0435\u043d\u0442\u0430\u043b\u044c\u043d\u0430\u044f \u0433\u0438\u043f\u043e\u0442\u0435\u0437\u0430.'
+    }
+  },
+  {
+    id: 3,
+    label: '\u0421\u0438\u0442\u0443\u0430\u0446\u0438\u044f 3 \u00b7 \u0418\u043d\u043d\u043e\u0432\u0430\u0446\u0438\u043e\u043d\u043d\u044b\u0439 \u043f\u0440\u043e\u0440\u044b\u0432',
+    title: '\u0418\u043d\u043d\u043e\u0432\u0430\u0446\u0438\u043e\u043d\u043d\u044b\u0439 \u043f\u0440\u043e\u0440\u044b\u0432',
+    text: '\u0414\u0438\u0440\u0435\u043a\u0442\u043e\u0440 \u0443\u043f\u043e\u043c\u044f\u043d\u0443\u043b \u043f\u043e\u0438\u0441\u043a \u043d\u043e\u0432\u044b\u0445 \u0442\u043e\u0447\u0435\u043a \u0440\u043e\u0441\u0442\u0430. \u0423 \u0432\u0430\u0441 \u0435\u0441\u0442\u044c \u0433\u0438\u043f\u043e\u0442\u0435\u0437\u0430, \u0447\u0442\u043e \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0435\u0439\u0440\u043e\u0441\u0435\u0442\u0435\u0439 \u0434\u043b\u044f \u0430\u043d\u0430\u043b\u0438\u0437\u0430 \u0434\u0430\u043d\u043d\u044b\u0445 \u043c\u043e\u0436\u0435\u0442 \u0441\u043e\u043a\u0440\u0430\u0442\u0438\u0442\u044c \u0432\u0440\u0435\u043c\u044f \u043d\u0430 \u043f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0443 \u0430\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0438 \u0432\u0434\u0432\u043e\u0435. \u042d\u0442\u043e \u0440\u0438\u0441\u043a\u043e\u0432\u0430\u043d\u043d\u0430\u044f, \u043d\u043e \u043f\u043e\u0442\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u043e \u043e\u0447\u0435\u043d\u044c \u0432\u044b\u0433\u043e\u0434\u043d\u0430\u044f \u0438\u043d\u0438\u0446\u0438\u0430\u0442\u0438\u0432\u0430. \u041a\u0430\u0442\u044f, \u0432\u0430\u0448 \u043c\u043b\u0430\u0434\u0448\u0438\u0439 \u0441\u043f\u0435\u0446\u0438\u0430\u043b\u0438\u0441\u0442, \u0433\u043e\u0440\u0438\u0442 \u0436\u0435\u043b\u0430\u043d\u0438\u0435\u043c \u043f\u043e\u043f\u0440\u043e\u0431\u043e\u0432\u0430\u0442\u044c.',
+    correct: 'OKR',
+    feedbackCorrect: '\u0410\u043c\u0431\u0438\u0446\u0438\u043e\u0437\u043d\u0430\u044f, \u0440\u0438\u0441\u043a\u043e\u0432\u0430\u043d\u043d\u0430\u044f \u0446\u0435\u043b\u044c \u0441 \u043d\u0435\u043e\u0447\u0435\u0432\u0438\u0434\u043d\u044b\u043c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u043e\u043c \u2014 \u0438\u0434\u0435\u0430\u043b\u044c\u043d\u044b\u0439 \u043a\u0430\u043d\u0434\u0438\u0434\u0430\u0442 \u0434\u043b\u044f OKR. \u0426\u0435\u043b\u044c \u043d\u0430 \u043a\u0432\u0430\u0440\u0442\u0430\u043b: \u043f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c \u0433\u0438\u043f\u043e\u0442\u0435\u0437\u0443 \u043e\u0431 \u044d\u0444\u0444\u0435\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u0438 \u0418\u0418 \u0432 \u0430\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0435. \u041a\u043b\u044e\u0447\u0435\u0432\u044b\u0435 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u044b: \u043f\u0440\u043e\u0442\u0435\u0441\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c 3 \u043d\u0435\u0439\u0440\u043e\u0441\u0435\u0442\u0435\u0432\u044b\u0435 \u043c\u043e\u0434\u0435\u043b\u0438; \u0434\u043e\u0431\u0438\u0442\u044c\u0441\u044f \u0441\u043e\u043a\u0440\u0430\u0449\u0435\u043d\u0438\u044f \u0432\u0440\u0435\u043c\u0435\u043d\u0438 \u043e\u0431\u0440\u0430\u0431\u043e\u0442\u043a\u0438 \u043e\u0434\u043d\u043e\u0433\u043e \u043e\u0442\u0447\u0451\u0442\u0430 \u043d\u0430 40% \u043d\u0430 \u0442\u0435\u0441\u0442\u043e\u0432\u044b\u0445 \u0434\u0430\u043d\u043d\u044b\u0445. \u041f\u0440\u044f\u043c\u043e\u0439 \u043f\u0440\u0435\u043c\u0438\u0438 \u043d\u0435 \u0431\u0443\u0434\u0435\u0442, \u043d\u043e \u0432 \u0441\u043b\u0443\u0447\u0430\u0435 \u0443\u0441\u043f\u0435\u0445\u0430 \u041a\u0430\u0442\u044f \u0441\u0442\u0430\u043d\u0435\u0442 \u0433\u043b\u0430\u0432\u043d\u044b\u043c \u044d\u043a\u0441\u043f\u0435\u0440\u0442\u043e\u043c \u043f\u043e \u043d\u043e\u0432\u043e\u043c\u0443 \u043d\u0430\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u044e.',
+    feedbackWrong: {
+      KPI: 'KPI \u0444\u0438\u043a\u0441\u0438\u0440\u0443\u0435\u0442 \u0441\u0442\u0430\u043d\u0434\u0430\u0440\u0442 \u0440\u0430\u0431\u043e\u0442\u0430\u044e\u0449\u0435\u0433\u043e \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u0430. \u0417\u0434\u0435\u0441\u044c \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u0430 \u0435\u0449\u0451 \u043d\u0435\u0442 \u2014 \u0435\u0441\u0442\u044c \u0442\u043e\u043b\u044c\u043a\u043e \u0433\u0438\u043f\u043e\u0442\u0435\u0437\u0430. \u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c KPI \u0434\u043b\u044f \u0442\u043e\u0433\u043e, \u0447\u0435\u0433\u043e \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442, \u2014 \u0437\u043d\u0430\u0447\u0438\u0442 \u0437\u0430\u0440\u0430\u043d\u0435\u0435 \u043d\u0430\u0441\u0442\u0440\u043e\u0438\u0442\u044c \u043a\u043e\u043c\u0430\u043d\u0434\u0443 \u043d\u0430 \u043f\u0440\u043e\u0432\u0430\u043b.',
+      MBO: 'MBO \u043f\u043e\u0434\u0445\u043e\u0434\u0438\u0442 \u0434\u043b\u044f \u043f\u043b\u0430\u043d\u043e\u0432\u044b\u0445 \u0446\u0435\u043b\u0435\u0439 \u0441 \u043f\u0440\u0435\u0434\u0441\u043a\u0430\u0437\u0443\u0435\u043c\u044b\u043c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u043e\u043c. \u0417\u0434\u0435\u0441\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 \u043d\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u0435\u043d \u2014 \u044d\u0442\u043e \u044d\u043a\u0441\u043f\u0435\u0440\u0438\u043c\u0435\u043d\u0442, \u0430 \u043d\u0435 \u043f\u043b\u0430\u043d\u043e\u0432\u043e\u0435 \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u0435.'
+    }
+  },
+  {
+    id: 4,
+    label: '\u0421\u0438\u0442\u0443\u0430\u0446\u0438\u044f 4 \u00b7 \u041d\u043e\u0432\u044b\u0439 \u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u043a',
+    title: '\u041d\u043e\u0432\u044b\u0439 \u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u043a \u043d\u0430 \u0438\u0441\u043f\u044b\u0442\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u043c \u0441\u0440\u043e\u043a\u0435',
+    text: '\u0412\u044b \u0432\u0437\u044f\u043b\u0438 \u0432 \u043a\u043e\u043c\u0430\u043d\u0434\u0443 \u043d\u043e\u0432\u043e\u0433\u043e \u0441\u043f\u0435\u0446\u0438\u0430\u043b\u0438\u0441\u0442\u0430, \u0418\u0433\u043e\u0440\u044f. \u0415\u043c\u0443 \u043f\u0440\u0435\u0434\u0441\u0442\u043e\u0438\u0442 \u043f\u0440\u043e\u0439\u0442\u0438 \u0438\u0441\u043f\u044b\u0442\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0439 \u0441\u0440\u043e\u043a \u2014 3 \u043c\u0435\u0441\u044f\u0446\u0430. \u0412\u044b \u0445\u043e\u0442\u0438\u0442\u0435 \u0447\u0451\u0442\u043a\u043e \u043e\u0431\u043e\u0437\u043d\u0430\u0447\u0438\u0442\u044c \u043e\u0436\u0438\u0434\u0430\u043d\u0438\u044f, \u0447\u0442\u043e\u0431\u044b \u043f\u043e \u0438\u0442\u043e\u0433\u0430\u043c \u043f\u0440\u0438\u043d\u044f\u0442\u044c \u0440\u0435\u0448\u0435\u043d\u0438\u0435 \u043e \u0435\u0433\u043e \u043e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u0438 \u0432 \u0448\u0442\u0430\u0442.',
+    correct: 'MBO',
+    feedbackCorrect: '\u041f\u043b\u0430\u043d \u043d\u0430 \u0438\u0441\u043f\u044b\u0442\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0439 \u0441\u0440\u043e\u043a \u2014 \u043a\u043b\u0430\u0441\u0441\u0438\u0447\u0435\u0441\u043a\u0438\u0439 \u043f\u0440\u0438\u043c\u0435\u0440 MBO. \u0412\u044b \u0441\u0442\u0430\u0432\u0438\u0442\u0435 \u043a\u043e\u043d\u043a\u0440\u0435\u0442\u043d\u044b\u0435 \u0446\u0435\u043b\u0438 (\u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440: \u0441\u0430\u043c\u043e\u0441\u0442\u043e\u044f\u0442\u0435\u043b\u044c\u043d\u043e \u0437\u0430\u043a\u0440\u044b\u0442\u044c 5 \u0442\u0438\u043f\u043e\u0432\u044b\u0445 \u0437\u0430\u0434\u0430\u0447, \u0443\u0441\u043f\u0435\u0448\u043d\u043e \u0441\u0434\u0430\u0442\u044c \u0432\u043d\u0443\u0442\u0440\u0435\u043d\u043d\u0438\u0439 \u0442\u0435\u0441\u0442 \u043f\u043e \u0440\u0435\u0433\u043b\u0430\u043c\u0435\u043d\u0442\u0430\u043c), \u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0436\u0451\u0441\u0442\u043a\u043e \u043f\u0440\u0438\u0432\u044f\u0437\u0430\u043d\u044b \u043a \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0443 \u2014 \u043f\u0440\u043e\u0445\u043e\u0436\u0434\u0435\u043d\u0438\u044e \u0438\u0441\u043f\u044b\u0442\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0433\u043e \u0441\u0440\u043e\u043a\u0430.',
+    feedbackWrong: {
+      KPI: 'KPI \u0445\u043e\u0440\u043e\u0448\u043e \u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442 \u0434\u043b\u044f \u0443\u0436\u0435 \u043e\u0441\u0432\u043e\u0438\u0432\u0448\u0435\u0433\u043e\u0441\u044f \u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u043a\u0430, \u0443 \u043a\u043e\u0442\u043e\u0440\u043e\u0433\u043e \u0435\u0441\u0442\u044c \u0443\u0441\u0442\u043e\u0439\u0447\u0438\u0432\u044b\u0435 \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u044b. \u041d\u0430 \u0438\u0441\u043f\u044b\u0442\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u043c \u0441\u0440\u043e\u043a\u0435 \u043d\u0443\u0436\u043d\u044b \u043a\u043e\u043d\u043a\u0440\u0435\u0442\u043d\u044b\u0435 \u0446\u0435\u043b\u0438-\u0432\u0435\u0445\u0438, \u0430 \u043d\u0435 \u0435\u0436\u0435\u043c\u0435\u0441\u044f\u0447\u043d\u044b\u0435 \u043c\u0435\u0442\u0440\u0438\u043a\u0438.',
+      OKR: 'OKR \u2014 \u0438\u043d\u0441\u0442\u0440\u0443\u043c\u0435\u043d\u0442 \u0434\u043b\u044f \u0430\u043c\u0431\u0438\u0446\u0438\u043e\u0437\u043d\u044b\u0445 \u044d\u043a\u0441\u043f\u0435\u0440\u0438\u043c\u0435\u043d\u0442\u043e\u0432. \u0418\u0441\u043f\u044b\u0442\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0439 \u0441\u0440\u043e\u043a \u2014 \u044d\u0442\u043e \u0430\u0434\u0430\u043f\u0442\u0430\u0446\u0438\u044f \u0438 \u0431\u0430\u0437\u043e\u0432\u0430\u044f \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u043a\u043e\u043c\u043f\u0435\u0442\u0435\u043d\u0442\u043d\u043e\u0441\u0442\u0438, \u0430 \u043d\u0435 \u043f\u0440\u043e\u0440\u044b\u0432\u043d\u0430\u044f \u0437\u0430\u0434\u0430\u0447\u0430.'
+    }
+  },
+  {
+    id: 5,
+    label: '\u0421\u0438\u0442\u0443\u0430\u0446\u0438\u044f 5 \u00b7 \u0420\u0443\u0442\u0438\u043d\u0430 \u0438 \u0434\u0438\u0441\u0446\u0438\u043f\u043b\u0438\u043d\u0430',
+    title: '\u0420\u0443\u0442\u0438\u043d\u0430 \u0438 \u0434\u0438\u0441\u0446\u0438\u043f\u043b\u0438\u043d\u0430',
+    text: '\u0412\u0430\u0448\u0430 \u043a\u043e\u043c\u0430\u043d\u0434\u0430 (\u0432\u043a\u043b\u044e\u0447\u0430\u044f \u041a\u0430\u0442\u044e \u0438 \u0410\u043b\u0435\u043a\u0441\u0435\u044f) \u043e\u0442\u0432\u0435\u0447\u0430\u0435\u0442 \u0437\u0430 \u0435\u0436\u0435\u0434\u043d\u0435\u0432\u043d\u0443\u044e \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0443 \u0438 \u0430\u043a\u0442\u0443\u0430\u043b\u0438\u0437\u0430\u0446\u0438\u044e \u0431\u0430\u0437 \u0434\u0430\u043d\u043d\u044b\u0445. \u0412 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0435 \u0432\u0440\u0435\u043c\u044f \u0432 \u0431\u0430\u0437\u0430\u0445 \u0441\u0442\u0430\u043b\u043e \u043f\u043e\u044f\u0432\u043b\u044f\u0442\u044c\u0441\u044f \u0431\u043e\u043b\u044c\u0448\u0435 \u043e\u0448\u0438\u0431\u043e\u043a \u0440\u0443\u0447\u043d\u043e\u0433\u043e \u0432\u0432\u043e\u0434\u0430. \u0420\u0430\u0431\u043e\u0442\u0430 \u043c\u043e\u043d\u043e\u0442\u043e\u043d\u043d\u0430\u044f, \u043d\u043e \u043a\u0440\u0438\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0432\u0430\u0436\u043d\u0430\u044f \u0434\u043b\u044f \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438.',
+    correct: 'KPI',
+    feedbackCorrect: '\u0420\u0443\u0442\u0438\u043d\u043d\u0430\u044f, \u043c\u043e\u043d\u043e\u0442\u043e\u043d\u043d\u0430\u044f \u0440\u0430\u0431\u043e\u0442\u0430, \u0442\u0440\u0435\u0431\u0443\u044e\u0449\u0430\u044f \u043f\u043e\u0441\u0442\u043e\u044f\u043d\u043d\u043e\u0433\u043e \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u0430\u043d\u0438\u044f \u0441\u0442\u0430\u043d\u0434\u0430\u0440\u0442\u0430 \u043a\u0430\u0447\u0435\u0441\u0442\u0432\u0430, \u0443\u043f\u0440\u0430\u0432\u043b\u044f\u0435\u0442\u0441\u044f \u0447\u0435\u0440\u0435\u0437 KPI. \u041f\u043e\u043a\u0430\u0437\u0430\u0442\u0435\u043b\u044c \u00ab\u041f\u0440\u043e\u0446\u0435\u043d\u0442 \u043e\u0448\u0438\u0431\u043e\u043a \u0440\u0443\u0447\u043d\u043e\u0433\u043e \u0432\u0432\u043e\u0434\u0430 \u2014 \u043d\u0435 \u0431\u043e\u043b\u0435\u0435 1% \u043d\u0430 1000 \u0437\u0430\u043f\u0438\u0441\u0435\u0439\u00bb \u0441 \u043f\u0440\u0438\u0432\u044f\u0437\u043a\u043e\u0439 \u043a \u0431\u0430\u0437\u043e\u0432\u043e\u0439 \u043f\u0440\u0435\u043c\u0438\u0438 \u0432\u0435\u0440\u043d\u0451\u0442 \u0434\u0438\u0441\u0446\u0438\u043f\u043b\u0438\u043d\u0443 \u0432 \u043e\u0442\u0434\u0435\u043b.',
+    feedbackWrong: {
+      MBO: 'MBO \u0437\u0430\u0434\u0430\u0451\u0442\u0441\u044f \u0440\u0430\u0437 \u0432 \u0433\u043e\u0434 \u0438 \u043d\u0430\u0446\u0435\u043b\u0435\u043d \u043d\u0430 \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u0435 \u0438\u043b\u0438 \u0437\u043d\u0430\u0447\u0438\u043c\u044b\u0439 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442. \u0415\u0436\u0435\u0434\u043d\u0435\u0432\u043d\u044b\u0439 \u043a\u043e\u043d\u0442\u0440\u043e\u043b\u044c \u043a\u0430\u0447\u0435\u0441\u0442\u0432\u0430 \u0434\u0430\u043d\u043d\u044b\u0445 \u2014 \u044d\u0442\u043e \u043e\u043f\u0435\u0440\u0430\u0446\u0438\u043e\u043d\u043d\u044b\u0439 \u0441\u0442\u0430\u043d\u0434\u0430\u0440\u0442, \u0430 \u043d\u0435 \u0433\u043e\u0434\u043e\u0432\u0430\u044f \u0446\u0435\u043b\u044c.',
+      OKR: 'OKR \u043d\u0443\u0436\u0435\u043d \u0434\u043b\u044f \u043f\u0440\u043e\u0440\u044b\u0432\u0430, \u0430 \u043d\u0435 \u0434\u043b\u044f \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u0430\u043d\u0438\u044f \u043c\u0438\u043d\u0438\u043c\u0430\u043b\u044c\u043d\u043e\u0439 \u043d\u043e\u0440\u043c\u044b \u043a\u0430\u0447\u0435\u0441\u0442\u0432\u0430. \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043d\u0438\u0435 OKR \u0437\u0434\u0435\u0441\u044c \u043e\u0431\u0435\u0441\u0446\u0435\u043d\u0438\u0442 \u0441\u0430\u043c \u0438\u043d\u0441\u0442\u0440\u0443\u043c\u0435\u043d\u0442.'
+    }
+  }
+];
+
+const TOOL_META = {
+  KPI: { cls: 'kpi', sub: 'Метрика процесса' },
+  MBO: { cls: 'mbo', sub: 'Цель развития' },
+  OKR: { cls: 'okr', sub: 'Амбициозный прорыв' }
+};
+
+// Dashboard items for final screen
+const DASHBOARD_ITEMS = {
+  KPI: [
+    { name: "Срыв сроков", text: "Отклонение ≤ 1 день" },
+    { name: "Качество БД", text: "Ошибок ≤ 1% / 1000 записей" }
+  ],
+  MBO: [
+    { name: "Алексей", text: "Подготовка к роли тимлида" },
+    { name: "Игорь", text: "Успешный испытательный срок" }
+  ],
+  OKR: [
+    { name: "Катя", text: "ИИ-аналитика: -40% времени" }
+  ]
+};
+
+let state = {
+  screen: 'intro',
+  idx: 0,
+  answered: false,
+  correctCount: 0,
+  results: []
+};
+
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'intro') app.innerHTML = renderIntro();
+  else if (state.screen === 'quiz') app.innerHTML = renderQuiz();
+  else if (state.screen === 'final') app.innerHTML = renderFinal();
+}
+
+function renderIntro() {
+  return `<div class="intro">
+    <div class="eyebrow">Управление эффективностью</div>
+    <div class="page-title">Система целей:<span>MBO, KPI и OKR</span></div>
+    <div class="divider"></div>
+
+    <div class="legend-box">
+      <div class="legend-tag">Легенда</div>
+      Вы — руководитель проектного отдела. Директор поставил стратегическую цель: <strong>«Повысить качество текущих продуктов и найти новые точки роста за счёт инноваций»</strong>.<br><br>
+      Вам нужно декомпозировать эту цель до уровня сотрудников, выбирая правильный инструмент для каждой ситуации.
+    </div>
+
+    <div class="tools-grid">
+      <div class="tool-card kpi">
+        <div class="tool-name">KPI</div>
+        <div class="tool-desc">Контроль повторяющихся процессов. Измеримые метрики с привязкой к премии.</div>
+      </div>
+      <div class="tool-card mbo">
+        <div class="tool-name">MBO</div>
+        <div class="tool-desc">Конкретные цели развития или результата на год. Основа для бонуса или роста.</div>
+      </div>
+      <div class="tool-card okr">
+        <div class="tool-name">OKR</div>
+        <div class="tool-desc">Амбициозные прорывные гипотезы. Цель + измеримые результаты на квартал.</div>
+      </div>
+    </div>
+
+    <button class="btn-start" onclick="startQuiz()">Начать →</button>
+  </div>`;
+}
+
+function renderQuiz() {
+  const sit = SITUATIONS[state.idx];
+  const pct = Math.round((state.idx / SITUATIONS.length) * 100);
+
+  const toolBtns = ['KPI', 'MBO', 'OKR'].map(t => {
+    let cls = `tool-btn ${TOOL_META[t].cls}`;
+    if (state.answered) cls += ' disabled';
+    return `<button class="${cls}" id="btn-${t}" onclick="answer('${t}')">${t}</button>`;
+  }).join('');
+
+  return `<div class="quiz-screen">
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <div class="progress-label">Ситуация ${state.idx + 1} из ${SITUATIONS.length}</div>
+        <div class="progress-pct">${pct}%</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="situation-wrap">
+      <div class="situation-card">
+        <div class="situation-eyebrow">${sit.label}</div>
+        <div class="situation-title">${sit.title}</div>
+        <div class="situation-body">${sit.text}</div>
+      </div>
+
+      <div class="select-area">
+        <div class="select-label">Выберите инструмент</div>
+        <div class="tool-options">${toolBtns}</div>
+      </div>
+
+      <div class="feedback-box" id="feedback-box">
+        <div class="feedback-header" id="feedback-header"></div>
+        <div id="feedback-text"></div>
+      </div>
+
+      <button class="btn-next" id="btn-next" onclick="nextSituation()">
+        ${state.idx + 1 >= SITUATIONS.length ? 'Посмотреть итоги →' : 'Следующая ситуация →'}
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderFinal() {
+  const correct = state.correctCount;
+  const total = SITUATIONS.length;
+  const pct = Math.round((correct / total) * 100);
+
+  const colsHtml = ['KPI','MBO','OKR'].map(tool => {
+    const meta = TOOL_META[tool];
+    const items = DASHBOARD_ITEMS[tool].map(item =>
+      `<div class="dash-item"><div class="dash-item-name">${item.name}</div>${item.text}</div>`
+    ).join('');
+    return `<div class="dash-col ${meta.cls}">
+      <div class="dash-col-title">${tool}</div>
+      <div class="dash-col-sub">${meta.sub}</div>
+      ${items}
+    </div>`;
+  }).join('');
+
+  const resultsDetail = state.results.map((r, i) => {
+    const sit = SITUATIONS[i];
+    const isOk = r.chosen === sit.correct;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;margin-bottom:7px;font-size:13px;
+      background:${isOk ? 'var(--green-bg)' : 'var(--red-bg)'};
+      border:1px solid ${isOk ? 'var(--green-border)' : 'var(--red-border)'};
+      animation:fadeUp 0.3s ease ${i*0.05}s both;">
+      <span style="font-size:14px;">${isOk ? '✓' : '✕'}</span>
+      <div>
+        <div style="font-weight:700;color:var(--dark);font-size:12px;">${sit.title}</div>
+        <span style="font-size:11px;font-weight:700;color:${isOk ? 'var(--green)' : 'var(--red)'};">
+          ${isOk ? r.chosen + ' — верно' : r.chosen + ' → правильно: ' + sit.correct}
+        </span>
+      </div>
+    </div>`;
+  }).join('');
+
+  let insight = '';
+  if (pct === 100) insight = 'Все инструменты применены верно. Ваша система целей сбалансирована: KPI обеспечивает стабильность, MBO развивает команду, OKR открывает дверь для прорывов.';
+  else if (pct >= 60) insight = 'Большинство инструментов выбраны верно. Вернитесь к ошибкам — они покажут, где граница между KPI, MBO и OKR ещё размыта.';
+  else insight = 'Смешение инструментов — распространённая ошибка. Пересмотрите шпаргалку на стартовом экране и попробуйте ещё раз.';
+
+  return `<div class="final">
+    <div class="final-hero">
+      <div class="final-icon">🎯</div>
+      <div class="final-title">Система целей отдела выстроена</div>
+      <div class="final-sub">${insight}</div>
+    </div>
+
+    <div class="score-row">
+      <div class="score-chip">
+        <div class="score-chip-num">${correct}<span style="font-size:18px;color:var(--slate)">/${total}</span></div>
+        <div class="score-chip-label">верных ответов</div>
+      </div>
+      <div class="score-chip">
+        <div class="score-chip-num">${pct}%</div>
+        <div class="score-chip-label">точность</div>
+      </div>
+    </div>
+
+    <div class="dashboard-title">Дашборд целей вашего отдела</div>
+    <div class="dashboard">${colsHtml}</div>
+
+    <div style="margin-bottom:20px;">
+      <div class="dashboard-title">Детали по ответам</div>
+      ${resultsDetail}
+    </div>
+
+    <button class="btn-restart" onclick="restartQuiz()">↺ Пройти заново</button>
+  </div>`;
+}
+
+function startQuiz() {
+  state = { screen: 'quiz', idx: 0, answered: false, correctCount: 0, results: [] };
+  render();
+}
+
+function answer(chosen) {
+  if (state.answered) return;
+  state.answered = true;
+
+  const sit = SITUATIONS[state.idx];
+  const isCorrect = chosen === sit.correct;
+  if (isCorrect) state.correctCount++;
+  state.results.push({ chosen, correct: sit.correct, isCorrect });
+
+  // Style buttons
+  ['KPI','MBO','OKR'].forEach(t => {
+    const btn = document.getElementById('btn-' + t);
+    if (!btn) return;
+    btn.classList.add('disabled');
+    if (t === sit.correct) btn.classList.add('selected-correct');
+    if (t === chosen && !isCorrect) btn.classList.add('selected-wrong');
+  });
+
+  // Feedback
+  const fb = document.getElementById('feedback-box');
+  const fbHeader = document.getElementById('feedback-header');
+  const fbText = document.getElementById('feedback-text');
+  const btnNext = document.getElementById('btn-next');
+
+  if (isCorrect) {
+    fb.className = 'feedback-box show correct';
+    fbHeader.innerHTML = '✓ Верный выбор';
+    fbText.textContent = sit.feedbackCorrect;
+  } else {
+    fb.className = 'feedback-box show wrong';
+    fbHeader.innerHTML = '✕ Неверный выбор';
+    const wrongMsg = sit.feedbackWrong[chosen] || 'Это не лучший инструмент для данной ситуации.';
+    const correctMsg = sit.feedbackCorrect;
+    fbText.innerHTML = `${wrongMsg}<br><br><strong style="color:var(--dark);">Правильный ответ — ${sit.correct}:</strong> ${correctMsg}`;
+  }
+
+  if (btnNext) btnNext.classList.add('show');
+}
+
+function nextSituation() {
+  state.idx++;
+  state.answered = false;
+  if (state.idx >= SITUATIONS.length) {
+    state.screen = 'final';
+  }
+  render();
+}
+
+function restartQuiz() {
+  state = { screen: 'intro', idx: 0, answered: false, correctCount: 0, results: [] };
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
