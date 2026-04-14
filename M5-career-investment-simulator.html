@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карьерный инвестор</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #C31532;
+  --dark: #003B48;
+  --slate: #495761;
+  --cream: #FAF8F4;
+  --sand: #F0EDE6;
+  --border: #DDD8CF;
+  --white: #FFFFFF;
+  --green: #1A6B4A;
+  --green-bg: #EBF5EF;
+  --green-border: #A8D5BC;
+  --red-bg: #FEF0F2;
+
+  --c1: #4A6FA5;
+  --c2: #C0392B;
+  --c3: #8E6BBE;
+  --c4: #1A6B4A;
+  --c5: #D4850A;
+}
+
+html, body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--cream);
+  color: var(--dark);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
+  z-index: 200;
+}
+
+#app {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 36px 20px 48px;
+}
+
+/* ── SHARED ── */
+.eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 14px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 5vw, 38px); font-weight: 900;
+  color: var(--dark); line-height: 1.15; margin-bottom: 6px;
+}
+.page-title span { color: var(--red); }
+.divider { width: 50px; height: 2px; background: var(--red); margin: 16px 0; }
+.subtitle {
+  font-size: 14px; color: var(--slate); line-height: 1.65; margin-bottom: 24px;
+}
+
+/* ── BUDGET COUNTER ── */
+.budget-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.budget-label {
+  font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--slate);
+}
+.budget-display {
+  display: flex; align-items: center; gap: 8px;
+}
+.budget-num {
+  font-family: 'Playfair Display', serif; font-size: 28px;
+  font-weight: 900; color: var(--dark); transition: color 0.3s;
+  min-width: 42px; text-align: right;
+}
+.budget-num.warn { color: var(--red); }
+.budget-num.ok { color: var(--green); }
+.budget-unit {
+  font-size: 11px; font-weight: 600; color: var(--slate); margin-top: 4px;
+}
+
+/* Progress bar of total budget used */
+.budget-bar-wrap {
+  height: 6px; background: var(--sand); border-radius: 3px;
+  margin-bottom: 24px; overflow: hidden;
+}
+.budget-bar-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--dark), var(--red));
+  transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.budget-bar-fill.over { background: var(--red); }
+
+/* ── SLIDERS ── */
+.sliders-list {
+  display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px;
+}
+
+.slider-item {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+.slider-item:focus-within { border-color: var(--dark); }
+
+.slider-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 10px; margin-bottom: 10px;
+}
+.slider-icon {
+  width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.si-1 .slider-icon { background: #EEF3FB; }
+.si-2 .slider-icon { background: #FDECEA; }
+.si-3 .slider-icon { background: #F4EDFB; }
+.si-4 .slider-icon { background: #EBF5EF; }
+.si-5 .slider-icon { background: #FFF3DC; }
+
+.slider-text { flex: 1; }
+.slider-name {
+  font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 2px;
+}
+.slider-desc {
+  font-size: 11px; color: var(--slate); line-height: 1.5;
+}
+.slider-val {
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900;
+  color: var(--dark); min-width: 40px; text-align: right; flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.slider-track-wrap { position: relative; padding: 4px 0; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%; height: 4px; border-radius: 2px;
+  background: var(--sand); outline: none; cursor: pointer;
+  transition: background 0.2s;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--dark); border: 2px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  cursor: pointer; transition: background 0.2s, transform 0.15s;
+}
+input[type=range]:hover::-webkit-slider-thumb,
+input[type=range]:focus::-webkit-slider-thumb {
+  background: var(--red); transform: scale(1.15);
+}
+input[type=range]::-moz-range-thumb {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--dark); border: 2px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25); cursor: pointer;
+}
+
+/* colour-coded fill via JS inline style on range */
+.si-1 input[type=range]::-webkit-slider-runnable-track { background: transparent; }
+
+/* ── BUTTONS ── */
+.btn-calc {
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 4px; padding: 15px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, transform 0.15s, opacity 0.2s;
+}
+.btn-calc:hover:not(:disabled) { background: var(--red); transform: translateY(-1px); }
+.btn-calc:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-reset {
+  width: 100%; background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 4px; padding: 13px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s; margin-top: 10px;
+}
+.btn-reset:hover { border-color: var(--dark); background: var(--sand); }
+
+/* ── RESULTS ── */
+.results-section { animation: fadeUp 0.5s ease both; }
+
+.results-hero {
+  background: var(--dark); color: var(--white);
+  border-radius: 12px; padding: 22px 22px 18px; margin-bottom: 20px;
+}
+.results-hero-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); margin-bottom: 8px;
+}
+.results-hero-title {
+  font-family: 'Playfair Display', serif; font-size: clamp(18px,4vw,26px);
+  font-weight: 900; line-height: 1.2; margin-bottom: 10px;
+}
+.results-hero-title span { color: #F0A070; }
+.results-hero-sub {
+  font-size: 13px; line-height: 1.65; color: rgba(255,255,255,0.75);
+}
+
+.scenarios-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--slate); margin-bottom: 14px;
+}
+
+.scenarios-list {
+  display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;
+}
+
+.scenario-row {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+  animation: fadeUp 0.4s ease both;
+}
+.scenario-row.top {
+  border-color: var(--dark);
+  box-shadow: 0 2px 10px rgba(0,59,72,0.08);
+}
+
+.scenario-top-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 8px;
+}
+.scenario-icon { font-size: 18px; flex-shrink: 0; }
+.scenario-name {
+  font-size: 13px; font-weight: 700; color: var(--dark); flex: 1;
+  line-height: 1.4;
+}
+.scenario-pct {
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900;
+  color: var(--dark); flex-shrink: 0;
+}
+.scenario-row.top .scenario-pct { color: var(--red); }
+
+.scenario-bar-wrap {
+  height: 5px; background: var(--sand); border-radius: 3px; overflow: hidden;
+}
+.scenario-bar-fill {
+  height: 100%; border-radius: 3px; width: 0;
+  transition: width 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.sb-0 { background: var(--c1); }
+.sb-1 { background: var(--c2); }
+.sb-2 { background: var(--c3); }
+.sb-3 { background: var(--c4); }
+.sb-4 { background: var(--c5); }
+
+.scenario-row.top .scenario-bar-fill { background: var(--dark); }
+
+.scenario-hint {
+  font-size: 11px; color: var(--slate); margin-top: 7px; line-height: 1.5;
+  display: none;
+}
+.scenario-row.top .scenario-hint { display: block; }
+
+/* ── FEEDBACK BOX ── */
+.feedback-card {
+  background: var(--sand); border-radius: 10px;
+  border: 1.5px solid var(--border); padding: 16px 18px; margin-bottom: 20px;
+  font-size: 13px; line-height: 1.7; color: var(--slate);
+  animation: fadeUp 0.5s ease 0.3s both;
+}
+.feedback-card-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--dark); margin-bottom: 8px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── WARN MESSAGE ── */
+.warn-msg {
+  font-size: 12px; color: var(--red); font-weight: 600;
+  margin-top: 8px; display: none; text-align: center;
+  animation: fadeUp 0.3s ease both;
+}
+.warn-msg.show { display: block; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- INPUT SECTION -->
+  <div id="input-section">
+    <div class="eyebrow">Карьерное планирование</div>
+    <div class="page-title">Куда <span>инвестировать</span> себя?</div>
+    <div class="divider"></div>
+    <div class="subtitle">
+      У вас есть <strong>100 единиц</strong> энергии, времени и ресурсов на следующий год.
+      Распределите их между пятью направлениями — и узнайте, к какому карьерному сценарию
+      вы движетесь.
+    </div>
+
+    <!-- Budget display -->
+    <div class="budget-row">
+      <div class="budget-label">Распределено</div>
+      <div class="budget-display">
+        <div class="budget-num" id="spent-num">0</div>
+        <div class="budget-unit">/ 100</div>
+      </div>
+    </div>
+    <div class="budget-bar-wrap">
+      <div class="budget-bar-fill" id="budget-bar" style="width:0%"></div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="sliders-list">
+
+      <div class="slider-item si-1">
+        <div class="slider-header">
+          <div class="slider-icon">🎓</div>
+          <div class="slider-text">
+            <div class="slider-name">Экспертиза и сертификация</div>
+            <div class="slider-desc">Углубление профессиональных знаний, отраслевые сертификаты</div>
+          </div>
+          <div class="slider-val" id="val-0">0</div>
+        </div>
+        <input type="range" min="0" max="100" step="5" value="0" id="sl-0" oninput="onSlide(0,this.value)">
+      </div>
+
+      <div class="slider-item si-2">
+        <div class="slider-header">
+          <div class="slider-icon">🚀</div>
+          <div class="slider-text">
+            <div class="slider-name">Пилотные проекты и инициативы</div>
+            <div class="slider-desc">Запуск новых идей, внутреннее предпринимательство</div>
+          </div>
+          <div class="slider-val" id="val-1">0</div>
+        </div>
+        <input type="range" min="0" max="100" step="5" value="0" id="sl-1" oninput="onSlide(1,this.value)">
+      </div>
+
+      <div class="slider-item si-3">
+        <div class="slider-header">
+          <div class="slider-icon">📈</div>
+          <div class="slider-text">
+            <div class="slider-name">Лидерство и стратегическое мышление</div>
+            <div class="slider-desc">Тренинги по управлению, финансам, стратегии</div>
+          </div>
+          <div class="slider-val" id="val-2">0</div>
+        </div>
+        <input type="range" min="0" max="100" step="5" value="0" id="sl-2" oninput="onSlide(2,this.value)">
+      </div>
+
+      <div class="slider-item si-4">
+        <div class="slider-header">
+          <div class="slider-icon">🤝</div>
+          <div class="slider-text">
+            <div class="slider-name">Волонтёрство и наставничество</div>
+            <div class="slider-desc">Социальные проекты компании, менторство новичков</div>
+          </div>
+          <div class="slider-val" id="val-3">0</div>
+        </div>
+        <input type="range" min="0" max="100" step="5" value="0" id="sl-3" oninput="onSlide(3,this.value)">
+      </div>
+
+      <div class="slider-item si-5">
+        <div class="slider-header">
+          <div class="slider-icon">⚖️</div>
+          <div class="slider-text">
+            <div class="slider-name">Личная эффективность и баланс</div>
+            <div class="slider-desc">Делегирование, выстраивание процессов, баланс работы и жизни</div>
+          </div>
+          <div class="slider-val" id="val-4">0</div>
+        </div>
+        <input type="range" min="0" max="100" step="5" value="0" id="sl-4" oninput="onSlide(4,this.value)">
+      </div>
+
+    </div>
+
+    <div class="warn-msg" id="warn-msg">Сумма должна быть ровно 100. Осталось распределить: <span id="warn-left"></span></div>
+
+    <button class="btn-calc" id="btn-calc" onclick="calculate()" disabled>
+      Рассчитать карьерный прогноз →
+    </button>
+  </div>
+
+  <!-- RESULTS SECTION (hidden initially) -->
+  <div id="results-section" style="display:none"></div>
+
+</div>
+
+<script>
+const TOTAL = 100;
+const vals = [0, 0, 0, 0, 0];
+
+// ── Scenarios config ──
+// Each scenario: name, icon, hint (shown for top scenario)
+// weights[i] = weight of slider i (can be negative to penalise)
+const SCENARIOS = [
+  {
+    name: 'Вертикальный рост до уровня топ-менеджмента',
+    icon: '🏆',
+    weights: [5, 10, 40, 5, -10],
+    hint: 'Ваши инвестиции в лидерство и управление создают сильный сигнал готовности к руководящей роли. Чтобы усилить сценарий — добавьте инициативы и публичную видимость.'
+  },
+  {
+    name: 'Независимый эксперт или внешний консультант',
+    icon: '💡',
+    weights: [35, 30, 5, 5, 5],
+    hint: 'Глубокая экспертиза плюс опыт запуска инициатив — классическая база для консультантского трека. Убедитесь, что у вас есть портфолио реальных кейсов.'
+  },
+  {
+    name: 'Идейный лидер и руководитель социальных проектов',
+    icon: '🌱',
+    weights: [5, 15, 10, 50, 0],
+    hint: 'Вы инвестируете в репутацию через людей. Наставничество и социальные инициативы формируют долгосрочный социальный капитал — это редкий и ценный актив.'
+  },
+  {
+    name: 'Высокооплачиваемый эксперт внутри компании',
+    icon: '🔑',
+    weights: [40, 5, 0, 10, 30],
+    hint: 'Сочетание глубокой экспертизы и отлаженных личных процессов — идеальная формула для роли незаменимого внутреннего эксперта с высокой ценностью и комфортным ритмом.'
+  },
+  {
+    name: 'Собственный бизнес или корпоративный стартап',
+    icon: '🔥',
+    weights: [5, 50, 20, 5, -5],
+    hint: 'Предпринимательский трек требует высокой толерантности к неопределённости. Ваши инвестиции в инициативы — правильная ставка. Добавьте понимание финансов и стратегии.'
+  }
+];
+
+// ── Slider logic ──
+function onSlide(idx, rawVal) {
+  const newVal = parseInt(rawVal);
+  vals[idx] = newVal;
+  updateUI();
+}
+
+function updateUI() {
+  const spent = vals.reduce((a, b) => a + b, 0);
+  const left = TOTAL - spent;
+
+  // update value displays
+  vals.forEach((v, i) => {
+    document.getElementById('val-' + i).textContent = v;
+    // colour slider fill
+    const sl = document.getElementById('sl-' + i);
+    const pct = v;
+    const colors = ['#4A6FA5','#C0392B','#8E6BBE','#1A6B4A','#D4850A'];
+    sl.style.background = `linear-gradient(to right, ${colors[i]} 0%, ${colors[i]} ${pct}%, #F0EDE6 ${pct}%, #F0EDE6 100%)`;
+  });
+
+  // budget bar
+  const bar = document.getElementById('budget-bar');
+  const spentNum = document.getElementById('spent-num');
+  bar.style.width = Math.min(spent, 100) + '%';
+  spentNum.textContent = spent;
+
+  if (spent > TOTAL) {
+    bar.classList.add('over');
+    spentNum.classList.remove('ok');
+    spentNum.classList.add('warn');
+  } else if (spent === TOTAL) {
+    bar.classList.remove('over');
+    spentNum.classList.remove('warn');
+    spentNum.classList.add('ok');
+  } else {
+    bar.classList.remove('over');
+    spentNum.classList.remove('warn', 'ok');
+  }
+
+  // warn message
+  const warnMsg = document.getElementById('warn-msg');
+  const warnLeft = document.getElementById('warn-left');
+  if (spent !== TOTAL) {
+    warnMsg.classList.add('show');
+    warnLeft.textContent = left > 0
+      ? left + ' ед.'
+      : 'убрать лишних ' + Math.abs(left) + ' ед.';
+  } else {
+    warnMsg.classList.remove('show');
+  }
+
+  // button state
+  const btn = document.getElementById('btn-calc');
+  btn.disabled = spent !== TOTAL;
+}
+
+// ── Scoring ──
+function calcScores() {
+  return SCENARIOS.map(sc => {
+    let raw = 0;
+    sc.weights.forEach((w, i) => {
+      raw += w * vals[i];
+    });
+    return raw;
+  });
+}
+
+function calculate() {
+  const raw = calcScores();
+
+  // Normalise to 0-100% range, then scale so it feels meaningful
+  const min = Math.min(...raw);
+  const max = Math.max(...raw);
+  const range = max - min || 1;
+
+  // Map raw to a 5–85% band so nothing is 0% or 100%
+  const pcts = raw.map(r => {
+    const norm = (r - min) / range; // 0..1
+    return Math.round(5 + norm * 80);
+  });
+
+  // Find sorted order
+  const order = pcts.map((p, i) => ({p, i}))
+    .sort((a, b) => b.p - a.p);
+
+  renderResults(pcts, order);
+}
+
+function renderResults(pcts, order) {
+  const resultsEl = document.getElementById('results-section');
+  const inputEl = document.getElementById('input-section');
+
+  const topIdx = order[0].i;
+  const top = SCENARIOS[topIdx];
+  const topPct = pcts[topIdx];
+
+  // Hero insight
+  let heroSub = `На основе распределённых ресурсов система рассчитала вероятность каждого сценария в ближайшие 2–3 года. Помните: невозможно инвестировать во всё сразу без потери эффективности.`;
+
+  // Build scenario rows HTML
+  const rowsHtml = order.map((item, rank) => {
+    const sc = SCENARIOS[item.i];
+    const pct = pcts[item.i];
+    const isTop = rank === 0;
+    return `
+      <div class="scenario-row ${isTop ? 'top' : ''}" style="animation-delay:${rank * 0.07}s">
+        <div class="scenario-top-row">
+          <div class="scenario-icon">${sc.icon}</div>
+          <div class="scenario-name">${sc.name}</div>
+          <div class="scenario-pct">${pct}%</div>
+        </div>
+        <div class="scenario-bar-wrap">
+          <div class="scenario-bar-fill sb-${isTop ? 'top' : item.i}" data-pct="${pct}" style="width:0%"></div>
+        </div>
+        ${isTop ? `<div class="scenario-hint">${sc.hint}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  // Summary of user allocations
+  const areas = ['Экспертиза и сертификация','Пилоты и инициативы','Лидерство','Волонтёрство и наставничество','Личная эффективность'];
+  const topArea = vals.indexOf(Math.max(...vals));
+  const allocSummary = areas.map((a, i) => `<strong>${a}:</strong> ${vals[i]} ед.`).join(' · ');
+
+  resultsEl.innerHTML = `
+    <div class="results-section">
+      <div class="results-hero">
+        <div class="results-hero-tag">Ваш прогноз на 2–3 года</div>
+        <div class="results-hero-title">Наиболее вероятный сценарий:<br><span>${top.name}</span></div>
+        <div class="results-hero-sub">${heroSub}</div>
+      </div>
+
+      <div class="scenarios-label">Карьерные сценарии · вероятность реализации</div>
+      <div class="scenarios-list">${rowsHtml}</div>
+
+      <div class="feedback-card">
+        <div class="feedback-card-title">Хотите изменить прогноз?</div>
+        Попробуйте перераспределить ресурсы — каждое смещение меняет картину.
+        Ваше текущее распределение: ${allocSummary}.<br><br>
+        Чтобы закрепить план, перейдите к заполнению индивидуального плана развития в рабочей тетради.
+      </div>
+
+      <button class="btn-reset" onclick="resetSim()">↺ Попробовать другое распределение</button>
+    </div>`;
+
+  inputEl.style.display = 'none';
+  resultsEl.style.display = 'block';
+
+  // Animate bars after a tick
+  setTimeout(() => {
+    resultsEl.querySelectorAll('.scenario-bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 80);
+}
+
+function resetSim() {
+  // Reset sliders
+  vals.fill(0);
+  for (let i = 0; i < 5; i++) {
+    document.getElementById('sl-' + i).value = 0;
+  }
+  updateUI();
+
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('input-section').style.display = 'block';
+
+  // Reset bar colours
+  for (let i = 0; i < 5; i++) {
+    const sl = document.getElementById('sl-' + i);
+    sl.style.background = '#F0EDE6';
+  }
+}
+
+// Init
+updateUI();
+</script>
+</body>
+</html>
