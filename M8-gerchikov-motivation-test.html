@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест Герчикова — типы мотивации</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red:    #C31532;
+  --dark:   #003B48;
+  --slate:  #495761;
+  --cream:  #FAF8F4;
+  --sand:   #F0EDE6;
+  --border: #DDD8CF;
+  --white:  #FFFFFF;
+  --cIN: #4A6FA5;
+  --cPR: #8E6BBE;
+  --cPA: #1A6B4A;
+  --cHO: #C0392B;
+  --cLU: #888;
+}
+
+html, body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--cream);
+  color: var(--dark);
+  height: 780px;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
+  z-index: 200;
+}
+
+#shell {
+  display: flex;
+  flex-direction: column;
+  height: 780px;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ── HEADER ── */
+.hdr {
+  padding: 22px 0 10px;
+  flex-shrink: 0;
+}
+.eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 8px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 4.5vw, 32px); font-weight: 900;
+  color: var(--dark); line-height: 1.15;
+}
+.page-title span { color: var(--red); }
+
+/* ── PROGRESS ── */
+.progress-wrap { flex-shrink: 0; padding: 10px 0 8px; }
+.progress-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 6px;
+}
+.progress-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--slate);
+}
+.progress-frac {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 900; color: var(--dark);
+}
+.progress-frac span { color: var(--red); }
+.progress-bar-bg { height: 4px; background: var(--sand); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--dark), var(--red));
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── QUESTION CARD ── */
+.q-area { overflow: hidden; }
+.q-card {
+  display: flex; flex-direction: column;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  animation: cardIn 0.32s cubic-bezier(0.34,1.1,0.64,1) both;
+}
+.q-card-head {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--sand);
+  flex-shrink: 0;
+}
+.q-num {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 4px;
+}
+.q-hint {
+  font-size: 11px; color: var(--slate); margin-bottom: 6px; font-style: italic;
+}
+.q-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(14px, 2.8vw, 17px); font-weight: 700;
+  color: var(--dark); line-height: 1.35;
+}
+.q-subtext {
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px; font-weight: 600; color: var(--slate);
+  margin-top: 5px; line-height: 1.4;
+}
+
+/* ── OPTIONS ── */
+.q-opts {
+  overflow-y: auto;
+  max-height: 380px;
+  padding: 10px 18px 14px;
+  display: flex; flex-direction: column; gap: 7px;
+}
+.q-opts::-webkit-scrollbar { width: 3px; }
+.q-opts::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.opt {
+  display: flex; align-items: center; gap: 11px;
+  background: var(--cream); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 10px 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.opt:hover { border-color: var(--dark); background: var(--sand); transform: translateY(-1px); }
+.opt:active { transform: translateY(0); }
+.opt.selected { border-color: var(--dark); background: #EEF3FB; }
+
+.opt-marker {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 11px; font-weight: 700; color: var(--border);
+  transition: all 0.15s;
+}
+.opt.check .opt-marker { border-radius: 4px; }
+.opt.selected .opt-marker {
+  background: var(--dark); border-color: var(--dark); color: var(--white);
+}
+.opt-text {
+  font-size: 13px; line-height: 1.45; color: var(--slate); flex: 1;
+}
+.opt.selected .opt-text { color: var(--dark); font-weight: 600; }
+
+/* ── NAV ── */
+.nav {
+  flex-shrink: 0; padding: 8px 0 0;
+  display: flex; gap: 8px;
+}
+.btn-back {
+  background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 4px;
+  padding: 12px 18px; font-family: 'Manrope', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s; flex-shrink: 0;
+}
+.btn-back:hover { border-color: var(--dark); background: var(--sand); }
+.btn-next {
+  flex: 1; background: var(--dark); color: var(--white);
+  border: none; border-radius: 4px; padding: 12px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.15s, opacity 0.15s, transform 0.1s;
+}
+.btn-next:hover:not(:disabled) { background: var(--red); transform: translateY(-1px); }
+.btn-next:disabled { opacity: 0.32; cursor: not-allowed; transform: none; }
+
+/* ── INTRO ── */
+.intro-body {
+  flex: 1; overflow-y: auto; padding: 2px 0;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.divider { width: 44px; height: 2px; background: var(--red); margin: 2px 0 6px; }
+.intro-text { font-size: 13px; line-height: 1.7; color: var(--slate); }
+.types-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.type-chip { border-radius: 8px; padding: 9px 11px; border: 1.5px solid; }
+.type-chip.IN { background:#EEF3FB; border-color:#9DBAE0; }
+.type-chip.PR { background:#F4EDFB; border-color:#C9AAEA; }
+.type-chip.PA { background:#EBF5EF; border-color:#A8D5BC; }
+.type-chip.HO { background:#FDECEA; border-color:#F0A89E; }
+.type-chip.LU { background:#F5F5F5; border-color:#CCC; }
+.type-chip-name { font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+.type-chip-code { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+.IN .type-chip-code { color: var(--cIN); }
+.PR .type-chip-code { color: var(--cPR); }
+.PA .type-chip-code { color: var(--cPA); }
+.HO .type-chip-code { color: var(--cHO); }
+.LU .type-chip-code { color: var(--cLU); }
+.type-chip-desc { font-size: 11px; color: var(--slate); line-height: 1.4; margin-top: 2px; }
+
+/* ── RESULTS ── */
+.results-wrap {
+  flex: 1; overflow-y: auto; padding: 2px 0 4px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.results-hero {
+  background: var(--dark); color: var(--white);
+  border-radius: 12px; padding: 18px 20px; flex-shrink: 0;
+}
+.results-hero-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 5px;
+}
+.results-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(15px,3.5vw,20px); font-weight: 900; line-height: 1.25;
+  margin-bottom: 7px;
+}
+.results-hero-title span { color: #F0A070; }
+.results-hero-desc { font-size: 12px; line-height: 1.65; color: rgba(255,255,255,0.8); }
+
+.bars-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--slate); flex-shrink: 0;
+}
+.bar-rows { display: flex; flex-direction: column; gap: 7px; }
+.bar-row {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 10px 13px;
+  animation: fadeUp 0.35s ease both;
+}
+.bar-row.top { border-color: var(--dark); }
+.bar-row-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: 6px;
+}
+.bar-row-name { font-size: 12px; font-weight: 700; color: var(--dark); flex: 1; }
+.bar-row-pct {
+  font-family: 'Playfair Display', serif; font-size: 18px;
+  font-weight: 900; color: var(--dark); flex-shrink: 0;
+}
+.bar-row.top .bar-row-pct { color: var(--red); }
+.bar-bg { height: 4px; background: var(--sand); border-radius: 2px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 2px; width: 0; transition: width 0.7s cubic-bezier(0.4,0,0.2,1); }
+.fill-IN { background: var(--cIN); }
+.fill-PR { background: var(--cPR); }
+.fill-PA { background: var(--cPA); }
+.fill-HO { background: var(--cHO); }
+.fill-LU { background: var(--cLU); }
+.bar-row.top .bar-fill { background: var(--dark); }
+
+.btn-restart {
+  width: 100%; background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 4px; padding: 12px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s; flex-shrink: 0;
+}
+.btn-restart:hover { border-color: var(--dark); background: var(--sand); }
+
+/* ── ANIMATIONS ── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 400px) {
+  .types-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="shell"></div>
+<script>
+// ═══════════════════════════════════════════════
+//  31 страница: 5 обычных вопросов + 9 карточек
+//  источников дохода (бывшие вопросы 6–14) +
+//  вопросы 15–23 = итого 31 страница
+// ═══════════════════════════════════════════════
+
+// type: 'radio' | 'check' (до maxSel) | 'checkany' (без лимита) | 'scale3'
+const PAGES = [
+  {
+    pid:1, qLabel:'1', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа',
+    text:'Что Вы больше всего цените в своей работе?',
+    opts:[
+      {id:1,t:'Что я в основном сам решаю, что и как мне делать.'},
+      {id:2,t:'Что она даёт мне возможность проявить то, что я знаю и умею.'},
+      {id:3,t:'Что я чувствую себя полезным и нужным.'},
+      {id:4,t:'Что мне за неё относительно неплохо платят.'},
+      {id:5,t:'Особенно ничего не ценю, но эта работа мне хорошо знакома и привычна.'},
+    ],
+    key:{1:'HO',2:'PR',3:'PA',4:'IN',5:'LU'}
+  },
+  {
+    pid:2, qLabel:'2', type:'radio',
+    hint:'Только один ответ',
+    text:'Какое выражение Вам подходит более всего?',
+    opts:[
+      {id:1,t:'Я хочу обеспечить своим трудом себе и своей семье приличный доход.'},
+      {id:2,t:'В своей работе я — полный хозяин.'},
+      {id:3,t:'У меня достаточно знаний и опыта, чтобы справиться с любыми трудностями в моей работе.'},
+      {id:4,t:'Я — ценный, незаменимый для организации работник.'},
+      {id:5,t:'Я всегда выполняю то, что от меня требуют.'},
+    ],
+    key:{1:'IN',2:'HO',3:'PR',4:'PA',5:'LU'}
+  },
+  {
+    pid:3, qLabel:'3', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа',
+    text:'Как Вы предпочитаете работать?',
+    opts:[
+      {id:1,t:'Предпочитаю делать то, что знакомо, привычно.'},
+      {id:2,t:'Нужно, чтобы в работе постоянно появлялось что-то новое, не стоять на месте.'},
+      {id:3,t:'Чтобы было точно известно, что нужно сделать и что я за это получу.'},
+      {id:4,t:'Предпочитаю работать под полную личную ответственность.'},
+      {id:5,t:'Готов(а) делать всё, что нужно для организации.'},
+    ],
+    key:{1:'LU',2:'PR',3:'IN',4:'HO',5:'PA'}
+  },
+  {
+    pid:4, qLabel:'4', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа',
+    text:'Вам предлагают другую работу в Вашей организации. При каких условиях Вы согласитесь?',
+    opts:[
+      {id:1,t:'Если предложат намного более высокую зарплату.'},
+      {id:2,t:'Если другая работа будет более творческой, интересней, чем нынешняя.'},
+      {id:3,t:'Если новая работа даст мне больше самостоятельности.'},
+      {id:4,t:'Если это очень нужно для организации.'},
+      {id:5,t:'При всех случаях предпочёл(а) бы остаться на той работе, к которой привык(ла).'},
+    ],
+    key:{1:'IN',2:'PR',3:'HO',4:'PA',5:'LU'}
+  },
+  {
+    pid:5, qLabel:'5', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа',
+    text:'Что для Вас означает Ваш заработок?',
+    opts:[
+      {id:1,t:'Плата за время и усилия, потраченные на выполнение работы.'},
+      {id:2,t:'Это, прежде всего, плата за мои знания, квалификацию.'},
+      {id:3,t:'Оплата за общие результаты деятельности организации.'},
+      {id:4,t:'Мне нужен гарантированный заработок — пусть небольшой, но чтобы он был.'},
+      {id:5,t:'Какой бы он ни был, я его заработал(а) сам(а).'},
+    ],
+    key:{1:'IN',2:'PR',3:'PA',4:'LU',5:'HO'}
+  },
+  // Вопросы 6–14: каждый — отдельная карточка, три кнопки-варианта
+  // ключ: answerNum → тип(ы). 1=Очень важно, 2=Не очень важно, 3=Совсем не важно
+  {
+    pid:6, qLabel:'6', type:'scale3',
+    hint:'Только один ответ',
+    text:'Как Вы относитесь к этому источнику дохода?',
+    sub:'Заработная плата и премии',
+    key:{1:'IN'}
+  },
+  {
+    pid:7, qLabel:'7', type:'scale3',
+    hint:'Только один ответ',
+    text:'Как Вы относитесь к этому источнику дохода?',
+    sub:'Доплаты за квалификацию',
+    key:{1:['PR','HO']}
+  },
+  {
+    pid:8, qLabel:'8', type:'scale3',
+    hint:'Только один ответ',
+    text:'Как Вы относитесь к этому источнику дохода?',
+    sub:'Доплаты за тяжёлые и вредные условия работы',
+    key:{1:'IN',3:'HO'}
+  },
+  {
+    pid:9, qLabel:'9', type:'scale3',
+    hint:'Только один ответ',
+    text:'Как Вы относитесь к этому источнику дохода?',
+    sub:'Социальные выплаты и льготы, пособия',
+    key:{3:'PR'}
+  },
+  {
+    pid:10, qLabel:'10', type:'scale3',
+    hint:'Только один ответ',
+    text:'Как Вы относитесь к этому источнику дохода?',
+    sub:'Доходы от капитала, акций',
+    key:{1:'HO',3:['IN','PR','PA']}
+  },
+  {
+    pid:11, qLabel:'11', type:'scale3',
+    hint:'Только один ответ',
+    text:'Как Вы относитесь к этому источнику дохода?',
+    sub:'Любые дополнительные приработки',
+    key:{1:['IN','LU'],3:'PR'}
+  },
+  {
+    pid:12, qLabel:'12', type:'scale3',
+    hint:'Только один ответ',
+    text:'Как Вы относитесь к этому источнику дохода?',
+    sub:'Приработки, но только по своей специальности',
+    key:{1:['PR','HO'],3:'LU'}
+  },
+  {
+    pid:13, qLabel:'13', type:'scale3',
+    hint:'Только один ответ',
+    text:'Как Вы относитесь к этому источнику дохода?',
+    sub:'Доходы от личного хозяйства, дачного участка',
+    key:{1:'LU'}
+  },
+  {
+    pid:14, qLabel:'14', type:'scale3',
+    hint:'Только один ответ',
+    text:'Как Вы относитесь к этому источнику дохода?',
+    sub:'Выигрыш в лотерею, казино и пр.',
+    key:{1:'LU',3:['IN','PR']}
+  },
+  {
+    pid:15, qLabel:'15', type:'radio',
+    hint:'Только один ответ',
+    text:'На каких принципах должны строиться отношения между работником и организацией?',
+    opts:[
+      {id:1,t:'Работник должен относиться к организации, как к своему дому, отдавать ей всё и вместе переживать трудности и подъёмы. Организация должна соответственно оценивать преданность и труд работника.'},
+      {id:2,t:'Работник продаёт организации свой труд, и если ему не дают хорошую цену, он вправе найти другого покупателя.'},
+      {id:3,t:'Работник приходит в организацию для самореализации и относится к ней как к месту реализации своих способностей. Организация должна обеспечивать работнику такую возможность.'},
+      {id:4,t:'Работник тратит на организацию свои силы, а организация должна взамен гарантировать ему зарплату и социальные блага.'},
+    ],
+    key:{1:'PA',2:'IN',3:'PR',4:'LU'}
+  },
+  {
+    pid:16, qLabel:'16', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа',
+    text:'Почему в процессе работы люди проявляют инициативу, вносят различные предложения?',
+    opts:[
+      {id:1,t:'Чувствуют особую ответственность за свою работу.'},
+      {id:2,t:'Из-за стремления реализовать свои знания и опыт, выйти за установленные работой рамки.'},
+      {id:3,t:'Чаще всего из-за желания улучшить работу своей организации.'},
+      {id:4,t:'Просто хотят «выделиться» или завоевать расположение начальства.'},
+      {id:5,t:'Хотят заработать, поскольку всякая полезная инициатива должна вознаграждаться.'},
+    ],
+    key:{1:'HO',2:'PR',3:'PA',4:'LU',5:'IN'}
+  },
+  {
+    pid:17, qLabel:'17', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа',
+    text:'Какое суждение о коллективной работе Вам ближе?',
+    opts:[
+      {id:1,t:'Коллектив для меня очень важен, одному хороших результатов не добиться.'},
+      {id:2,t:'Предпочитаю работать автономно, но чувствую себя так же хорошо, когда работаю вместе с интересными людьми.'},
+      {id:3,t:'Мне нужна свобода действий, а коллектив чаще всего эту свободу ограничивает.'},
+      {id:4,t:'Можно работать и в коллективе, но платить должны по личным результатам.'},
+      {id:5,t:'Мне нравится работать в коллективе, так как там я среди своих.'},
+    ],
+    key:{1:'PA',2:'PR',3:'HO',4:'IN',5:'LU'}
+  },
+  {
+    pid:18, qLabel:'18', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа',
+    text:'У Вас появилась возможность стать совладельцем Вашей организации. Воспользуетесь ли Вы ею?',
+    opts:[
+      {id:1,t:'Да, так как я смогу участвовать в управлении организацией.'},
+      {id:2,t:'Да, потому что это может увеличить мой доход.'},
+      {id:3,t:'Да, так как настоящий работник должен быть совладельцем.'},
+      {id:4,t:'Вряд ли: на заработке это не скажется, участие в управлении меня не интересует, а работе это помешает.'},
+      {id:5,t:'Нет, не нужны мне лишние заботы.'},
+    ],
+    key:{1:'HO',2:'IN',3:'PA',4:'HO',5:'LU'}
+  },
+  {
+    pid:19, qLabel:'19', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа',
+    text:'Вы сейчас ищете работу. Вам предлагают несколько вариантов. Какую работу Вы выберете?',
+    opts:[
+      {id:1,t:'Наиболее интересную, творческую.'},
+      {id:2,t:'Наиболее самостоятельную, независимую.'},
+      {id:3,t:'За которую больше платят.'},
+      {id:4,t:'Чтобы за не слишком большие деньги не требовалось особенно «надрываться».'},
+      {id:5,t:'Не могу представить, что я уйду из нашей организации.'},
+    ],
+    key:{1:'PR',2:'HO',3:'IN',4:'LU',5:'PA'}
+  },
+  {
+    pid:20, qLabel:'20', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа',
+    text:'Что Вы прежде всего учитываете, когда оцениваете успехи другого работника в Вашей организации?',
+    opts:[
+      {id:1,t:'Его зарплату, доходы, материальное положение.'},
+      {id:2,t:'Уровень его профессионализма, квалификации.'},
+      {id:3,t:'Насколько хорошо он «устроился».'},
+      {id:4,t:'Насколько его уважают в организации.'},
+      {id:5,t:'Насколько он самостоятелен, независим.'},
+    ],
+    key:{1:'IN',2:'PR',3:'LU',4:'PA',5:'HO'}
+  },
+  {
+    pid:21, qLabel:'21', type:'checkany',
+    hint:'Можно выбрать несколько ответов',
+    text:'Если положение в Вашей организации ухудшится, на какие перемены Вы согласитесь, чтобы остаться на работе?',
+    opts:[
+      {id:1,t:'Освоить новую профессию.'},
+      {id:2,t:'Работать неполный рабочий день или перейти на менее квалифицированную работу и меньше получать.'},
+      {id:3,t:'Перейти на менее удобный режим работы.'},
+      {id:4,t:'Работать более интенсивно.'},
+      {id:5,t:'Соглашусь просто терпеть, потому что деваться некуда.'},
+      {id:6,t:'Скорее всего, я просто уйду из этой организации.'},
+    ],
+    keyM:{1:['PR','PA','HO'],2:['PA','HO','LU'],3:[],4:['IN','PR','PA','HO'],5:['PA','LU'],6:['IN']}
+  },
+  {
+    pid:22, qLabel:'22', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа (если Вы руководитель)',
+    text:'Если Вы — РУКОВОДИТЕЛЬ, то что Вас привлекает прежде всего в этом положении?',
+    opts:[
+      {id:1,t:'Возможность принимать самостоятельные, ответственные решения.'},
+      {id:2,t:'Возможность принести наибольшую пользу организации.'},
+      {id:3,t:'Высокий уровень оплаты.'},
+      {id:4,t:'Возможность организовывать работу других людей.'},
+      {id:5,t:'Возможность наилучшим образом применить свои знания и умения.'},
+      {id:6,t:'Ничего особенно не привлекает, за положение руководителя не держусь.'},
+    ],
+    key:{1:'HO',2:'PA',3:'IN',4:'LU',5:'PR',6:'IN'}
+  },
+  {
+    pid:23, qLabel:'23', type:'check', maxSel:2,
+    hint:'Один или два варианта ответа (если Вы не руководитель)',
+    text:'Если Вы НЕ ЯВЛЯЕТЕСЬ РУКОВОДИТЕЛЕМ, то хотели бы Вы им стать?',
+    opts:[
+      {id:1,t:'Да, поскольку это даст возможность принимать самостоятельные, ответственные решения.'},
+      {id:2,t:'Не против, если это нужно для пользы дела.'},
+      {id:3,t:'Да, так как при этом я смогу лучше применить свои знания и умения.'},
+      {id:4,t:'Да, если это будет должным образом оплачиваться.'},
+      {id:5,t:'Нет, профессионал может отвечать только за самого себя.'},
+      {id:6,t:'Нет, руководство меня не привлекает, а хорошо заработать я могу и на своём месте.'},
+      {id:7,t:'Да, чем я хуже других?'},
+      {id:8,t:'Нет, это слишком большая нагрузка для меня.'},
+    ],
+    keyM:{1:['HO'],2:['PA'],3:['PR','HO'],4:['IN'],5:['PR'],6:['IN'],7:['LU'],8:['LU']}
+  },
+];
+
+const TOTAL = PAGES.length; // 31
+
+const SCALE3 = [
+  {id:1,t:'Очень важно'},
+  {id:2,t:'Не очень важно'},
+  {id:3,t:'Совсем не важно'},
+];
+
+const TYPE_INFO = {
+  IN:{name:'Инструментальный',color:'var(--cIN)',
+    desc:'Для вас труд — инструмент для достижения жизненных целей, прежде всего достойного дохода. Вы цените справедливое вознаграждение и хотите чётко понимать «цену» своего труда. Вас стимулируют прозрачные KPI, премии и возможность заработать больше при большем вкладе.'},
+  PR:{name:'Профессиональный',color:'var(--cPR)',
+    desc:'Вам важно содержание работы — возможность решать сложные задачи и расти как профессионал. Вы не согласитесь на скучную работу, сколько бы за неё ни платили. Ключевые мотиваторы: профессиональное признание, сложные вызовы и свобода в методах работы.'},
+  PA:{name:'Патриотический',color:'var(--cPA)',
+    desc:'Вам важно ощущать причастность к значимому делу и получать признание как незаменимый участник команды. Вас мотивируют общие цели, корпоративный дух, моральное поощрение и публичное признание вклада в успех организации.'},
+  HO:{name:'Хозяйский',color:'var(--cHO)',
+    desc:'Вы берёте на себя полную ответственность за результат и требуете соответствующей свободы действий. Вы — «хозяин» своего участка. Вас мотивирует самостоятельность, участие в управлении и право принимать решения без постоянных согласований.'},
+  LU:{name:'Люмпенизированный',color:'var(--cLU)',
+    desc:'Вам важна стабильность и минимизация усилий. Вы предпочитаете привычную работу без лишней ответственности. Такой профиль нередко сигнализирует о выгорании или несоответствии текущей роли. Стоит задуматься: что вас по-настоящему вдохновляет?'},
+};
+
+// ── State ──
+let pIdx = 0;
+let ans  = {};   // pid → [optId,...]
+let sans = {};   // pid → optId (scale3)
+let screen = 'intro';
+
+// ── Scoring ──
+function calcScores(){
+  const sc={IN:0,PR:0,PA:0,HO:0,LU:0};
+  function add(t){ if(!t)return; if(Array.isArray(t)) t.forEach(x=>{if(sc[x]!==undefined)sc[x]++;}); else if(sc[t]!==undefined)sc[t]++; }
+  PAGES.forEach(p=>{
+    if(p.type==='scale3'){
+      const a=sans[p.pid]; if(a===undefined)return;
+      Object.entries(p.key).forEach(([k,t])=>{ if(parseInt(k)===a) add(t); });
+    } else if(p.keyM){
+      (ans[p.pid]||[]).forEach(id=>add(p.keyM[id]));
+    } else {
+      (ans[p.pid]||[]).forEach(id=>add(p.key[id]));
+    }
+  });
+  const total=Object.values(sc).reduce((a,b)=>a+b,0)||1;
+  const pcts={};
+  Object.keys(sc).forEach(k=>pcts[k]=Math.round(sc[k]/total*100));
+  return pcts;
+}
+
+function isAnswered(p){
+  if(p.type==='scale3') return sans[p.pid]!==undefined;
+  return (ans[p.pid]||[]).length>0;
+}
+
+// ── Render ──
+function renderIntro(){
+  document.getElementById('shell').innerHTML=`
+    <div class="hdr">
+      <div class="eyebrow">Методика Герчикова · Motype</div>
+      <div class="page-title">Типы <span>трудовой мотивации</span></div>
+    </div>
+    <div class="intro-body">
+      <div>
+        <div class="divider"></div>
+        <p class="intro-text">Тест состоит из <strong>23 вопросов</strong>. На некоторые из них можно дать два ответа — это указано в каждом вопросе. Отвечайте честно: нет правильных или неправильных вариантов.</p>
+      </div>
+      <div class="types-grid">
+        <div class="type-chip IN"><div class="type-chip-code">ИН</div><div class="type-chip-name">Инструментальный</div><div class="type-chip-desc">Труд как инструмент дохода и личных целей</div></div>
+        <div class="type-chip PR"><div class="type-chip-code">ПР</div><div class="type-chip-name">Профессиональный</div><div class="type-chip-desc">Содержание работы, мастерство, рост</div></div>
+        <div class="type-chip PA"><div class="type-chip-code">ПА</div><div class="type-chip-name">Патриотический</div><div class="type-chip-desc">Причастность к делу, признание, команда</div></div>
+        <div class="type-chip HO"><div class="type-chip-code">ХО</div><div class="type-chip-name">Хозяйский</div><div class="type-chip-desc">Автономия, ответственность, свобода решений</div></div>
+        <div class="type-chip LU" style="grid-column:1/-1"><div class="type-chip-code">ЛЮ</div><div class="type-chip-name">Люмпенизированный</div><div class="type-chip-desc">Стабильность, минимум усилий, избегание ответственности</div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn-next" onclick="startTest()">Начать тест →</button>
+    </div>`;
+}
+
+function renderPage(){
+  const p = PAGES[pIdx];
+  const pct = ((pIdx+1)/TOTAL)*100;
+  const ok  = isAnswered(p);
+  const isLast = pIdx===TOTAL-1;
+
+  let optsHtml='';
+  if(p.type==='scale3'){
+    const sel=sans[p.pid];
+    optsHtml=SCALE3.map(o=>`
+      <div class="opt${sel===o.id?' selected':''}" onclick="pickScale(${p.pid},${o.id})">
+        <div class="opt-marker">${sel===o.id?'✓':''}</div>
+        <div class="opt-text">${o.t}</div>
+      </div>`).join('');
+  } else {
+    const sel=ans[p.pid]||[];
+    const multi=(p.type==='check'||p.type==='checkany');
+    optsHtml=p.opts.map(o=>`
+      <div class="opt${sel.includes(o.id)?' selected':''} ${multi?'check':''}"
+        onclick="pickOpt(${p.pid},${o.id},'${p.type}',${p.maxSel||99})">
+        <div class="opt-marker">${sel.includes(o.id)?'✓':''}</div>
+        <div class="opt-text">${o.t}</div>
+      </div>`).join('');
+  }
+
+  const subHtml = p.sub ? `<div class="q-subtext">«${p.sub}»</div>` : '';
+
+  document.getElementById('shell').innerHTML=`
+    <div class="hdr" style="padding-bottom:6px">
+      <div class="eyebrow">Вопрос ${p.qLabel} из 23</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <div class="progress-label">Прогресс</div>
+        <div class="progress-frac">${pIdx+1}<span>/${TOTAL}</span></div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="q-area">
+      <div class="q-card">
+        <div class="q-card-head">
+          <div class="q-num">Вопрос ${p.qLabel}</div>
+          <div class="q-hint">${p.hint}</div>
+          <div class="q-text">${p.text}</div>
+          ${subHtml}
+        </div>
+        <div class="q-opts">${optsHtml}</div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goBack()">← Назад</button>
+      <button class="btn-next" ${ok?'':'disabled'} onclick="goNext()">
+        ${isLast?'Посмотреть результат →':'Далее →'}
+      </button>
+    </div>`;
+}
+
+function renderResults(){
+  const pcts=calcScores();
+  const order=Object.entries(pcts).sort((a,b)=>b[1]-a[1]);
+  const [topKey]=order[0];
+  const top=TYPE_INFO[topKey];
+
+  const barsHtml=order.map(([k,pct],i)=>{
+    const info=TYPE_INFO[k];
+    return `<div class="bar-row${i===0?' top':''}" style="animation-delay:${i*0.07}s">
+      <div class="bar-row-head">
+        <div class="bar-row-name">${info.name}</div>
+        <div class="bar-row-pct">${pct}%</div>
+      </div>
+      <div class="bar-bg"><div class="bar-fill fill-${k}" data-pct="${pct}" style="width:0%"></div></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('shell').innerHTML=`
+    <div class="hdr" style="padding-bottom:6px">
+      <div class="eyebrow">Методика Герчикова · Motype</div>
+    </div>
+    <div class="results-wrap">
+      <div class="results-hero">
+        <div class="results-hero-tag">Ваш ведущий тип мотивации</div>
+        <div class="results-hero-title"><span>${top.name}</span></div>
+        <div class="results-hero-desc">${top.desc}</div>
+      </div>
+      <div class="bars-label">Профиль мотивации — все типы</div>
+      <div class="bar-rows">${barsHtml}</div>
+      <button class="btn-restart" onclick="doRestart()">↺ Пройти заново</button>
+    </div>`;
+
+  setTimeout(()=>{
+    document.querySelectorAll('.bar-fill').forEach(el=>{
+      el.style.width=el.dataset.pct+'%';
+    });
+  },80);
+}
+
+// ── Handlers ──
+function pickScale(pid,optId){
+  sans[pid]=optId;
+  renderPage();
+}
+
+function pickOpt(pid,optId,type,maxSel){
+  if(!ans[pid]) ans[pid]=[];
+  const arr=ans[pid];
+  const idx=arr.indexOf(optId);
+  if(type==='radio'){
+    ans[pid]=[optId];
+  } else {
+    if(idx>=0){ arr.splice(idx,1); }
+    else {
+      if(arr.length<maxSel) arr.push(optId);
+      else { arr.shift(); arr.push(optId); }
+    }
+  }
+  renderPage();
+}
+
+function goNext(){
+  if(pIdx<TOTAL-1){ pIdx++; renderPage(); }
+  else renderResults();
+}
+
+function goBack(){
+  if(pIdx>0){ pIdx--; renderPage(); }
+  else { screen='intro'; renderIntro(); }
+}
+
+function startTest(){
+  screen='test'; pIdx=0; renderPage();
+}
+
+function doRestart(){
+  pIdx=0; ans={}; sans={}; screen='intro'; renderIntro();
+}
+
+renderIntro();
+</script>
+</body>
+</html>
