@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --accent-color: #C31532; /* Красный для ошибок */
+            --success-color: #27ae60; /* Зеленый для нейтральных предметов */
+            --ui-dark: #003B48;
+            --text-grey: #495761;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 1024px;
+            aspect-ratio: 4 / 3; 
+            background-color: #333;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .game-background {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        /* --- СТИЛИ ЗОН --- */
+        .click-zone {
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            /* border: 1px solid rgba(0,255,0,0.3); Для отладки раскомментируйте */
+        }
+
+        /* Состояние "Найдено" (ОШИБКА) */
+        .click-zone.found {
+            border: 3px solid var(--accent-color);
+            background-color: rgba(195, 21, 50, 0.1);
+            pointer-events: none;
+        }
+
+        /* Анимация тряски для нейтральных предметов */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            50% { transform: translateX(5px) rotate(2deg); }
+            75% { transform: translateX(-5px) rotate(-2deg); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-animation {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- ТУЛТИПЫ --- */
+        .tooltip {
+            position: absolute;
+            bottom: 110%;
+            background-color: var(--ui-dark);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            z-index: 20;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        
+/* --- СПЕЦИАЛЬНЫЙ ТУЛТИП ДЛЯ МОНИТОРА (СНИЗУ) --- */
+        /* Позиционируем снизу от объекта, так как сверху нет места */
+        .tooltip-bottom {
+            top: 100%; /* Прижимаем к нижнему краю зоны */
+            bottom: auto; /* Сбрасываем стандартное позиционирование */
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 8px; /* Небольшой отступ от зоны */
+        }
+
+        /* Стрелочка для нижнего тултипа (должна смотреть ВВЕРХ) */
+        .tooltip-bottom::after {
+            top: auto;
+            bottom: 100%; /* Стрелка сверху тултипа */
+            border-width: 6px;
+            border-style: solid;
+            /* Цвет стрелки: Прозрачный - Прозрачный - Темный - Прозрачный */
+            border-color: transparent transparent var(--ui-dark) transparent;
+        }
+
+        /* Анимация появления для нижнего тултипа (сдвиг вниз) */
+        .click-zone.found .tooltip-bottom {
+            transform: translateX(-50%) translateY(5px);
+        }
+
+        
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--ui-dark) transparent transparent transparent;
+        }
+
+        /* Зеленый тултип для нейтральных предметов */
+        .tooltip.neutral-tip {
+            background-color: var(--success-color);
+        }
+        .tooltip.neutral-tip::after {
+            border-color: var(--success-color) transparent transparent transparent;
+        }
+
+        /* Позиционирование тултипов */
+        .tooltip-center { left: 50%; transform: translateX(-50%); }
+        .tooltip-center::after { left: 50%; margin-left: -6px; }
+
+        .tooltip-left { left: 0; transform: translateX(0); }
+        .tooltip-left::after { left: 20px; }
+
+        .tooltip-right { right: 0; left: auto; transform: translateX(0); }
+        .tooltip-right::after { right: 20px; left: auto; }
+
+        /* Показ тултипа для найденной ошибки (постоянный) */
+        .click-zone.found .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        .click-zone.found .tooltip-center { transform: translateX(-50%) translateY(-5px); }
+        .click-zone.found .tooltip-left { transform: translateY(-5px); }
+        .click-zone.found .tooltip-right { transform: translateY(-5px); }
+
+        /* Показ тултипа для дистрактора (временный, через JS класс) */
+        .click-zone.show-temp-tooltip .tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-5px); /* или сдвиг для center/left/right */
+        }
+        .click-zone.show-temp-tooltip .tooltip-center { transform: translateX(-50%) translateY(-5px); }
+
+
+        /* --- КООРДИНАТЫ ОБЪЕКТОВ --- */
+        
+        /* ОШИБКИ (Красные зоны) */
+        #zone-monitor { top: 1%; left: 1%; width: 84%; height: 24%; }
+        #zone-phone { top: 44%; left: 1.5%; width: 17.5%; height: 18.5%; }
+        #zone-note { top: 39.2%; left: 66.8%; width: 16.5%; height: 13%; }
+        #zone-papers { top: 24%; left: 86%; width: 14%; height: 33%; }
+
+        /* ДИСТРАКТОРЫ (Зеленые зоны) */
+        /* Блокнот (слева внизу) */
+        #zone-notebook { 
+            top: 80%; 
+            left: 1%; 
+            width: 14%; 
+            height: 20%; 
+        }
+        
+        /* Ручка (между телефоном и монитором или просто на столе) */
+        #zone-pen { 
+            top: 55%; 
+            left: 1%; 
+            width: 5%; 
+            height: 18%;
+            /*transform: rotate(45deg); /* Если нужно повернуть зону клика */
+        }
+
+        /* Счетчик */
+        .counter-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--ui-dark);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        .counter-score { color: var(--accent-color); }
+
+        /* Модальное окно */
+        .final-modal {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 59, 72, 0.85);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+            z-index: 200;
+        }
+        .final-modal.visible { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: white; padding: 40px; border-radius: 12px;
+            text-align: center; max-width: 400px;
+            transform: translateY(20px); transition: transform 0.5s ease;
+        }
+        .final-modal.visible .modal-card { transform: translateY(0); }
+        .modal-avatar {
+            width: 80px; height: 80px; background-color: #ddd; border-radius: 50%;
+            margin: 0 auto 15px; background-size: cover;
+            background-image: url('https://ui-avatars.com/api/?name=Alexey&background=003B48&color=fff&size=128');
+        }
+        .modal-title { color: var(--ui-dark); font-size: 24px; margin: 0 0 10px; }
+        .modal-text { color: var(--text-grey); font-size: 16px; line-height: 1.5; margin-bottom: 25px; }
+        .modal-btn {
+            background-color: var(--accent-color); color: white; border: none;
+            padding: 12px 30px; font-size: 16px; border-radius: 6px; cursor: pointer;
+        }
+        .modal-btn:hover { background-color: #a01229; }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="counter-panel">
+            Найдено: <span class="counter-score" id="score">0</span>/4
+        </div>
+
+        <img src="image_0.jpg" alt="Office Desk" class="game-background">
+
+        <!-- --- ОШИБКИ (Target) --- -->
+        <div class="click-zone target" id="zone-monitor" onclick="handleClick(this, true)">
+            <!-- Используем tooltip-bottom, чтобы он появился ПОД зоной клика -->
+            <div class="tooltip tooltip-bottom">Слишком много окон! Многозадачность убивает фокус.</div>
+        </div>
+
+        <div class="click-zone target" id="zone-phone" onclick="handleClick(this, true)">
+            <div class="tooltip tooltip-left">99+ уведомлений. Отключите пуш-уведомления!</div>
+        </div>
+
+        <div class="click-zone target" id="zone-note" onclick="handleClick(this, true)">
+            <div class="tooltip tooltip-center">Перфекционизм тормозит работу.</div>
+        </div>
+
+        <div class="click-zone target" id="zone-papers" onclick="handleClick(this, true)">
+            <div class="tooltip tooltip-right">Хаос в документах. Нужна приоритизация.</div>
+        </div>
+
+        <!-- --- ДИСТРАКТОРЫ (Neutral) --- -->
+        <!-- Блокнот -->
+        <div class="click-zone distractor" id="zone-notebook" onclick="handleClick(this, false)">
+            <div class="tooltip neutral-tip tooltip-left">Блокнот полезен для заметок. Это ок!</div>
+        </div>
+
+        <!-- Ручка -->
+        <div class="click-zone distractor" id="zone-pen" onclick="handleClick(this, false)">
+            <div class="tooltip neutral-tip tooltip-left">Просто ручка. Никаких проблем.</div>
+        </div>
+
+
+        <div class="final-modal" id="finalModal">
+            <div class="modal-card">
+                <div class="modal-avatar"></div>
+                <h3 class="modal-title">Спасибо!</h3>
+                <p class="modal-text">
+                    «Привет! Это Алексей. Спасибо, что помог разобрать этот хаос. 
+                    Теперь я вижу, где терял время, и смогу сдать проект вовремя!»
+                </p>
+                <button class="modal-btn" onclick="location.reload()">Пройти еще раз</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let foundCount = 0;
+        const totalItems = 4; // Только ошибки считаются
+
+        function handleClick(element, isTarget) {
+            // Если это ошибка (Target)
+            if (isTarget) {
+                if (element.classList.contains('found')) return; // Уже найдено
+
+                element.classList.add('found');
+                foundCount++;
+                document.getElementById('score').innerText = foundCount;
+
+                if (foundCount === totalItems) {
+                    setTimeout(() => {
+                        document.getElementById('finalModal').classList.add('visible');
+                    }, 600);
+                }
+            } 
+            // Если это дистрактор (Neutral)
+            else {
+                // Запускаем анимацию тряски
+                element.classList.add('shake-animation');
+                // Показываем тултип временно
+                element.classList.add('show-temp-tooltip');
+
+                // Через 1 сек убираем анимацию и тултип
+                setTimeout(() => {
+                    element.classList.remove('shake-animation');
+                    element.classList.remove('show-temp-tooltip');
+                }, 1500);
+            }
+        }
+    </script>
+</body>
+</html>
