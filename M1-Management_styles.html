@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corporate Mail Outlook Style</title>
+<style>
+    /* --- 1. БАЗА --- */
+    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: #f3f2f1; overflow: hidden; }
+    
+    /* --- 2. СТАРТОВЫЙ ЭКРАН --- */
+    #start-screen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: #f3f2f1; z-index: 9999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 20px; box-sizing: border-box;
+    }
+    .intro-card {
+        background: white; padding: 40px; border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; text-align: center;
+    }
+    .intro-title { color: #0078d4; font-size: 24px; margin-bottom: 10px; font-weight: 700; }
+    .intro-text { color: #333; font-size: 15px; line-height: 1.6; margin-bottom: 30px; text-align: left; }
+    .start-btn {
+        background: #0078d4; color: white; border: none; padding: 12px 30px;
+        font-size: 16px; border-radius: 4px; cursor: pointer; font-weight: 600;
+        transition: 0.2s;
+    }
+    .start-btn:hover { background: #005a9e; }
+
+    /* --- 3. ИНТЕРФЕЙС ПОЧТЫ --- */
+    .app { display: flex; flex-direction: column; height: 100%; background: white; }
+    
+    .top-bar {
+        height: 48px; background: #0078d4; color: white;
+        display: flex; align-items: center; padding: 0 20px; flex-shrink: 0;
+        justify-content: space-between;
+    }
+    .logo { font-weight: bold; font-size: 18px; display: flex; gap: 10px; align-items: center; }
+
+    .main-area { display: flex; flex: 1; overflow: hidden; }
+
+    /* ЛЕВАЯ КОЛОНКА */
+    .inbox-list {
+        width: 320px; background: #fff; border-right: 1px solid #e1dfdd;
+        display: flex; flex-direction: column; flex-shrink: 0;
+        overflow-y: auto;
+    }
+    .inbox-header {
+        padding: 15px; border-bottom: 1px solid #e1dfdd; font-weight: 600;
+        color: #333; display: flex; justify-content: space-between;
+    }
+    
+    .email-item {
+        padding: 15px; border-bottom: 1px solid #f3f2f1; cursor: pointer;
+        transition: 0.1s; position: relative;
+    }
+    .email-item:hover { background: #f3f2f1; }
+    .email-item.active { background: #c7e0f4; border-left: 4px solid #0078d4; }
+    .email-item.unread .item-subject, .email-item.unread .item-from { font-weight: 700; color: #000; }
+    .email-item.done { border-left: 4px solid #107c10; opacity: 0.6; background: #fdfdfd; }
+    
+    .item-from { font-size: 14px; color: #201f1e; margin-bottom: 4px; display: flex; justify-content: space-between;}
+    .item-subject { font-size: 13px; color: #0078d4; margin-bottom: 4px; }
+    .item-preview { font-size: 12px; color: #605e5c; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    
+    /* ПРАВАЯ КОЛОНКА */
+    .reading-pane { flex: 1; background: #faf9f8; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    
+    .empty-state {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        height: 100%; color: #605e5c;
+    }
+    .empty-icon { font-size: 60px; margin-bottom: 20px; opacity: 0.3; }
+
+    /* Переписка */
+    .thread-view { flex: 1; overflow-y: auto; padding: 20px 40px; display: none; }
+    .thread-view.show { display: block; }
+
+    .mail-card {
+        background: white; border: 1px solid #e1dfdd; padding: 25px;
+        margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        animation: fadeIn 0.3s ease;
+    }
+    .mail-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #f3f2f1; padding-bottom: 10px; }
+    .mail-avatar { 
+        width: 42px; height: 42px; border-radius: 50%; color: white; 
+        display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; 
+    }
+    .av-alex { background: #d83b01; }
+    .av-katya { background: #d13438; }
+    .av-me { background: #0078d4; }
+    .av-sys { background: #333; }
+
+    .mail-body { font-size: 15px; line-height: 1.6; color: #323130; white-space: pre-wrap; }
+
+    /* Панель выбора */
+    .action-panel { margin-top: 20px; border-top: 2px solid #0078d4; padding-top: 20px; background: #fff; padding: 20px; }
+    .action-title { font-size: 12px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 10px; }
+    
+    .choice-btn {
+        display: block; width: 100%; text-align: left;
+        background: white; border: 1px solid #8a8886; border-radius: 4px;
+        padding: 12px 15px; margin-bottom: 8px; cursor: pointer;
+        font-size: 14px; transition: 0.1s;
+    }
+    .choice-btn:hover { background: #eff6fc; border-color: #0078d4; }
+    .choice-btn strong { display: block; color: #000; margin-bottom: 3px; }
+
+    /* Системные сообщения */
+    .sys-msg { padding: 15px; text-align: center; font-size: 14px; border-radius: 4px; margin-bottom: 20px; }
+    .sys-good { background: #dff6dd; color: #107c10; border: 1px solid #107c10; }
+    .sys-bad { background: #fde7e9; color: #a80000; border: 1px solid #a80000; }
+
+    /* Адаптив */
+    @media (max-width: 700px) {
+        .inbox-list { width: 100%; display: flex; }
+        .reading-pane { display: none; width: 100%; }
+        .reading-pane.active { display: flex; }
+        .inbox-list.hidden { display: none; }
+        .back-btn { display: inline-block; }
+    }
+    .back-btn { display: none; color: white; background: none; border: none; font-size: 20px; cursor: pointer; margin-right: 10px; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .typing { font-size: 12px; color: #0078d4; margin-left: 20px; display: none; font-style: italic; padding-bottom: 20px;}
+</style>
+</head>
+<body>
+
+<!-- 1. СТАРТОВЫЙ ЭКРАН -->
+<div id="start-screen">
+    <div class="intro-card">
+        <div style="font-size: 50px; margin-bottom: 20px;">📧</div>
+        <h1 class="intro-title">Входящая почта</h1>
+        <div class="intro-text">
+            <p><b>Ваша роль:</b> Руководитель отдела.</p>
+            <p><b>Ситуация:</b> Вы вернулись с обеда и видите два новых письма. Оба сотрудника требуют внимания.</p>
+            <p>1. <b>Алексей</b> (Ведущий аналитик) прислал ответ на вашу задачу по отчету.<br>
+            2. <b>Екатерина</b> (Новичок в продажах) горит новой идеей.</p>
+            <p><b>Задача:</b> Разберите почту, выбрав верную стратегию. Ваши ответы имеют последствия.</p>
+        </div>
+        <button class="start-btn" onclick="startGame()">Открыть почту</button>
+    </div>
+</div>
+
+<!-- 2. ИНТЕРФЕЙС -->
+<div class="app">
+    <div class="top-bar">
+        <div class="logo">
+            <button class="back-btn" onclick="showInbox()">←</button>
+            Outlook Web
+        </div>
+        <div>Входящие: <span id="unread-counter" style="background:white; color:#0078d4; padding:2px 6px; border-radius:10px; font-size:12px;">2</span></div>
+    </div>
+
+    <div class="main-area">
+        <!-- СПИСОК ПИСЕМ -->
+        <div class="inbox-list" id="inbox">
+            <div class="inbox-header">Входящие</div>
+            <!-- Письмо 1: Алексей -->
+            <div class="email-item unread" id="item-alex" onclick="openMail('alex')">
+                <div class="item-from">
+                    <span>Алексей Смирнов</span>
+                    <span style="font-size:11px; color:#0078d4;">13:45</span>
+                </div>
+                <div class="item-subject">RE: Годовой отчет</div>
+                <div class="item-preview">Слушайте, у меня завал...</div>
+            </div>
+            <!-- Письмо 2: Катя -->
+            <div class="email-item unread" id="item-katya" onclick="openMail('katya')">
+                <div class="item-from">
+                    <span>Екатерина Новикова</span>
+                    <span style="font-size:11px; color:#0078d4;">14:10</span>
+                </div>
+                <div class="item-subject">Идея по клиенту "Альфа"!</div>
+                <div class="item-preview">Я нашла контакт ЛПР!</div>
+            </div>
+        </div>
+
+        <!-- ОБЛАСТЬ ЧТЕНИЯ -->
+        <div class="reading-pane" id="reading-pane">
+            <div class="empty-state" id="empty-state">
+                <div class="empty-icon">📧</div>
+                <div>Выберите письмо для чтения</div>
+            </div>
+            
+            <!-- КОНТЕЙНЕР ДЛЯ ПЕРЕПИСКИ -->
+            <div class="thread-view" id="thread-content"></div>
+            <div class="typing" id="typing-indicator">Пишет ответ...</div>
+            <div id="action-area"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- ДАННЫЕ (STATE) ---
+    let state = {
+        alex: { status: 'new', history: [], currentOptions: null },
+        katya: { status: 'new', history: [], currentOptions: null },
+        unread: 2
+    };
+
+    // СЦЕНАРИИ
+    const scenarios = {
+        // --- АЛЕКСЕЙ ---
+        'alex': {
+            'start': {
+                // Первый шаг - это ваше исходящее и его входящее
+                emails: [
+                    {
+                        from: 'me',
+                        time: '13:30',
+                        body: 'Алексей, привет.\n\nНам нужно подготовить сводный отчет по филиалам к этой пятнице. Вводные во вложении. Жду подтверждения.'
+                    },
+                    {
+                        from: 'alex',
+                        time: '13:45',
+                        delay: 1000,
+                        body: 'Добрый день.\n\nСлушайте, у меня сейчас полный завал по текущим проектам. Мы же помним прошлый год? Я потратил на этот отчет выходные, а его даже не открыли на совете.\n\nМожет, поручим это стажеру? Я правда не вижу смысла тратить на это ресурс опытного специалиста.'
+                    }
+                ],
+                options: [
+                    { title: 'Надавить авторитетом', desc: '«Есть задача — нужно делать. Это твоя обязанность».', next: 'pressure' },
+                    { title: 'Предложить компромисс', desc: '«Сделай, а я дам тебе отгул в понедельник».', next: 'bargain' },
+                    { title: 'Выяснить причину', desc: '«Ты говоришь, что не видишь смысла. Что именно демотивирует?»', next: 'dialog' }
+                ]
+            },
+            'pressure': {
+                my_reply: 'Алексей, давай без дискуссий. Это входит в твой функционал и KPI. Стажер не справится с такой аналитикой. Жду результат в пятницу.',
+                emails: [
+                    { from: 'alex', body: 'Принято. Будет сделано.' },
+                    { type: 'sys_bad', body: '⛔ РИСК: Алексей делает отчет формально, "для галочки". Вы чувствуете холод в общении. Вы применили давление к эксперту, и он закрылся.' }
+                ],
+                options: [
+                    { title: 'Признать ошибку и поговорить', desc: 'Попытаться исправить ситуацию (Вернуться к диалогу)', next: 'dialog' },
+                    { title: 'Оставить как есть', desc: 'Главное - результат получен.', next: 'fail_pressure' }
+                ]
+            },
+            'fail_pressure': {
+                emails: [{ type: 'sys_bad', body: '❌ ИТОГ: Вы получили отчет, но потеряли лояльность эксперта. Через месяц он начнет искать новую работу.' }],
+                end: true
+            },
+            'bargain': {
+                my_reply: 'Леш, понимаю, что задача нудная. Давай так: ты делаешь отчет качественно, а я согласовываю тебе отгул.',
+                emails: [{ from: 'alex', body: 'Дело не в отгуле... Но ладно, отдохнуть не помешает. Сделаю.' }, { type: 'sys_bad', body: '⚠️ ИТОГ: Вы создали опасный прецедент. Теперь сотрудник будет торговаться за каждую сложную задачу.' }],
+                end: true
+            },
+            'dialog': {
+                my_reply: 'Ты говоришь, что не видишь смысла. Это звучит как профессиональная обида. Давай честно: в чем причина?',
+                emails: [{ from: 'alex', body: 'Да потому что это работа «в стол»! Я в прошлом году нашел ошибку в логистике, а Финдир просто подшил папку. Никто даже спасибо не сказал.' }],
+                options: [
+                    { title: 'Делегировать решение', desc: '«Ты профи, сделай так, чтобы заметили».', next: 'delegate_fail' },
+                    { title: 'Поддержка и продажа', desc: '«Я лично презентую твой вклад на совете директоров».', next: 'win' }
+                ]
+            },
+            'delegate_fail': {
+                my_reply: 'Леш, ты же профи. Сам знаешь, как подать данные.',
+                emails: [{ from: 'alex', body: 'Я уже пробовал. Не работает. Ладно, сделаю как обычно.' }, { type: 'sys_bad', body: '⚠️ ОШИБКА: Вы попытались делегировать задачу демотивированному сотруднику. Он не проявит инициативу.' }],
+                end: true
+            },
+            'win': {
+                my_reply: 'Я не знал про тот кейс. В этом году мы защищаем бюджет. Я лично презентую твой слайд с выводами на совете директоров. Твоя работа будет видна.',
+                emails: [{ from: 'alex', body: 'Если лично на совете... тогда ладно. У меня есть идея, как показать динамику затрат на графике.' }, { type: 'sys_good', body: '✅ ПОБЕДА! Вы вернули вовлеченность сотрудника, показав значимость его работы (Поддерживающий стиль).' }],
+                success: true,
+                end: true
+            }
+        },
+
+        // --- КАТЯ ---
+        'katya': {
+            'start': {
+                emails: [
+                    {
+                        from: 'katya',
+                        time: '14:10',
+                        body: 'Я увидела в базе, что мы пытаемся выйти на холдинг "Альфа". Я нашла мобильный их ЛПР! У меня есть супер-идея, как зайти через креатив. Можно я ему наберу прямо сейчас? Я чувствую, что дожму!'
+                    }
+                ],
+                options: [
+                    { title: 'Разрешить (Доверие)', desc: '«У тебя глаза горят, действуй! Я доверяю».', next: 'risk' },
+                    { title: 'Запретить (Охладить)', desc: '«Рано тебе еще. Иди учи скрипты».', next: 'demotivation' },
+                    { title: 'Направить (Структура)', desc: '«Энергия супер, но клиент сложный. Давай сначала напишем план».', next: 'win' }
+                ]
+            },
+            'risk': {
+                my_reply: 'Окей, Катя, мне нравится твой напор. Звони, верю в тебя.',
+                emails: [
+                    { from: 'katya', delay: 2000, body: '...(Спустя час)...\n\nОн... он бросил трубку. Сказал, что мы непрофессионалы. Я просто хотела пошутить в начале...' },
+                    { type: 'sys_bad', body: '⛔ ПРОВАЛ: Вы дали слишком много свободы новичку. Клиент потерян.' }
+                ],
+                options: [
+                    { title: 'Утешить', desc: '«Не переживай, бывает».', next: 'fail_comfort' },
+                    { title: 'Разбор полетов', desc: '«Вытирай слезы. Садись, разберем ошибку и напишем скрипт».', next: 'win_loop' }
+                ]
+            },
+            'fail_comfort': {
+                emails: [{ type: 'sys_bad', body: '❌ ИТОГ: Катя успокоилась, но ничему не научилась. Она продолжит совершать ошибки.' }],
+                end: true
+            },
+            'demotivation': {
+                my_reply: 'Катя, стоп. Рано тебе еще VIP-ов трогать. Изучи сначала регламент.',
+                emails: [{ from: 'katya', body: 'Поняла... Извините. (Больше инициативы не проявляет).' }, { type: 'sys_bad', body: '⚠️ ИТОГ: Вы погасили инициативу. Сотрудник превратится в пассивного исполнителя.' }],
+                end: true
+            },
+            'win': {
+                my_reply: 'Катя, энергия — огонь! Но клиент очень консервативный. Давай направим твой креатив в правильное русло. Прямо сейчас пишем скрипт звонка, и только потом звонишь.',
+                emails: [{ from: 'katya', body: 'Ну... ладно, давайте писать. Я просто боялась упустить момент.' }, { type: 'sys_good', body: '✅ УСПЕХ! Вы использовали энергию новичка, дали четкий алгоритм действий (Директивный стиль).' }],
+                success: true,
+                end: true
+            },
+            'win_loop': {
+                my_reply: 'Это опыт. Сейчас мы пропишем каждое слово, чтобы в следующий раз ты знала, что говорить. Открывай документ.',
+                emails: [{ from: 'katya', body: 'Спасибо, я готова учиться.' }, { type: 'sys_good', body: '✅ СПАСЕНИЕ: Вы перешли в режим наставничества и исправили ситуацию.' }],
+                success: true,
+                end: true
+            }
+        }
+    };
+
+    // --- ДВИЖОК ---
+    let activeChar = null;
+    const threadContent = document.getElementById('thread-content');
+    const actionArea = document.getElementById('action-area');
+    const startScreen = document.getElementById('start-screen');
+    const typing = document.getElementById('typing-indicator');
+
+    function startGame() {
+        startScreen.style.display = 'none';
+    }
+
+    function showInbox() {
+        // Для мобилок - возврат к списку
+        document.querySelector('.inbox-list').classList.remove('hidden');
+        document.querySelector('.reading-pane').classList.remove('active');
+    }
+
+    function openMail(charId) {
+        activeChar = charId;
+        
+        // UI
+        document.getElementById('empty-state').style.display = 'none';
+        document.querySelector('.thread-view').classList.add('show');
+        
+        // Подсветка активного
+        document.querySelectorAll('.email-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('item-' + charId).classList.add('active');
+        document.getElementById('item-' + charId).classList.remove('unread');
+
+        // Мобильная адаптация
+        if (window.innerWidth <= 700) {
+            document.querySelector('.inbox-list').classList.add('hidden');
+            document.querySelector('.reading-pane').classList.add('active');
+        }
+
+        // Рендерим историю
+        renderHistory(charId);
+
+        // Если это первый заход - запускаем старт
+        if (state[charId].history.length === 0) {
+            processStep(charId, 'start');
+        }
+    }
+
+    function renderHistory(charId) {
+        threadContent.innerHTML = '';
+        actionArea.innerHTML = '';
+        
+        state[charId].history.forEach(block => {
+            threadContent.appendChild(block);
+        });
+
+        // Если есть активные кнопки, рендерим их
+        if (state[charId].currentOptions) {
+            renderOptions(state[charId].currentOptions);
+        }
+        
+        scrollToBottom();
+    }
+
+    function processStep(charId, stepId) {
+        const stepData = scenarios[charId][stepId];
+        
+        // 1. Если есть МОЙ ответ (выбранный ранее)
+        if (stepData.my_reply) {
+            addToHistory(charId, createMailNode('me', stepData.my_reply));
+        }
+
+        // 2. Входящие письма с задержкой
+        let delay = 0;
+        if (stepData.emails) {
+            stepData.emails.forEach(email => {
+                const wait = email.delay || 1000;
+                
+                // Если пишет персонаж - показываем "печатает"
+                if (!email.type) {
+                    setTimeout(() => { 
+                        if(activeChar === charId) {
+                            typing.style.display = 'block'; 
+                            scrollToBottom(); 
+                        }
+                    }, delay);
+                }
+
+                delay += wait;
+
+                setTimeout(() => {
+                    typing.style.display = 'none';
+                    if (email.type) {
+                        addToHistory(charId, createSysMsg(email.body, email.type));
+                    } else {
+                        addToHistory(charId, createMailNode(email.from, email.body));
+                    }
+                }, delay);
+            });
+        }
+
+        // 3. Кнопки (в конце)
+        setTimeout(() => {
+            if (stepData.options) {
+                state[charId].currentOptions = stepData.options;
+                if (activeChar === charId) renderOptions(stepData.options);
+            }
+            
+            // Если конец
+            if (stepData.end) {
+                if (stepData.success && state[charId].status !== 'done') {
+                    state[charId].status = 'done';
+                    state.unread--;
+                    updateCounter();
+                    document.getElementById('item-' + charId).classList.add('done');
+                }
+                
+                // Кнопка рестарта
+                const restartOpt = [{ title: 'Попробовать еще раз', next: 'start', restart: true }];
+                state[charId].currentOptions = restartOpt;
+                if (activeChar === charId) renderOptions(restartOpt);
+            }
+        }, delay + 500);
+    }
+
+    function addToHistory(charId, node) {
+        state[charId].history.push(node);
+        if (activeChar === charId) {
+            threadContent.appendChild(node);
+            scrollToBottom();
+        }
+    }
+
+    function renderOptions(options) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'action-panel';
+        wrapper.innerHTML = '<div class="action-title">Выберите действие:</div>';
+        
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            
+            if (opt.restart) {
+                btn.innerHTML = `<strong>🔄 ${opt.title}</strong>`;
+                btn.style.textAlign = 'center';
+                btn.onclick = () => restartCase(activeChar);
+            } else {
+                btn.innerHTML = `<strong>${opt.title}</strong>${opt.desc}`;
+                btn.onclick = () => {
+                    // Убираем кнопки
+                    state[activeChar].currentOptions = null;
+                    actionArea.innerHTML = '';
+                    // Идем дальше
+                    processStep(activeChar, opt.next);
+                };
+            }
+            wrapper.appendChild(btn);
+        });
+        
+        actionArea.innerHTML = '';
+        actionArea.appendChild(wrapper);
+        scrollToBottom();
+    }
+
+    function createMailNode(role, text) {
+        const div = document.createElement('div');
+        div.className = 'mail-card';
+        
+        let name = '', avatarClass = '', initials = '';
+        if (role === 'alex') { name = 'Алексей Смирнов'; avatarClass = 'av-alex'; initials = 'АС'; }
+        if (role === 'katya') { name = 'Екатерина Новикова'; avatarClass = 'av-katya'; initials = 'ЕН'; }
+        if (role === 'me') { name = 'Вы (Руководитель)'; avatarClass = 'av-me'; initials = 'Я'; }
+
+        div.innerHTML = `
+            <div class="mail-header">
+                <div style="display:flex; align-items:center;">
+                    <div class="mail-avatar ${avatarClass}">${initials}</div>
+                    <div style="font-weight:bold; color:#333;">${name}</div>
+                </div>
+                <div style="font-size:12px; color:#999;">Только что</div>
+            </div>
+            <div class="mail-body">${text}</div>
+        `;
+        return div;
+    }
+
+    function createSysMsg(text, type) {
+        const div = document.createElement('div');
+        div.className = type === 'sys_good' ? 'sys-msg sys-good' : 'sys-msg sys-bad';
+        div.innerText = text;
+        return div;
+    }
+
+    function restartCase(charId) {
+        state[charId].history = [];
+        state[charId].currentOptions = null;
+        state[charId].status = 'new';
+        
+        // Визуальный сброс списка (если был пройден)
+        /* document.getElementById('item-' + charId).classList.remove('done'); */ 
+        // Не убираем галочку DONE, чтобы пользователь видел прогресс, даже если переигрывает
+        
+        renderHistory(charId);
+        processStep(charId, 'start');
+    }
+
+    function scrollToBottom() {
+        setTimeout(() => {
+            threadContent.scrollTop = threadContent.scrollHeight;
+            document.getElementById('reading-pane').scrollTop = document.getElementById('reading-pane').scrollHeight;
+        }, 100);
+    }
+
+    function updateCounter() {
+        const badge = document.getElementById('unread-counter');
+        badge.innerText = state.unread;
+        if (state.unread === 0) {
+            badge.style.background = '#107c10'; badge.style.color = 'white';
+        }
+    }
+
+</script>
+
+</body>
+</html>
