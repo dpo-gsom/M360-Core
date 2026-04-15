@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Батарейка Ресурсов</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FFFFFF;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #003B48;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #495761;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .items-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+        }
+
+        .items-section h2 {
+            color: #003B48;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            min-height: 200px;
+            grid-auto-rows: max-content;
+        }
+
+        .draggable-item {
+            background: #495761;
+            color: #FFFFFF;
+            padding: 16px 12px;
+            border-radius: 8px;
+            cursor: move;
+            text-align: center;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            user-select: none;
+            touch-action: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+            height: auto;
+            line-height: 1.3;
+            max-width: 200px;
+            width: 100%;
+        }
+
+        .draggable-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .draggable-item.touch-dragging {
+            position: fixed;
+            z-index: 1000;
+            opacity: 0.8;
+            transform: scale(1.05);
+            pointer-events: none;
+        }
+
+        .zones-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .drop-zone {
+            background: transparent;
+            border-radius: 8px;
+            padding: 0;
+            min-height: 70px;
+            height: 70px;
+            position: relative;
+            overflow: visible;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .drop-zone.drag-over .battery-container {
+            border-color: #004d5e;
+            background: #004d5e;
+        }
+
+        .drop-zone.error .battery-container {
+            animation: shake 0.4s ease;
+            background: #C31532;
+            border-color: #C31532;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .battery-container {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            background: #003B48;
+            border: 3px solid #003B48;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .battery-container::after {
+            content: '';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 24px;
+            background: #003B48;
+            border-radius: 0 4px 4px 0;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.error .battery-container::after {
+            background: #C31532;
+        }
+
+        .battery-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: width 0.5s ease;
+            z-index: 0;
+        }
+
+        .zone-label {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 15px;
+            z-index: 1;
+            white-space: nowrap;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .trash-zone .battery-container {
+            background: #C31532;
+            border-color: #C31532;
+        }
+
+        .trash-zone .battery-container::after {
+            background: #C31532;
+        }
+
+        .win-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 2000;
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .win-message.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .win-battery {
+            position: relative;
+            width: 200px;
+            height: 100px;
+            background: #003B48;
+            border: 6px solid #003B48;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .win-battery::after {
+            content: '';
+            position: absolute;
+            right: -24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 48px;
+            background: #003B48;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .win-battery-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            animation: fillBattery 2s ease-in-out forwards;
+        }
+
+        @keyframes fillBattery {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .win-battery-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            z-index: 1;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .game-board {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .items-section {
+                padding: 20px;
+            }
+
+            .items-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+
+            .draggable-item {
+                padding: 14px 10px;
+                font-size: 13px;
+                min-height: 65px;
+                max-width: 180px;
+            }
+
+            .drop-zone {
+                padding: 0;
+                min-height: 60px;
+                height: 60px;
+            }
+
+            .battery-container {
+                height: 45px;
+            }
+
+            .battery-container::after {
+                width: 10px;
+                height: 20px;
+                right: -10px;
+            }
+
+            .zone-label {
+                font-size: 13px;
+            }
+
+            .win-battery {
+                width: 160px;
+                height: 80px;
+                border: 5px solid #003B48;
+            }
+
+            .win-battery::after {
+                right: -20px;
+                width: 20px;
+                height: 40px;
+            }
+
+            .win-battery-icon {
+                font-size: 40px;
+            }
+
+            .win-message {
+                padding: 30px 40px;
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Батарейка Ресурсов</h1>
+        <p class="subtitle">Распредели активности по типам ресурсов</p>
+
+        <div class="game-board">
+            <div class="items-section">
+                <h2>Активности</h2>
+                <div class="items-grid" id="itemsGrid">
+                    <div class="draggable-item" data-type="emotional">Любимое хобби</div>
+                    <div class="draggable-item" data-type="physical">Прогулка</div>
+                    <div class="draggable-item" data-type="trash">20 минут соц сетей</div>
+                    <div class="draggable-item" data-type="social">Поддержка семьи</div>
+                    <div class="draggable-item" data-type="intellectual">Обучение и чтение</div>
+                    <div class="draggable-item" data-type="social">Нетворкинг на конференции</div>
+                    <div class="draggable-item" data-type="physical">Сбалансированное питание</div>
+                    <div class="draggable-item" data-type="trash">Поминутный контроль сотрудников</div>
+                    <div class="draggable-item" data-type="social">Встречи с друзьями</div>
+                    <div class="draggable-item" data-type="intellectual">Игра в шахматы или го</div>
+                    <div class="draggable-item" data-type="emotional">Практики релаксации</div>
+                    <div class="draggable-item" data-type="physical">Полноценный сон</div>
+                </div>
+            </div>
+
+            <div class="zones-section">
+                <div class="drop-zone" data-zone="physical">
+                    <div class="battery-container">
+                        <div class="battery-fill"></div>
+                        <span class="zone-label">Физические</span>
+                    </div>
+                </div>
+
+                <div class="drop-zone" data-zone="emotional">
+                    <div class="battery-container">
+                        <div class="battery-fill"></div>
+                        <span class="zone-label">Эмоциональные</span>
+                    </div>
+                </div>
+
+                <div class="drop-zone" data-zone="intellectual">
+                    <div class="battery-container">
+                        <div class="battery-fill"></div>
+                        <span class="zone-label">Интеллектуальные</span>
+                    </div>
+                </div>
+
+                <div class="drop-zone" data-zone="social">
+                    <div class="battery-container">
+                        <div class="battery-fill"></div>
+                        <span class="zone-label">Социальные</span>
+                    </div>
+                </div>
+
+                <div class="drop-zone trash-zone" data-zone="trash">
+                    <div class="battery-container">
+                        <div class="battery-fill"></div>
+                        <span class="zone-label">🗑️ Мусор</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="win-message" id="winMessage">
+        <div class="win-battery">
+            <div class="win-battery-fill"></div>
+            <div class="win-battery-icon">⚡</div>
+        </div>
+    </div>
+
+    <script>
+        let draggedElement = null;
+        let touchDragClone = null;
+        let touchStartPos = { x: 0, y: 0 };
+        
+        const zoneCounts = {
+            physical: { current: 0, total: 3 },
+            emotional: { current: 0, total: 2 },
+            intellectual: { current: 0, total: 2 },
+            social: { current: 0, total: 3 },
+            trash: { current: 0, total: 2 }
+        };
+
+        // Desktop Drag and Drop
+        const items = document.querySelectorAll('.draggable-item');
+        const zones = document.querySelectorAll('.drop-zone');
+
+        items.forEach(item => {
+            // Desktop events
+            item.setAttribute('draggable', 'true');
+            
+            item.addEventListener('dragstart', (e) => {
+                draggedElement = item;
+                item.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            item.addEventListener('dragend', (e) => {
+                item.classList.remove('dragging');
+                draggedElement = null;
+            });
+
+            // Touch events for mobile
+            item.addEventListener('touchstart', handleTouchStart, { passive: false });
+            item.addEventListener('touchmove', handleTouchMove, { passive: false });
+            item.addEventListener('touchend', handleTouchEnd, { passive: false });
+        });
+
+        zones.forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', (e) => {
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                handleDrop(zone, draggedElement);
+            });
+        });
+
+        // Touch event handlers
+        function handleTouchStart(e) {
+            e.preventDefault();
+            draggedElement = e.target;
+            
+            const touch = e.touches[0];
+            touchStartPos = { x: touch.clientX, y: touch.clientY };
+            
+            // Create visual clone for dragging
+            touchDragClone = draggedElement.cloneNode(true);
+            touchDragClone.classList.add('touch-dragging');
+            touchDragClone.style.width = draggedElement.offsetWidth + 'px';
+            touchDragClone.style.left = touch.clientX - draggedElement.offsetWidth / 2 + 'px';
+            touchDragClone.style.top = touch.clientY - draggedElement.offsetHeight / 2 + 'px';
+            document.body.appendChild(touchDragClone);
+            
+            draggedElement.style.opacity = '0.3';
+        }
+
+        function handleTouchMove(e) {
+            if (!touchDragClone) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            touchDragClone.style.left = touch.clientX - touchDragClone.offsetWidth / 2 + 'px';
+            touchDragClone.style.top = touch.clientY - touchDragClone.offsetHeight / 2 + 'px';
+        }
+
+        function handleTouchEnd(e) {
+            if (!touchDragClone) return;
+            e.preventDefault();
+            
+            const touch = e.changedTouches[0];
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            // Find the drop zone
+            let zone = dropTarget;
+            while (zone && !zone.classList.contains('drop-zone')) {
+                zone = zone.parentElement;
+            }
+            
+            if (zone) {
+                handleDrop(zone, draggedElement);
+            }
+            
+            // Cleanup
+            if (touchDragClone && touchDragClone.parentNode) {
+                touchDragClone.parentNode.removeChild(touchDragClone);
+            }
+            touchDragClone = null;
+            
+            if (draggedElement) {
+                draggedElement.style.opacity = '1';
+                draggedElement = null;
+            }
+        }
+
+        function handleDrop(zone, item) {
+            if (!item) return;
+
+            const itemType = item.dataset.type;
+            const zoneType = zone.dataset.zone;
+
+            if (itemType === zoneType) {
+                // Correct drop
+                item.style.transition = 'all 0.3s ease';
+                item.style.opacity = '0';
+                item.style.transform = 'scale(0.5)';
+                
+                setTimeout(() => {
+                    item.remove();
+                    updateBattery(zone, zoneType);
+                    checkWinCondition();
+                }, 300);
+            } else {
+                // Incorrect drop
+                zone.classList.add('error');
+                setTimeout(() => {
+                    zone.classList.remove('error');
+                }, 400);
+            }
+        }
+
+        function updateBattery(zone, type) {
+            zoneCounts[type].current++;
+            const fillElement = zone.querySelector('.battery-fill');
+            
+            const fillPercentage = (zoneCounts[type].current / zoneCounts[type].total) * 100;
+            fillElement.style.width = fillPercentage + '%';
+        }
+
+        function checkWinCondition() {
+            const allSorted = Object.values(zoneCounts).every(zone => zone.current === zone.total);
+            
+            if (allSorted) {
+                setTimeout(() => {
+                    const winMessage = document.getElementById('winMessage');
+                    winMessage.classList.add('show');
+                    
+                    setTimeout(() => {
+                        winMessage.classList.remove('show');
+                    }, 3000);
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
