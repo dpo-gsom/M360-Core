@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приборная панель руководителя</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 10px 5px;
+            background: transparent;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        h3 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .instruction-text {
+            text-align: center;
+            color: #555;
+            font-size: 16px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        /* ЛЕГЕНДА */
+        .status-guide {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .guide-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            min-width: 120px; /* Чтобы не сжимались слишком сильно */
+        }
+
+        /* FLEX-КОНТЕЙНЕР ДЛЯ КАРТОЧЕК */
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap; /* Разрешаем перенос на новую строку */
+            justify-content: center; /* Центрируем содержимое (в том числе последний ряд) */
+            gap: 12px; /* Отступ между карточками */
+        }
+
+        /* КАРТОЧКА */
+        .dash-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            
+            /* ГИБКАЯ ШИРИНА */
+            flex-grow: 1; /* Карточка может растягиваться */
+            flex-basis: 140px; /* Базовая ширина узкая, чтобы влезать по 2-3 в ряд */
+            max-width: 220px; /* Но не шире этого, чтобы не быть гигантской */
+            
+            min-height: 150px;
+            user-select: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .dash-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            border-color: #bdc3c7;
+            z-index: 2;
+        }
+
+        .dash-card:active { transform: translateY(-1px); }
+        
+        /* ЭЛЕМЕНТЫ КАРТОЧКИ */
+        .status-bar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: #ecf0f1;
+            transition: background 0.3s;
+        }
+
+        .card-icon { font-size: 28px; margin-bottom: 10px; margin-top: 5px; }
+        .card-title { font-weight: 700; color: #2c3e50; margin-bottom: 5px; font-size: 14px; line-height: 1.2; }
+        .card-desc { font-size: 11px; color: #95a5a6; line-height: 1.3; flex-grow: 1; margin-bottom: 10px; }
+        
+        .current-status { 
+            font-size: 10px; 
+            font-weight: 800; 
+            color: #bdc3c7; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        /* ЦВЕТА И БЕЙДЖИ */
+        .guide-badge {
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 12px; margin-bottom: 5px; display: inline-block;
+        }
+        .guide-desc { font-size: 11px; color: #555; line-height: 1.3; }
+
+        .badge-green { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .badge-yellow { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-red { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        .dash-card[data-status="green"] { background: #f0fff4; border-color: #27ae60; }
+        .dash-card[data-status="green"] .status-bar { background: #27ae60; }
+        .dash-card[data-status="green"] .current-status { color: #155724; background: #d4edda; }
+
+        .dash-card[data-status="yellow"] { background: #fffcf5; border-color: #f1c40f; }
+        .dash-card[data-status="yellow"] .status-bar { background: #f1c40f; }
+        .dash-card[data-status="yellow"] .current-status { color: #856404; background: #fff3cd; }
+
+        .dash-card[data-status="red"] { background: #fff5f5; border-color: #c0392b; }
+        .dash-card[data-status="red"] .status-bar { background: #c0392b; }
+        .dash-card[data-status="red"] .current-status { color: #721c24; background: #f8d7da; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <h3>Приборная панель руководителя</h3>
+    <p class="instruction-text">Нажимайте на карточки, чтобы оценить состояние процесса:</p>
+
+    <!-- ЛЕГЕНДА -->
+    <div class="status-guide">
+        <div class="guide-item">
+            <div class="guide-badge badge-green">Системно</div>
+            <div class="guide-desc">Процесс отлажен, работает предсказуемо.</div>
+        </div>
+        <div class="guide-item">
+            <div class="guide-badge badge-yellow">Интуитивно</div>
+            <div class="guide-desc">Нет четкой системы. Результат зависит от удачи.</div>
+        </div>
+        <div class="guide-item">
+            <div class="guide-badge badge-red">Проседает</div>
+            <div class="guide-desc">Источник проблем и «пожаров».</div>
+        </div>
+    </div>
+
+    <!-- ЕДИНЫЙ БЛОК КАРТОЧЕК -->
+    <div class="cards-container">
+        
+        <!-- Карточка 1 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">🎯</div>
+            <div class="card-title">Постановка цели</div>
+            <div class="card-desc">Понимание «Куда и Зачем» идем</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+        <!-- Карточка 2 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">📅</div>
+            <div class="card-title">Планирование</div>
+            <div class="card-desc">Декомпозиция целей на задачи</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+        <!-- Карточка 3 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">⚙️</div>
+            <div class="card-title">Организация</div>
+            <div class="card-desc">Распределение ресурсов</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+        <!-- Карточка 4 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">🔍</div>
+            <div class="card-title">Оценка, Контроль</div>
+            <div class="card-desc">Сверка факта и стандартов</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+        <!-- Карточка 5 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">🔥</div>
+            <div class="card-title">Мотивация</div>
+            <div class="card-desc">Вдохновение на результат</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+        <!-- Карточка 6 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">🤝</div>
+            <div class="card-title">Работа с командой</div>
+            <div class="card-desc">Атмосфера и взаимодействие</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+        <!-- Карточка 7 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">👥</div>
+            <div class="card-title">Расстановка кадров</div>
+            <div class="card-desc">Нужные люди на нужных местах</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+        <!-- Карточка 8 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">📥</div>
+            <div class="card-title">Делегирование</div>
+            <div class="card-desc">Передача полномочий</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+        <!-- Карточка 9 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">💬</div>
+            <div class="card-title">Коммуникация</div>
+            <div class="card-desc">Обмен информацией</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+        <!-- Карточка 10 -->
+        <div class="dash-card" onclick="toggleStatus(this)">
+            <div class="status-bar"></div>
+            <div class="card-icon">🚀</div>
+            <div class="card-title">Развитие, Поддержка</div>
+            <div class="card-desc">Обучение и наставничество</div>
+            <div class="current-status">Оценить</div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function toggleStatus(card) {
+        let current = card.getAttribute('data-status');
+        let statusText = card.querySelector('.current-status');
+        
+        if (!current) {
+            card.setAttribute('data-status', 'green');
+            statusText.innerText = "Владею уверенно";
+        } else if (current === 'green') {
+            card.setAttribute('data-status', 'yellow');
+            statusText.innerText = "В процессе";
+        } else if (current === 'yellow') {
+            card.setAttribute('data-status', 'red');
+            statusText.innerText = "Зона роста";
+        } else {
+            card.removeAttribute('data-status');
+            statusText.innerText = "Оценить";
+        }
+    }
+</script>
+<!-- КНОПКА СОХРАНЕНИЯ -->
+<div class="save-block" style="text-align: center; margin: 40px 0;">
+    <button onclick="downloadScreenshot()" class="save-btn">
+        📸 Скачать мой результат
+    </button>
+    <div id="loading-text" style="display:none; color: #7f8c8d; font-size: 13px; margin-top: 5px;">
+        Создаю снимок...
+    </div>
+</div>
+
+<!-- СТИЛИ ДЛЯ КНОПКИ -->
+<style>
+    .save-btn {
+        background: #34495e;
+        color: #fff;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-family: Arial, sans-serif;
+    }
+    .save-btn:hover { background: #2c3e50; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .save-btn:active { transform: translateY(0); }
+</style>
+
+<!-- БИБЛИОТЕКА HTML2CANVAS (Берем с CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<!-- СКРИПТ СОХРАНЕНИЯ -->
+<script>
+    function downloadScreenshot() {
+        const btn = document.querySelector('.save-btn');
+        const loader = document.getElementById('loading-text');
+        const content = document.body; // Можно заменить на document.querySelector('.m360-dashboard')
+
+        // 1. Показываем индикатор загрузки и прячем кнопку (чтобы она не попала на скрин)
+        btn.style.display = 'none';
+        loader.style.display = 'block';
+
+        // 2. Делаем скриншот
+        html2canvas(content, {
+            scale: 2, // Улучшает качество (Retina)
+            backgroundColor: '#ffffff', // Белый фон, т.к. у нас прозрачный
+            scrollX: 0,
+            scrollY: 0
+        }).then(canvas => {
+            // 3. Создаем ссылку для скачивания
+            const link = document.createElement('a');
+            link.download = 'мой-результат-м360.png';
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+
+            // 4. Возвращаем кнопку назад
+            btn.style.display = 'inline-block';
+            loader.style.display = 'none';
+        }).catch(err => {
+            console.error(err);
+            alert("Ошибка при сохранении. Попробуйте скриншот экрана.");
+            btn.style.display = 'inline-block';
+            loader.style.display = 'none';
+        });
+    }
+</script>
+</body>
+</html>
