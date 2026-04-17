@@ -938,7 +938,7 @@ function showCardFeedback(greenId, type, title, body) {
 
   // Auto-dismiss fallback timer (still active as safety net)
   if (toastTimer) clearTimeout(toastTimer);
-  const dur = type === 'success' ? 8000 : 10000;
+  const dur = type === 'success' ? 10000 : 10000;
   toastTimer = setTimeout(() => closeFeedback(fb), dur);
 }
 
