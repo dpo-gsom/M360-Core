@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    ИНСТРУКЦИЯ ПО ЗАПОЛНЕНИЮ ШАБЛОНА
+    ══════════════════════════════════
+    1. <title> — название интерактива (видно во вкладке браузера)
+    2. В <style> — только стили, специфичные для ЭТОЙ страницы.
+       Всё общее (кнопки, карточки, прогресс и т.д.) уже в styles.css.
+    3. Имя файла: M{N}-kebab-case.html (латиница, без пробелов)
+    4. notifyHeight() вызывать в конце каждого render() — это сообщает
+       Moodle актуальную высоту iframe.
+  -->
+  <title>Название интерактива — М360</title>
+
+  <!-- Шрифты: Inter + Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+
+  <!-- Общая дизайн-система M360 -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Стили, специфичные только для этого интерактива -->
+  <style>
+    /*
+      Здесь — только то, чего нет в styles.css.
+      Пример: специфичная сетка карточек, SVG-графики,
+      кастомные цвета шкал, уникальная анимация.
+    */
+
+    /* Пример: сетка вариантов ответа 2×N */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 440px) {
+      .options-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Корневой элемент приложения — render() наполняет его динамически -->
+<div id="app"></div>
+
+<!--
+  common.js ДОЛЖЕН идти ПЕРВЫМ — он объявляет notifyHeight(),
+  которую использует основной скрипт ниже.
+-->
+<script src="common.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   СОСТОЯНИЕ (state)
+   Всё, что нужно помнить между экранами — храним здесь.
+   ═══════════════════════════════════════════════════════════ */
+var state = {
+  screen: 'intro',   /* 'intro' | 'main' | 'final' */
+  /* Добавьте нужные поля: */
+  /* selected: null, */
+  /* answers: [],    */
+  /* score: 0,       */
+};
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER — центральная функция отрисовки
+   ═══════════════════════════════════════════════════════════ */
+function render() {
+  var app = document.getElementById('app');
+  if (state.screen === 'intro') app.innerHTML = renderIntro();
+  if (state.screen === 'main')  app.innerHTML = renderMain();
+  if (state.screen === 'final') app.innerHTML = renderFinal();
+  notifyHeight(); /* Сообщаем Moodle актуальную высоту */
+}
+
+/* ─── Экран 1: Вводный ──────────────────────────────────── */
+function renderIntro() {
+  return (
+    '<div class="page-wrap anim-fade-up">' +
+
+      /* Шапка */
+      '<h1 class="page-title">Название<span>интерактива</span></h1>' +
+      '<div class="divider"></div>' +
+
+      /* Описание */
+      '<p class="lead-text">' +
+        'Краткое описание задачи, которую предстоит выполнить. ' +
+        'Одно-два предложения — не больше.' +
+      '</p>' +
+
+      /* Тёмный блок-легенда (если нужен) */
+      '<div class="legend-box mt-md">' +
+        '<div class="legend-tag">Задача</div>' +
+        'Здесь можно описать контекст или правила игры. ' +
+        '<strong>Ключевые слова</strong> выделяются цветом.' +
+      '</div>' +
+
+      /* Кнопка старта */
+      '<div class="mt-md">' +
+        '<button class="btn btn--primary btn--full" onclick="goMain()">' +
+          'Начать \u2192' +
+        '</button>' +
+      '</div>' +
+
+    '</div>'
+  );
+}
+
+/* ─── Экран 2: Основной ─────────────────────────────────── */
+function renderMain() {
+  return (
+    '<div class="page-wrap anim-card-in">' +
+
+      /* Метка этапа (если многошаговый) */
+      '<div class="stage-badge">Этап 1 из 2</div>' +
+
+      /* Заголовок и задание */
+      '<h2 class="section-title">Выберите вариант</h2>' +
+      '<p class="question-text mt-xs">Текст вопроса или описание задания?</p>' +
+
+      /* Прогресс-бар (если нужен) */
+      '<div class="progress mt-sm">' +
+        '<div class="progress__meta">' +
+          '<span class="progress__label">Прогресс</span>' +
+          '<span class="progress__fraction">1<em>/5</em></span>' +
+        '</div>' +
+        '<div class="progress__track">' +
+          '<div class="progress__fill" style="width: 20%"></div>' +
+        '</div>' +
+      '</div>' +
+
+      /* Варианты — используем .options-grid из <style> выше */
+      '<div class="options-grid mt-sm">' +
+        renderOption('A', 'Первый вариант') +
+        renderOption('B', 'Второй вариант') +
+        renderOption('C', 'Третий вариант') +
+        renderOption('D', 'Четвёртый вариант') +
+      '</div>' +
+
+      /* Кнопки навигации */
+      '<div class="nav-bar">' +
+        '<button class="btn btn--secondary" onclick="restart()">← Назад</button>' +
+        '<button class="btn btn--primary" onclick="goFinal()">Далее →</button>' +
+      '</div>' +
+
+    '</div>'
+  );
+}
+
+/* Вспомогательная функция: рендер одного варианта ответа */
+function renderOption(id, text) {
+  var isSelected = (state.selected === id);
+  var cls = 'card card--interactive' + (isSelected ? ' card--selected' : '');
+  return (
+    /* data-option — используется в selectOption для точечного обновления */
+    '<div class="' + cls + '" data-option="' + id + '" onclick="selectOption(\'' + id + '\')">' +
+      '<div style="display:flex;align-items:center;gap:10px">' +
+        '<span class="badge badge--neutral">' + id + '</span>' +
+        '<span class="lead-text">' + text + '</span>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+/* ─── Экран 3: Итоговый ─────────────────────────────────── */
+function renderFinal() {
+  return (
+    '<div class="page-wrap anim-fade-up">' +
+
+      /* Итоговый блок */
+      '<div class="result-hero">' +
+        '<div class="result-hero__icon">\uD83C\uDFC6</div>' +
+        '<div class="result-hero__title">Готово!</div>' +
+        '<div class="result-hero__text">' +
+          'Ваш результат и пояснение к нему. ' +
+          'Одно-три предложения.' +
+        '</div>' +
+      '</div>' +
+
+      /* Сводка по ответам (если нужна) */
+      '<div class="card mt-sm">' +
+        '<p class="lead-text">Здесь можно показать итоговый разбор.</p>' +
+      '</div>' +
+
+      /* Кнопка рестарта */
+      '<button class="btn btn--secondary btn--full mt-md" onclick="restart()">' +
+        '\u21BA\u00A0 Пройти заново' +
+      '</button>' +
+
+    '</div>'
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ЛОГИКА
+   ═══════════════════════════════════════════════════════════ */
+function goMain()   { state.screen = 'main';  render(); }
+function goFinal()  { state.screen = 'final'; render(); }
+
+function selectOption(id) {
+  state.selected = id;
+  /* Точечное обновление — только переключаем классы, без полного ре-рендера */
+  document.querySelectorAll('[data-option]').forEach(function(el) {
+    el.classList.toggle('card--selected', el.dataset.option === id);
+  });
+  notifyHeight();
+}
+
+function restart() {
+  state = { screen: 'intro', selected: null };
+  render();
+}
+
+/* ─── Старт ─────────────────────────────────────────────── */
+render();
+</script>
+
+</body>
+</html>
