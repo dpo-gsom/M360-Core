@@ -4,42 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Управленческий ДНК: тест PAEI</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+/* ─── PAEI-специфичные переменные ─── */
 :root {
-  --red: #C31532;
-  --dark: #003B48;
-  --slate: #495761;
-  --cream: #FAF8F4;
-  --sand: #F0EDE6;
-  --border: #DDD8CF;
-  --white: #FFFFFF;
-
-  --p: #1A5FA5;   --p-bg: #EEF3FB; --p-border: #9DBAE0;
-  --a: #7B3FA0;   --a-bg: #F4EDFB; --a-border: #C9AAEA;
-  --e: #B85C00;   --e-bg: #FEF3E6; --e-border: #F0C080;
-  --i: #1A6B4A;   --i-bg: #EBF5EF; --i-border: #A8D5BC;
-
-  --score-4: #003B48;
-  --score-3: #495761;
-  --score-2: #8A9BA3;
-  --score-1: #C8D4D9;
-}
-
-body {
-  font-family: 'Manrope', sans-serif;
-  background: var(--cream);
-  min-height: 100vh;
-  color: var(--dark);
-}
-
-body::before {
-  content: '';
-  position: fixed; top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
-  z-index: 100;
+  --p: #1A5FA5;  --p-bg: #EEF3FB; --p-border: #9DBAE0;
+  --a: #7B3FA0;  --a-bg: #F4EDFB; --a-border: #C9AAEA;
+  --e: #B85C00;  --e-bg: #FEF3E6; --e-border: #F0C080;
+  --i: #1A6B4A;  --i-bg: #EBF5EF; --i-border: #A8D5BC;
 }
 
 #app { max-width: 700px; margin: 0 auto; padding: 44px 20px 60px; }
@@ -53,24 +30,15 @@ body::before {
 }
 
 .intro-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(32px, 7vw, 56px); font-weight: 700;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 7vw, 56px); font-weight: 900;
   color: var(--dark); line-height: 1.1; margin-bottom: 8px;
 }
 .intro-title em { color: var(--red); font-style: normal; display: block; }
 
 .intro-divider { width: 60px; height: 2px; background: var(--red); margin: 24px 0; }
 
-.intro-lead {
-  font-size: 15px; line-height: 1.75; color: var(--slate); margin-bottom: 28px;
-}
-
-.intro-instruction {
-  background: var(--dark); color: var(--white);
-  border-radius: 10px; padding: 20px 22px; margin-bottom: 24px;
-  font-size: 14px; line-height: 1.7;
-}
-.intro-instruction strong { color: #F0C080; }
+.intro-lead { font-size: 15px; line-height: 1.75; color: var(--slate); margin-bottom: 28px; }
 
 .intro-anon {
   background: var(--sand); border-radius: 8px; padding: 14px 18px;
@@ -91,13 +59,13 @@ body::before {
 .btn-start {
   display: flex; align-items: center; justify-content: center; width: 100%;
   background: var(--dark); color: var(--white); border: none; border-radius: 4px;
-  padding: 16px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  padding: 16px; font-family: var(--font-body); font-size: 13px; font-weight: 700;
   letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
   transition: background 0.2s, transform 0.15s;
 }
 .btn-start:hover { background: var(--red); transform: translateY(-1px); }
 
-/* ─── PROGRESS ─── */
+/* ─── ПРОГРЕСС ─── */
 .progress-bar-wrap { margin-bottom: 28px; }
 .progress-top {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
@@ -105,16 +73,15 @@ body::before {
 .progress-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); }
 .progress-right { display: flex; align-items: center; gap: 14px; }
 .score-counter {
-  font-size: 13px; font-weight: 700;
-  padding: 4px 12px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 20px;
   background: var(--sand); border: 1.5px solid var(--border);
   color: var(--slate); transition: all 0.2s;
 }
-.score-counter.ready { background: var(--i-bg); border-color: var(--i-border); color: var(--i); }
+.score-counter.ready { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
 .progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
 .progress-fill { height: 100%; background: var(--red); border-radius: 2px; transition: width 0.4s ease; }
 
-/* ─── BLOCK ─── */
+/* ─── БЛОК ВОПРОСА ─── */
 .block-wrap { animation: cardIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both; }
 
 .block-zone {
@@ -122,22 +89,19 @@ body::before {
   color: var(--red); margin-bottom: 6px;
 }
 .block-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-display);
   font-size: clamp(18px, 4vw, 24px); font-weight: 700; color: var(--dark);
   line-height: 1.3; margin-bottom: 6px;
 }
 .block-question { font-size: 13px; color: var(--slate); margin-bottom: 24px; line-height: 1.6; font-style: italic; }
 
-/* ─── MATRIX ─── */
+/* ─── МАТРИЦА ─── */
 .matrix-wrap { overflow-x: auto; margin-bottom: 20px; }
-.matrix {
-  width: 100%; min-width: 340px; border-collapse: separate; border-spacing: 0;
-}
+.matrix { width: 100%; min-width: 340px; border-collapse: separate; border-spacing: 0; }
 
 .matrix th {
   text-align: center; padding: 0 0 12px; font-size: 11px; font-weight: 700;
-  letter-spacing: 1px; text-transform: uppercase; color: var(--slate);
-  width: 60px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--slate); width: 60px;
 }
 .matrix th:first-child { text-align: left; width: auto; padding-left: 0; }
 
@@ -148,53 +112,36 @@ body::before {
   color: var(--slate); background: var(--white);
 }
 
-.matrix td {
-  padding: 6px 0; vertical-align: middle;
-}
+.matrix td { padding: 6px 0; vertical-align: middle; }
 .matrix td:first-child {
   padding-right: 16px; font-size: 13px; line-height: 1.55; color: var(--slate);
-  padding-bottom: 14px; padding-top: 8px;
-  border-bottom: 1px solid var(--border);
+  padding-bottom: 14px; padding-top: 8px; border-bottom: 1px solid var(--border);
 }
 .matrix tr:last-child td:first-child { border-bottom: none; }
-.matrix td:not(:first-child) {
-  text-align: center; border-bottom: 1px solid var(--border);
-}
+.matrix td:not(:first-child) { text-align: center; border-bottom: 1px solid var(--border); }
 .matrix tr:last-child td:not(:first-child) { border-bottom: none; }
 
 .matrix-cell {
   width: 40px; height: 40px; border-radius: 50%; margin: 0 auto;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  border: 2px solid var(--border); background: var(--white);
+  cursor: pointer; border: 2px solid var(--border); background: var(--white);
   transition: border-color 0.15s, background 0.15s, opacity 0.15s;
   position: relative;
 }
 .matrix-cell:hover { border-color: var(--dark); }
 .matrix-cell::after {
-  content: '';
-  width: 18px; height: 18px; border-radius: 50%;
-  background: transparent;
-  transition: background 0.15s;
+  content: ''; width: 18px; height: 18px; border-radius: 50%;
+  background: transparent; transition: background 0.15s;
 }
 .matrix-cell.selected::after { background: var(--dark); }
 .matrix-cell.selected { border-color: var(--dark); }
-.matrix-cell.impossible {
-  opacity: 0.18;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-.matrix-cell.impossible {
-  opacity: 0.18;
-  cursor: not-allowed;
-  pointer-events: none;
-}
+.matrix-cell.impossible { opacity: 0.18; cursor: not-allowed; pointer-events: none; }
 
-/* ─── NEXT BTN ─── */
+/* ─── КНОПКА «ДАЛЕЕ» ─── */
 .btn-next {
   width: 100%; background: var(--dark); color: var(--white);
   border: none; border-radius: 4px; padding: 15px;
-  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
   letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
   transition: background 0.2s, opacity 0.2s, transform 0.15s;
   opacity: 0.35; pointer-events: none;
@@ -202,24 +149,24 @@ body::before {
 .btn-next.ready { opacity: 1; pointer-events: all; }
 .btn-next.ready:hover { background: var(--red); transform: translateY(-1px); }
 
-/* ─── RESULTS ─── */
+/* ─── РЕЗУЛЬТАТЫ ─── */
 .results { animation: fadeUp 0.6s ease both; }
 
-.results-hero {
-  text-align: center; margin-bottom: 32px;
+.results-hero { text-align: center; margin-bottom: 32px; }
+.results-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 16px;
 }
-.results-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 16px; }
 
 .dna-code {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(40px, 10vw, 72px); font-weight: 700;
-  letter-spacing: 8px; color: var(--dark); line-height: 1;
-  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 10vw, 72px); font-weight: 900;
+  letter-spacing: 8px; color: var(--dark); line-height: 1; margin-bottom: 8px;
 }
 
 .results-sub { font-size: 14px; color: var(--slate); line-height: 1.6; margin-bottom: 24px; }
 
-/* ─── BARS ─── */
+/* ─── ШКАЛЫ ─── */
 .bars-section { margin-bottom: 28px; }
 .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .bar-label { font-size: 13px; font-weight: 700; min-width: 100px; }
@@ -235,27 +182,31 @@ body::before {
 .bar-fill.i { background: var(--i); }
 .bar-score { font-size: 13px; font-weight: 700; color: var(--dark); min-width: 36px; text-align: right; }
 .bar-code { font-size: 11px; font-weight: 700; min-width: 18px; text-align: center; }
-.bar-code.big { color: var(--dark); font-size: 14px; }
+.bar-code.big   { color: var(--dark); font-size: 14px; }
 .bar-code.small { color: var(--slate); }
-.bar-code.dash { color: var(--border); }
+.bar-code.dash  { color: var(--border); }
 
-/* ─── ROLE CARDS ─── */
-.roles-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 14px; }
-.roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
-.role-card {
-  border-radius: 10px; padding: 16px 16px; border: 1.5px solid;
+/* ─── КАРТОЧКИ РОЛЕЙ ─── */
+.roles-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--slate); margin-bottom: 14px;
 }
+.roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+.role-card { border-radius: 10px; padding: 16px; border: 1.5px solid; }
 .role-card.p { background: var(--p-bg); border-color: var(--p-border); }
 .role-card.a { background: var(--a-bg); border-color: var(--a-border); }
 .role-card.e { background: var(--e-bg); border-color: var(--e-border); }
 .role-card.i { background: var(--i-bg); border-color: var(--i-border); }
 .role-card.dimmed { opacity: 0.4; }
 
-.role-letter { font-size: 28px; font-family: 'Cormorant Garamond', serif; font-weight: 700; margin-bottom: 4px; }
+.role-letter {
+  font-family: var(--font-display); font-size: 28px; font-weight: 700; margin-bottom: 4px;
+}
 .role-card.p .role-letter { color: var(--p); }
 .role-card.a .role-letter { color: var(--a); }
 .role-card.e .role-letter { color: var(--e); }
 .role-card.i .role-letter { color: var(--i); }
+
 .role-name { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
 .role-code-badge {
   display: inline-block; font-size: 11px; font-weight: 700;
@@ -267,28 +218,30 @@ body::before {
 .role-card.i .role-code-badge { background: var(--i); color: #fff; }
 .role-desc { font-size: 12px; color: var(--slate); line-height: 1.55; }
 
-/* ─── PATHOLOGIES ─── */
+/* ─── ЗОНЫ РИСКА ─── */
 .pathology-section {
-  background: #FEF0F2; border: 1.5px solid #F2A0AC; border-radius: 10px;
-  padding: 18px 20px; margin-bottom: 24px;
+  background: var(--red-bg); border: 1.5px solid var(--red-border);
+  border-radius: 10px; padding: 18px 20px; margin-bottom: 24px;
 }
-.pathology-title { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C31532; margin-bottom: 12px; }
-.pathology-item {
-  display: flex; gap: 12px; margin-bottom: 10px; font-size: 13px; align-items: flex-start;
+.pathology-title {
+  font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 12px;
 }
+.pathology-item { display: flex; gap: 12px; margin-bottom: 10px; font-size: 13px; align-items: flex-start; }
 .pathology-item:last-child { margin-bottom: 0; }
 .pathology-code {
-  font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700;
-  color: #C31532; flex-shrink: 0; min-width: 20px; margin-top: -1px;
+  font-family: var(--font-display); font-size: 18px; font-weight: 700;
+  color: var(--red); flex-shrink: 0; min-width: 20px; margin-top: -1px;
 }
 .pathology-name { font-weight: 700; color: var(--dark); margin-bottom: 2px; font-size: 12px; }
 .pathology-desc { color: var(--slate); line-height: 1.5; font-size: 12px; }
 
+/* ─── КНОПКИ РЕЗУЛЬТАТОВ ─── */
 .btn-save {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; background: var(--dark); color: var(--white);
   border: none; border-radius: 4px; padding: 15px;
-  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
   letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
   transition: background 0.2s; margin-bottom: 12px;
 }
@@ -298,30 +251,41 @@ body::before {
 .btn-restart {
   width: 100%; background: var(--white); color: var(--dark);
   border: 1.5px solid var(--border); border-radius: 4px; padding: 14px;
-  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
   letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
 .btn-restart:hover { border-color: var(--dark); background: var(--sand); }
 
-@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-@keyframes cardIn { from { opacity:0; transform:translateY(18px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
-
+/* ─── Адаптив ─── */
 @media (max-width: 500px) {
   .roles-grid { grid-template-columns: 1fr; }
-  .matrix-cell { width: 38px; height: 38px; font-size: 13px; }
+  .matrix-cell { width: 38px; height: 38px; }
   .matrix th .score-head { width: 38px; height: 38px; font-size: 14px; }
 }
 </style>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div id="app"></div>
+<script src="common.js"></script>
 <script>
 // ── DATA ──
-const ZONES = ['Зона 1: Задачи и результат','Зона 1: Задачи и результат','Зона 1: Задачи и результат','Зона 1: Задачи и результат','Зона 2: Процессы и изменения','Зона 2: Процессы и изменения','Зона 2: Процессы и изменения','Зона 2: Процессы и изменения','Зона 3: Люди и взаимодействие','Зона 3: Люди и взаимодействие','Зона 3: Люди и взаимодействие','Зона 3: Люди и взаимодействие'];
+const ZONES = [
+  'Зона 1: Задачи и результат','Зона 1: Задачи и результат',
+  'Зона 1: Задачи и результат','Зона 1: Задачи и результат',
+  'Зона 2: Процессы и изменения','Зона 2: Процессы и изменения',
+  'Зона 2: Процессы и изменения','Зона 2: Процессы и изменения',
+  'Зона 3: Люди и взаимодействие','Зона 3: Люди и взаимодействие',
+  'Зона 3: Люди и взаимодействие','Зона 3: Люди и взаимодействие'
+];
 
-const BLOCK_TITLES = ['Приоритеты в работе','Принятие решений','Реакция на проблему','Отношение к KPI','Планирование','Правила и регламенты','Реакция на изменения','Контроль и делегирование','Мотивация команды','Конфликт в команде','Оценка кандидатов','Проведение совещаний'];
+const BLOCK_TITLES = [
+  'Приоритеты в работе','Принятие решений','Реакция на проблему','Отношение к KPI',
+  'Планирование','Правила и регламенты','Реакция на изменения','Контроль и делегирование',
+  'Мотивация команды','Конфликт в команде','Оценка кандидатов','Проведение совещаний'
+];
 
 const BLOCK_QUESTIONS = [
   'Что для вас является самым важным фокусом в роли руководителя отдела?',
@@ -338,7 +302,6 @@ const BLOCK_QUESTIONS = [
   'Как обычно проходят ваши регулярные планёрки с отделом?'
 ];
 
-// [P, A, E, I] texts per block
 const BLOCK_OPTIONS_PAEI = [
   [
     'Обеспечить выполнение текущих планов и достижение конкретных, измеримых результатов точно в срок.',
@@ -389,7 +352,7 @@ const BLOCK_OPTIONS_PAEI = [
     'Распределю задачи с учётом сильных сторон каждого и буду следить за тем, чтобы внутри команды не было трений.'
   ],
   [
-    'Переключу внимание людей на новые срочные задачи — лучший способ забыть о неудаче это погрузиться в работу.',
+    'Переключу внимание людей на новые срочные задачи — лучший способ забыть о неудаче, это погрузиться в работу.',
     'Проведу структурный разбор полётов, обновлю процессы, чтобы дать людям уверенность, что система теперь работает лучше.',
     'Выступлю с вдохновляющей речью, покажу новые перспективы и докажу, что эта неудача — лишь ступень к более крупной цели.',
     'Поговорю с каждым сотрудником, дам возможность выговориться, окажу эмоциональную поддержку и восстановлю доверие.'
@@ -414,42 +377,30 @@ const BLOCK_OPTIONS_PAEI = [
   ]
 ];
 
-// Randomization table: for each block, position of [P,A,E,I] in display order [A,B,C,D]
-// Value at index = which role [0=P,1=A,2=E,3=I]
 const BLOCK_ORDER = [
-  [3,0,2,1], // Block 1:  A=I, B=P, C=E, D=A
-  [0,1,2,3], // Block 2:  A=P, B=A, C=E, D=I
-  [2,3,0,1], // Block 3:  A=E, B=I, C=P, D=A
-  [0,2,1,3], // Block 4:  A=P, B=E, C=A, D=I
-  [1,0,3,2], // Block 5:  A=A, B=P, C=I, D=E
-  [1,2,0,3], // Block 6:  A=A, B=E, C=P, D=I
-  [2,0,1,3], // Block 7:  A=E, B=P, C=A, D=I
-  [0,3,1,2], // Block 8:  A=P, B=I, C=A, D=E
-  [3,1,2,0], // Block 9:  A=I, B=A, C=E, D=P
-  [1,3,0,2], // Block 10: A=A, B=I, C=P, D=E
-  [0,2,3,1], // Block 11: A=P, B=E, C=I, D=A
-  [3,0,2,1]  // Block 12: A=I, B=P, C=E, D=A
+  [3,0,2,1],[0,1,2,3],[2,3,0,1],[0,2,1,3],
+  [1,0,3,2],[1,2,0,3],[2,0,1,3],[0,3,1,2],
+  [3,1,2,0],[1,3,0,2],[0,2,3,1],[3,0,2,1]
 ];
 
 const ROLE_INFO = {
-  P: { name: 'Producer — Результативник', focus: 'Фокус на «что делать». Важна скорость и итог. Энергичен, ориентирован на задачи, нетерпелив к промедлению.' },
-  A: { name: 'Administrator — Администратор', focus: 'Фокус на «как делать». Важна система, правила и порядок. Структурирует хаос, следит за соблюдением процессов.' },
-  E: { name: 'Entrepreneur — Предприниматель', focus: 'Фокус на «зачем и когда». Важны идеи, изменения и будущее. Видит возможности там, где другие видят стены.' },
-  I: { name: 'Integrator — Интегратор', focus: 'Фокус на «кто делает». Важна атмосфера, ценности и климат. Создаёт доверие и превращает группу людей в команду.' }
+  P: { name: 'Producer — Результативник',   focus: 'Фокус на «что делать». Важна скорость и итог. Энергичен, ориентирован на задачи, нетерпелив к промедлению.' },
+  A: { name: 'Administrator — Администратор',focus: 'Фокус на «как делать». Важна система, правила и порядок. Структурирует хаос, следит за соблюдением процессов.' },
+  E: { name: 'Entrepreneur — Предприниматель',focus: 'Фокус на «зачем и когда». Важны идеи, изменения и будущее. Видит возможности там, где другие видят стены.' },
+  I: { name: 'Integrator — Интегратор',     focus: 'Фокус на «кто делает». Важна атмосфера, ценности и климат. Создаёт доверие и превращает группу людей в команду.' }
 };
 
 const PATHOLOGIES = {
-  P: { code: 'P---', name: 'Одинокий рейнджер', desc: 'Всё делает сам, не умеет делегировать, команда не растёт.' },
-  A: { code: '-A--', name: 'Бюрократ', desc: 'Соблюдение правил важнее результата. Топит любые идеи в бумажках.' },
-  E: { code: '--E-', name: 'Поджигатель', desc: 'Генерирует 100 идей в минуту, бросает дела на полпути, команда в хаосе.' },
-  I: { code: '---I', name: 'Горячий сторонник', desc: 'Со всеми согласен, избегает конфликтов ценой эффективности, боится принимать решения.' }
+  P: { code: 'P---', name: 'Одинокий рейнджер',   desc: 'Всё делает сам, не умеет делегировать, команда не растёт.' },
+  A: { code: '-A--', name: 'Бюрократ',             desc: 'Соблюдение правил важнее результата. Топит любые идеи в бумажках.' },
+  E: { code: '--E-', name: 'Поджигатель',          desc: 'Генерирует 100 идей в минуту, бросает дела на полпути, команда в хаосе.' },
+  I: { code: '---I', name: 'Горячий сторонник',    desc: 'Со всеми согласен, избегает конфликтов ценой эффективности, боится принимать решения.' }
 };
 
 // ── STATE ──
 let state = {
   screen: 'intro',
   block: 0,
-  // answers[block] = {rowScores: [score for row 0..3 by display order], colUsed: Set}
   answers: Array.from({length: 12}, () => ({ row: [null,null,null,null] })),
   scores: { P:0, A:0, E:0, I:0 }
 };
@@ -457,9 +408,10 @@ let state = {
 // ── RENDER ──
 function render() {
   const app = document.getElementById('app');
-  if (state.screen === 'intro') app.innerHTML = renderIntro();
-  else if (state.screen === 'quiz') app.innerHTML = renderQuiz();
+  if (state.screen === 'intro')   app.innerHTML = renderIntro();
+  else if (state.screen === 'quiz')    app.innerHTML = renderQuiz();
   else if (state.screen === 'results') app.innerHTML = renderResults();
+  notifyHeight();
 }
 
 function renderIntro() {
@@ -468,11 +420,12 @@ function renderIntro() {
     <div class="intro-title">Управленческий ДНК:<em>тест PAEI</em></div>
     <div class="intro-divider"></div>
     <p class="intro-lead">Идеального руководителя не существует — но существует идеальная команда. Этот тест поможет определить вашу естественную роль в управлении и зоны развития.</p>
-    <div class="intro-instruction">
-      <strong>Как проходить:</strong> В каждом из 12 блоков распределите баллы <strong>4, 3, 2, 1</strong> между четырьмя утверждениями. Каждый балл — ровно одному варианту. Сумма в блоке всегда равна <strong>10</strong>. Выбирайте интуитивно — нет правильных или неправильных ответов.
+    <div class="legend-box">
+      <div class="legend-tag">Как проходить</div>
+      В каждом из 12 блоков распределите баллы <strong>4, 3, 2, 1</strong> между четырьмя утверждениями. Каждый балл — ровно одному варианту. Сумма в блоке всегда равна <strong>10</strong>. Выбирайте интуитивно — нет правильных или неправильных ответов.
     </div>
-    <div class="intro-anon">🔒 Результаты анонимны. Данные не сохраняются на сервере и доступны только вам — для саморазвития.</div>
-    <div class="paei-chips">
+    <div class="intro-anon mt-sm">🔒 Результаты анонимны. Данные не сохраняются на сервере и доступны только вам — для саморазвития.</div>
+    <div class="paei-chips mt-md">
       <div class="paei-chip p">P — Producer</div>
       <div class="paei-chip a">A — Administrator</div>
       <div class="paei-chip e">E — Entrepreneur</div>
@@ -542,20 +495,10 @@ function renderQuiz() {
 
 function renderResults() {
   const sc = state.scores;
-  const maxScore = 48;
-  const minScore = 12;
-  const range = maxScore - minScore;
+  const maxScore = 48, minScore = 12, range = maxScore - minScore;
 
-  function codeChar(val) {
-    if (val >= 30) return 'big';
-    if (val >= 20) return 'small';
-    return 'dash';
-  }
-  function codeLetter(key, val) {
-    if (val >= 30) return key.toUpperCase();
-    if (val >= 20) return key.toLowerCase();
-    return '-';
-  }
+  function codeChar(val) { return val >= 30 ? 'big' : val >= 20 ? 'small' : 'dash'; }
+  function codeLetter(key, val) { return val >= 30 ? key.toUpperCase() : val >= 20 ? key.toLowerCase() : '-'; }
 
   const code = ['P','A','E','I'].map(k => codeLetter(k, sc[k])).join('');
 
@@ -564,8 +507,9 @@ function renderResults() {
     const pct = Math.round(((v - minScore) / range) * 100);
     const cc = codeChar(v);
     const letter = codeLetter(k, v);
+    const names = { P:'Результативник', A:'Администратор', E:'Предприниматель', I:'Интегратор' };
     return `<div class="bar-row">
-      <div class="bar-label ${k.toLowerCase()}">${k} — ${['Результативник','Администратор','Предприниматель','Интегратор'][['P','A','E','I'].indexOf(k)]}</div>
+      <div class="bar-label ${k.toLowerCase()}">${k} — ${names[k]}</div>
       <div class="bar-track"><div class="bar-fill ${k.toLowerCase()}" id="bar-${k}" style="width:0%" data-w="${pct}"></div></div>
       <div class="bar-score">${v}</div>
       <div class="bar-code ${cc}">${letter}</div>
@@ -607,14 +551,10 @@ function renderResults() {
       <div class="dna-code">${code}</div>
       <div class="results-sub">Код PAEI отражает выраженность четырёх управленческих ролей. Заглавная буква — сильная роль, строчная — рабочая, прочерк — зона развития.</div>
     </div>
-
     <div class="bars-section">${bars}</div>
-
     <div class="roles-title">Расшифровка ролей</div>
     <div class="roles-grid">${roleCards}</div>
-
     ${pathHtml}
-
     <div style="display:flex;flex-direction:column;gap:0">
       <button class="btn-save" id="btn-save" onclick="saveResult()">↓ Сохранить результат</button>
       <button class="btn-restart" onclick="restart()">↺ Пройти заново</button>
@@ -623,26 +563,15 @@ function renderResults() {
 }
 
 // ── LOGIC ──
-function startQuiz() {
-  state.screen = 'quiz';
-  state.block = 0;
-  render();
-}
+function startQuiz() { state.screen = 'quiz'; state.block = 0; render(); }
 
 function setScore(blockIdx, rowIdx, score) {
   const ans = state.answers[blockIdx];
-  const prevScore = ans.row[rowIdx];
+  ans.row[rowIdx] = (ans.row[rowIdx] === score) ? null : score;
 
-  // Toggle off if same, otherwise set new value
-  ans.row[rowIdx] = (prevScore === score) ? null : score;
-
-  // Update visual selection for this row's cells
   document.querySelectorAll(`.matrix-cell[data-row="${rowIdx}"]`).forEach(cell => {
-    const s = parseInt(cell.dataset.score);
-    cell.classList.toggle('selected', s === ans.row[rowIdx]);
+    cell.classList.toggle('selected', parseInt(cell.dataset.score) === ans.row[rowIdx]);
   });
-
-  // Recalculate everything from scratch
   refreshMatrix(ans);
 }
 
@@ -651,72 +580,42 @@ function refreshMatrix(ans) {
   const allFilled = ans.row.every(v => v !== null);
   const ready = allFilled && total === 10;
   const pointsLeft = 10 - total;
+  const emptyCount = ans.row.filter(v => v === null).length;
 
-  // Update counter
   const counter = document.getElementById('score-counter');
   if (counter) {
-    counter.textContent = ready ? '\u2713 10 / 10' : `${total} / 10`;
+    counter.textContent = ready ? '✓ 10 / 10' : `${total} / 10`;
     counter.className = ready ? 'score-counter ready' : 'score-counter';
   }
   const btn = document.getElementById('btn-next');
   if (btn) btn.className = ready ? 'btn-next ready' : 'btn-next';
 
-  // For each row independently:
-  // - If row has NO selection: can pick any score s where s <= pointsLeft
-  //   AND enough budget remains for other empty rows (each needs at least 1)
-  //   i.e. s <= pointsLeft - (emptyCount - 1)
-  // - If row HAS a selection (val): can repick any score s where:
-  //   the new total after change is still <= 10
-  //   i.e. s <= val + pointsLeft  (freeing val, spending s)
-  //   BUT also can't leave remaining empty rows unable to fill:
-  //   after this change, pointsLeft becomes (val + pointsLeft - s),
-  //   and emptyCount stays same — so s <= val + pointsLeft - (emptyCount - filledAfter)*1
-  //   Simplified: treat filled rows independently, only constrain by budget
-
-  const emptyCount = ans.row.filter(v => v === null).length;
-
   for (let r = 0; r < 4; r++) {
-    const rowVal = ans.row[r]; // null or 1-4
+    const rowVal = ans.row[r];
     document.querySelectorAll(`.matrix-cell[data-row="${r}"]`).forEach(cell => {
       const s = parseInt(cell.dataset.score);
       let allowed;
-
       if (rowVal === null) {
-        // Row empty: picking s leaves (pointsLeft - s) for (emptyCount-1) other empty rows
-        // Each needs at least 1, so pointsLeft - s >= emptyCount - 1
-        // i.e. s <= pointsLeft - (emptyCount - 1)
-        const maxForEmpty = pointsLeft - (emptyCount - 1);
-        allowed = s >= 1 && s <= maxForEmpty;
+        allowed = s >= 1 && s <= pointsLeft - (emptyCount - 1);
       } else {
-        // Row has value rowVal: switching to s changes budget by (rowVal - s)
-        // New pointsLeft = pointsLeft + rowVal - s >= 0  =>  s <= pointsLeft + rowVal
-        // Also other empty rows still need at least 1 each:
-        // pointsLeft + rowVal - s >= emptyCount  =>  s <= pointsLeft + rowVal - emptyCount
         const newBudget = pointsLeft + rowVal;
-        const maxForFilled = newBudget - emptyCount;
-        allowed = s >= 1 && s <= maxForFilled;
+        allowed = s >= 1 && s <= newBudget - emptyCount;
       }
-
-      if (allowed) cell.classList.remove('impossible');
-      else cell.classList.add('impossible');
+      cell.classList.toggle('impossible', !allowed);
     });
   }
+  notifyHeight();
 }
-
 
 function nextBlock() {
   const ans = state.answers[state.block];
   const total = ans.row.reduce((s, v) => s + (v || 0), 0);
   if (total !== 10) return;
 
-  // Tally scores
   const order = BLOCK_ORDER[state.block];
   const roles = ['P','A','E','I'];
   ans.row.forEach((score, rowIdx) => {
-    if (score !== null) {
-      const roleKey = roles[order[rowIdx]];
-      state.scores[roleKey] += score;
-    }
+    if (score !== null) state.scores[roles[order[rowIdx]]] += score;
   });
 
   if (state.block === 11) {
@@ -730,9 +629,7 @@ function nextBlock() {
 }
 
 function animateBars() {
-  document.querySelectorAll('.bar-fill').forEach(bar => {
-    bar.style.width = bar.dataset.w + '%';
-  });
+  document.querySelectorAll('.bar-fill').forEach(bar => { bar.style.width = bar.dataset.w + '%'; });
 }
 
 function saveResult() {
@@ -741,11 +638,7 @@ function saveResult() {
 
   const sc = state.scores;
   const maxScore = 48, minScore = 12, range = maxScore - minScore;
-  function codeLetter(key, val) {
-    if (val >= 30) return key.toUpperCase();
-    if (val >= 20) return key.toLowerCase();
-    return '-';
-  }
+  function codeLetter(key, val) { return val >= 30 ? key.toUpperCase() : val >= 20 ? key.toLowerCase() : '-'; }
   const code = ['P','A','E','I'].map(k => codeLetter(k, sc[k])).join('');
 
   const W = 960, H = 540;
@@ -753,56 +646,49 @@ function saveResult() {
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // Background
   ctx.fillStyle = '#FAF8F4';
   ctx.fillRect(0, 0, W, H);
 
-  // Top accent line
-  const grad = ctx.createLinearGradient(0,0,W,0);
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
   grad.addColorStop(0, '#C31532'); grad.addColorStop(0.5, '#003B48'); grad.addColorStop(1, '#C31532');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, 5);
 
-  // Left dark panel
   ctx.fillStyle = '#003B48';
   ctx.fillRect(0, 0, 340, H);
 
-  // Eyebrow
   ctx.fillStyle = '#C31532';
-  ctx.font = '700 11px Manrope, sans-serif';
-  ctx.letterSpacing = '3px';
+  ctx.font = '700 11px Inter, sans-serif';
   ctx.fillText('УПРАВЛЕНЧЕСКИЙ КОД · PAEI', 36, 60);
 
-  // Code
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = '700 72px "Cormorant Garamond", serif';
+  ctx.font = '900 72px "Playfair Display", serif';
   ctx.fillText(code, 36, 160);
 
-  // Divider
   ctx.fillStyle = '#C31532';
   ctx.fillRect(36, 178, 60, 2);
 
-  // Role descriptions
-  const roleNames = { P: 'Producer — Результативник', A: 'Administrator — Администратор', E: 'Entrepreneur — Предприниматель', I: 'Integrator — Интегратор' };
-  const roleColors = { P: '#1A5FA5', A: '#7B3FA0', E: '#B85C00', I: '#1A6B4A' };
+  const roleNames = {
+    P:'Producer — Результативник', A:'Administrator — Администратор',
+    E:'Entrepreneur — Предприниматель', I:'Integrator — Интегратор'
+  };
+  const roleColors = { P:'#1A5FA5', A:'#7B3FA0', E:'#B85C00', I:'#1A6B4A' };
   let yPos = 210;
   ['P','A','E','I'].forEach(k => {
     const v = sc[k];
     const lvl = v >= 30 ? '● Сильная роль' : v >= 20 ? '◐ Рабочая роль' : '○ Зона развития';
     ctx.fillStyle = v >= 20 ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)';
-    ctx.font = `${v >= 20 ? '600' : '400'} 13px Manrope, sans-serif`;
+    ctx.font = `${v >= 20 ? '600' : '400'} 13px Inter, sans-serif`;
     ctx.fillText(`${k}  ${lvl}`, 36, yPos);
     yPos += 28;
   });
 
-  // Adizes note
   ctx.fillStyle = 'rgba(255,255,255,0.35)';
-  ctx.font = '400 11px Manrope, sans-serif';
+  ctx.font = '400 11px Inter, sans-serif';
   ctx.fillText('Модель Ицхака Адизеса', 36, H - 30);
 
-  // Right panel: bars
   const barX = 380, barMaxW = 500, barH = 14, barGap = 56;
-  ctx.font = '700 11px Manrope, sans-serif';
+  ctx.font = '700 11px Inter, sans-serif';
   ctx.fillStyle = '#495761';
   ctx.fillText('РАСПРЕДЕЛЕНИЕ РОЛЕЙ', barX, 55);
 
@@ -812,30 +698,25 @@ function saveResult() {
     const bw = Math.round(pct * barMaxW);
     const y = 80 + i * barGap;
 
-    // Label
     ctx.fillStyle = '#003B48';
-    ctx.font = '600 13px Manrope, sans-serif';
+    ctx.font = '600 13px Inter, sans-serif';
     ctx.fillText(roleNames[k], barX, y);
 
-    // Track
     ctx.fillStyle = '#F0EDE6';
     roundRect(ctx, barX, y + 8, barMaxW, barH, 7);
 
-    // Fill
     ctx.fillStyle = roleColors[k];
     if (bw > 0) roundRect(ctx, barX, y + 8, bw, barH, 7);
 
-    // Score
     ctx.fillStyle = '#003B48';
-    ctx.font = '700 13px Manrope, sans-serif';
+    ctx.font = '700 13px Inter, sans-serif';
     ctx.fillText(v, barX + barMaxW + 12, y + 20);
   });
 
-  // Path bars note
   const pathItems = ['P','A','E','I'].filter(k => sc[k] < 20);
   if (pathItems.length > 0) {
     ctx.fillStyle = '#C31532';
-    ctx.font = '700 11px Manrope, sans-serif';
+    ctx.font = '700 11px Inter, sans-serif';
     ctx.fillText('ЗОНЫ РИСКА: ' + pathItems.join(', '), barX, H - 30);
   }
 
@@ -861,8 +742,7 @@ function roundRect(ctx, x, y, w, h, r) {
 
 function restart() {
   state = {
-    screen: 'intro',
-    block: 0,
+    screen: 'intro', block: 0,
     answers: Array.from({length: 12}, () => ({ row: [null,null,null,null] })),
     scores: { P:0, A:0, E:0, I:0 }
   };
