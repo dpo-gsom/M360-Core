@@ -4,147 +4,229 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Самодиагностика</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --c1:#C31532;--c1h:#a01029;--c1l:rgba(195,21,50,.06);
-  --c2:#495761;--c3:#003B48;--c3l:rgba(0,59,72,.05);
-  --g:#16a34a;--gl:#dcfce7;--gd:#15803d;
-  --y:#d97706;--yl:#fef3c7;--yd:#92400e;
-  --r:#C31532;--rl:#fce8eb;--rd:#a01029;
-  --bg:#f4f5f6;--w:#fff;
-  --t1:#1a1f25;--t2:#495761;--t3:#8a949d;--brd:#dfe3e7;
-  --rad:12px;
+/* Зонные цвета (не в styles.css) */
+:root {
+  --g:  #1A6B4A; --gl: #EBF5EF; --gd: #14532D;
+  --y:  #8A6200; --yl: #FFF8E6; --yd: #5C3D00;
 }
-html,body{height:100%;overflow:hidden}
-body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
-  background:var(--bg);color:var(--t1);line-height:1.6;-webkit-font-smoothing:antialiased;
-  display:flex;align-items:center;justify-content:center}
-.sd{width:100%;max-width:520px;padding:12px}
 
-.sd-v{display:none}.sd-v.on{display:flex;flex-direction:column;justify-content:center;min-height:0}
+/* Фиксированная высота — страница не скроллится снаружи */
+html, body { height: 100%; overflow: hidden; }
 
-/* ===== INTRO ===== */
-.sd-intro{background:var(--w);border-radius:var(--rad);padding:28px 22px;
-  text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.sd-intro-ico{width:48px;height:48px;background:var(--c3);color:#fff;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin:0 auto 12px}
-.sd-intro h2{color:var(--c3);font-size:1.1rem;margin-bottom:8px}
-.sd-intro p{color:var(--t2);font-size:.86rem;margin-bottom:4px}
-.sd-intro .note{color:var(--t3);font-size:.76rem;font-style:italic;margin:4px 0 16px}
-.btn-start{background:var(--c1);color:#fff;border:none;padding:11px 34px;
-  font-size:.95rem;font-weight:700;border-radius:8px;cursor:pointer;
-  transition:background .2s,transform .15s}
-.btn-start:hover{background:var(--c1h);transform:translateY(-1px)}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-/* ===== PROGRESS ===== */
-.sd-prog{margin-bottom:12px}
-.sd-prog-row{display:flex;justify-content:space-between;margin-bottom:4px}
-.sd-prog-row span{font-size:.76rem;color:var(--t3);font-weight:600}
-.sd-prog-track{background:var(--brd);border-radius:6px;height:4px;overflow:hidden}
-.sd-prog-fill{height:100%;background:var(--c1);border-radius:6px;transition:width .4s ease;width:0%}
+.sd { width: 100%; max-width: 520px; padding: 12px; }
 
-/* ===== QUESTION ===== */
-.sd-qc{background:var(--w);border-radius:var(--rad);padding:24px 20px;
-  box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:12px;
-  transition:opacity .2s,transform .2s}
-.sd-qc.fade{opacity:0;transform:translateY(10px)}
-.sd-qt{font-size:1.02rem;text-align:center;min-height:48px;
-  display:flex;align-items:center;justify-content:center;
-  line-height:1.5;margin-bottom:18px;color:var(--t1)}
-.sd-labels{display:flex;justify-content:space-between;padding:0 2px;margin-bottom:5px}
-.sd-labels span{font-size:.66rem;color:var(--t3);max-width:76px;line-height:1.2}
-.sd-labels span:first-child{text-align:left}
-.sd-labels span:last-child{text-align:right}
-.sd-opts{display:flex;gap:8px}
-.sd-o{flex:1;height:46px;border:2px solid var(--brd);border-radius:10px;
-  background:var(--w);color:var(--t2);font-size:1.1rem;font-weight:700;
-  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
-.sd-o:hover{border-color:var(--c1);color:var(--c1);background:var(--c1l)}
-.sd-o.sel{background:var(--c1);border-color:var(--c1);color:#fff;
-  box-shadow:0 2px 8px rgba(195,21,50,.25);transform:scale(1.06)}
+.sd-v { display: none; }
+.sd-v.on { display: flex; flex-direction: column; justify-content: center; min-height: 0; }
 
-/* ===== NAV ===== */
-.sd-nav{display:flex;justify-content:space-between;align-items:center}
-.btn-back{background:none;border:2px solid var(--brd);color:var(--t2);
-  padding:9px 16px;font-size:.86rem;font-weight:600;border-radius:8px;
-  cursor:pointer;transition:all .2s}
-.btn-back:hover{border-color:var(--c2);color:var(--c3)}
-.btn-back:disabled{opacity:.25;cursor:default;pointer-events:none}
-.btn-next{background:var(--brd);border:none;color:var(--t3);
-  padding:9px 24px;font-size:.9rem;font-weight:700;border-radius:8px;
-  cursor:not-allowed;transition:all .2s;margin-left:auto}
-.btn-next.go{background:var(--c1);color:#fff;cursor:pointer;
-  box-shadow:0 2px 10px rgba(195,21,50,.3)}
-.btn-next.go:hover{background:var(--c1h);transform:translateY(-1px)}
+/* ── INTRO ── */
+.sd-intro {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 28px 22px; text-align: center;
+  box-shadow: 0 1px 6px rgba(0,59,72,0.08);
+  border: 1.5px solid var(--border);
+}
+.sd-intro-ico {
+  width: 48px; height: 48px; background: var(--dark); color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; margin: 0 auto 14px;
+}
+.sd-intro h2 {
+  font-family: var(--font-display); color: var(--dark);
+  font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; line-height: 1.3;
+}
+.sd-intro p   { color: var(--slate); font-size: .86rem; margin-bottom: 4px; }
+.sd-intro .note {
+  color: #AAB5BB; font-size: .75rem; font-style: italic; margin: 6px 0 18px;
+}
+.btn-start {
+  background: var(--dark); color: var(--white); border: none;
+  padding: 11px 34px; font-family: var(--font-body);
+  font-size: .95rem; font-weight: 700; border-radius: var(--radius-sm);
+  cursor: pointer; transition: background .2s, transform .15s;
+}
+.btn-start:hover { background: var(--red); transform: translateY(-1px); }
 
-/* ===== RESULT CARD ===== */
-.sd-rc{background:var(--w);border-radius:var(--rad);padding:24px 22px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:12px}
-.sd-rc-hdr{text-align:center;padding-bottom:12px;margin-bottom:14px;
-  border-bottom:2px solid var(--bg)}
-.sd-rc-hdr h2{color:var(--c3);font-size:1.05rem;margin-bottom:2px}
-.sd-rc-hdr p{color:var(--t3);font-size:.74rem}
-.sd-sr{margin-bottom:14px}.sd-sr:last-of-type{margin-bottom:0}
-.sd-sr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.sd-sr-name{font-size:.84rem;font-weight:700;color:var(--t1)}
-.sd-sr-sc{font-size:.82rem;font-weight:700}
-.sd-sr-sc.green{color:var(--g)}.sd-sr-sc.yellow{color:var(--y)}.sd-sr-sc.red{color:var(--r)}
-.sd-bt{background:var(--bg);border-radius:6px;height:8px;overflow:hidden;margin-bottom:4px}
-.sd-bf{height:100%;border-radius:6px;width:0%;transition:width 1s cubic-bezier(.4,0,.2,1)}
-.sd-bf.green{background:var(--g)}.sd-bf.yellow{background:var(--y)}.sd-bf.red{background:var(--r)}
-.sd-zl{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.68rem;font-weight:600}
-.sd-zl.green{background:var(--gl);color:var(--gd)}
-.sd-zl.yellow{background:var(--yl);color:var(--yd)}
-.sd-zl.red{background:var(--rl);color:var(--rd)}
-.sd-ov{text-align:center;padding-top:14px;margin-top:16px;border-top:2px solid var(--bg)}
-.sd-ov-i{font-size:1.8rem;margin-bottom:2px}
-.sd-ov h3{font-size:.98rem;margin-bottom:5px}
-.sd-ov p{font-size:.8rem;color:var(--t2);line-height:1.5;max-width:400px;margin:0 auto}
-.sd-rc-ft{text-align:center;padding-top:10px;margin-top:12px;
-  border-top:1px solid var(--bg);font-size:.66rem;color:var(--t3)}
+/* ── ПРОГРЕСС ── */
+.sd-prog { margin-bottom: 12px; }
+.sd-prog-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.sd-prog-row span { font-size: .76rem; color: var(--slate); font-weight: 600; }
+.sd-prog-track { background: var(--border); border-radius: 6px; height: 4px; overflow: hidden; }
+.sd-prog-fill  { height: 100%; background: var(--red); border-radius: 6px; transition: width .4s ease; width: 0%; }
 
-/* ===== ACTIONS ===== */
-.sd-acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.btn-save{background:var(--c1);color:#fff;border:none;padding:10px 20px;
-  font-size:.86rem;font-weight:600;border-radius:8px;cursor:pointer;
-  transition:all .2s;display:flex;align-items:center;gap:5px}
-.btn-save:hover{background:var(--c1h);transform:translateY(-1px)}
-.btn-save:disabled{opacity:.6;cursor:wait;transform:none}
-.btn-rst{background:none;border:2px solid var(--brd);color:var(--t2);
-  padding:10px 20px;font-size:.86rem;font-weight:600;border-radius:8px;
-  cursor:pointer;transition:all .2s}
-.btn-rst:hover{border-color:var(--c2);color:var(--c3)}
+/* ── ВОПРОС ── */
+.sd-qc {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 24px 20px; box-shadow: 0 1px 4px rgba(0,59,72,0.06);
+  border: 1.5px solid var(--border); margin-bottom: 12px;
+  transition: opacity .2s, transform .2s;
+}
+.sd-qc.fade { opacity: 0; transform: translateY(10px); }
 
-@media(max-width:480px){
-  .sd{padding:8px 6px}
-  .sd-intro{padding:20px 14px}
-  .sd-qc{padding:18px 12px}
-  .sd-opts{gap:5px}
-  .sd-o{height:42px;font-size:1rem;border-radius:8px}
-  .sd-qt{font-size:.95rem;min-height:42px}
-  .sd-rc{padding:18px 14px}
+.sd-qt {
+  font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+  text-align: center; min-height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1.45; margin-bottom: 18px; color: var(--dark);
+}
+.sd-labels {
+  display: flex; justify-content: space-between; padding: 0 2px; margin-bottom: 6px;
+}
+.sd-labels span {
+  font-size: .65rem; color: var(--slate); max-width: 76px; line-height: 1.2;
+}
+.sd-labels span:first-child { text-align: left; }
+.sd-labels span:last-child  { text-align: right; }
+
+.sd-opts { display: flex; gap: 8px; }
+.sd-o {
+  flex: 1; height: 46px; border: 2px solid var(--border); border-radius: var(--radius-md);
+  background: var(--white); color: var(--slate);
+  font-family: var(--font-body); font-size: 1.1rem; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.sd-o:hover { border-color: var(--red); color: var(--red); background: rgba(195,21,50,.05); }
+.sd-o.sel   {
+  background: var(--dark); border-color: var(--dark); color: #fff;
+  box-shadow: 0 2px 8px rgba(0,59,72,0.25); transform: scale(1.06);
+}
+
+/* ── НАВИГАЦИЯ ── */
+.sd-nav { display: flex; justify-content: space-between; align-items: center; }
+.btn-back {
+  background: none; border: 2px solid var(--border); color: var(--slate);
+  padding: 9px 16px; font-family: var(--font-body); font-size: .86rem; font-weight: 600;
+  border-radius: var(--radius-sm); cursor: pointer; transition: all .2s;
+}
+.btn-back:hover { border-color: var(--dark); color: var(--dark); }
+.btn-back:disabled { opacity: .25; cursor: default; pointer-events: none; }
+
+.btn-next {
+  background: var(--border); border: none; color: var(--slate);
+  padding: 9px 24px; font-family: var(--font-body); font-size: .9rem; font-weight: 700;
+  border-radius: var(--radius-sm); cursor: not-allowed; transition: all .2s; margin-left: auto;
+}
+.btn-next.go {
+  background: var(--dark); color: #fff; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,59,72,0.3);
+}
+.btn-next.go:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ── КАРТОЧКА РЕЗУЛЬТАТА ── */
+.sd-rc {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 22px 20px; box-shadow: 0 2px 8px rgba(0,59,72,0.08);
+  border: 1.5px solid var(--border); margin-bottom: 12px;
+}
+.sd-rc-hdr {
+  text-align: center; padding-bottom: 12px; margin-bottom: 14px;
+  border-bottom: 2px solid var(--sand);
+}
+.sd-rc-hdr h2 {
+  font-family: var(--font-display); color: var(--dark);
+  font-size: 1rem; font-weight: 700; margin-bottom: 2px;
+}
+.sd-rc-hdr p { color: var(--slate); font-size: .74rem; }
+
+.sd-sr { margin-bottom: 14px; }
+.sd-sr:last-of-type { margin-bottom: 0; }
+.sd-sr-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.sd-sr-name { font-size: .84rem; font-weight: 700; color: var(--dark); }
+.sd-sr-sc   { font-size: .82rem; font-weight: 700; }
+.sd-sr-sc.green  { color: var(--g); }
+.sd-sr-sc.yellow { color: var(--y); }
+.sd-sr-sc.red    { color: var(--red); }
+
+.sd-bt { background: var(--sand); border-radius: 6px; height: 8px; overflow: hidden; margin-bottom: 4px; }
+.sd-bf { height: 100%; border-radius: 6px; width: 0%; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.sd-bf.green  { background: var(--g); }
+.sd-bf.yellow { background: var(--y); }
+.sd-bf.red    { background: var(--red); }
+
+.sd-zl {
+  display: inline-block; padding: 2px 10px; border-radius: 12px;
+  font-size: .68rem; font-weight: 700; letter-spacing: .5px;
+}
+.sd-zl.green  { background: var(--gl); color: var(--gd); }
+.sd-zl.yellow { background: var(--yl); color: var(--yd); }
+.sd-zl.red    { background: var(--red-bg); color: var(--red); }
+
+.sd-ov {
+  text-align: center; padding-top: 14px; margin-top: 16px; border-top: 2px solid var(--sand);
+}
+.sd-ov-i { font-size: 1.8rem; margin-bottom: 2px; }
+.sd-ov h3 { font-family: var(--font-display); font-size: .98rem; font-weight: 700; margin-bottom: 5px; }
+.sd-ov p  { font-size: .8rem; color: var(--slate); line-height: 1.55; max-width: 400px; margin: 0 auto; }
+
+.sd-rc-ft {
+  text-align: center; padding-top: 10px; margin-top: 12px;
+  border-top: 1px solid var(--sand); font-size: .66rem; color: var(--slate);
+}
+
+/* ── КНОПКИ РЕЗУЛЬТАТА ── */
+.sd-acts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+.btn-save {
+  background: var(--dark); color: #fff; border: none;
+  padding: 10px 20px; font-family: var(--font-body); font-size: .86rem; font-weight: 600;
+  border-radius: var(--radius-sm); cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; gap: 5px;
+}
+.btn-save:hover { background: var(--red); transform: translateY(-1px); }
+.btn-save:disabled { opacity: .6; cursor: wait; transform: none; }
+
+.btn-rst {
+  background: none; border: 2px solid var(--border); color: var(--slate);
+  padding: 10px 20px; font-family: var(--font-body); font-size: .86rem; font-weight: 600;
+  border-radius: var(--radius-sm); cursor: pointer; transition: all .2s;
+}
+.btn-rst:hover { border-color: var(--dark); color: var(--dark); }
+
+/* ── Адаптив ── */
+@media (max-width: 480px) {
+  .sd { padding: 8px 6px; }
+  .sd-intro { padding: 20px 14px; }
+  .sd-qc    { padding: 18px 12px; }
+  .sd-opts  { gap: 5px; }
+  .sd-o     { height: 42px; font-size: 1rem; border-radius: var(--radius-sm); }
+  .sd-qt    { font-size: .93rem; min-height: 44px; }
+  .sd-rc    { padding: 18px 14px; }
 }
 </style>
 </head>
 <body>
 <div class="sd">
 
-  <!-- ===== INTRO ===== -->
+  <!-- INTRO -->
   <div class="sd-v on" id="vIntro">
     <div class="sd-intro">
       <div class="sd-intro-ico">📋</div>
       <h2>Самодиагностика: ваш ресурс как руководителя</h2>
       <p>18 коротких утверждений о вашей работе, энергии и самоощущении в роли менеджера.</p>
       <p>Оцените каждое по шкале от 1 до 5, опираясь на ощущения <strong>за последние 2–3 месяца</strong>.</p>
-      <p>Результаты полностью анонимны, данные не сохраняются на сервере и доступны только вам в этом браузере.</p>
+      <p>Результаты полностью анонимны и доступны только вам в этом браузере.</p>
       <div class="note">Это не тест с правильными ответами, а инструмент для саморефлексии. Займёт 3–4 минуты.</div>
       <button class="btn-start" onclick="start()">Начать →</button>
     </div>
   </div>
 
-  <!-- ===== QUIZ ===== -->
+  <!-- QUIZ -->
   <div class="sd-v" id="vQuiz">
     <div class="sd-prog">
       <div class="sd-prog-row">
@@ -167,7 +249,7 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
     </div>
   </div>
 
-  <!-- ===== RESULTS ===== -->
+  <!-- RESULTS -->
   <div class="sd-v" id="vRes">
     <div class="sd-rc" id="resCard"></div>
     <div class="sd-acts">
@@ -178,151 +260,175 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
 
 </div>
 
+<script src="common.js"></script>
 <script>
-const QS=[
-  {id:1, txt:"Я просыпаюсь с энергией и готовностью к рабочему дню",                                    sc:"EN",rv:0},
-  {id:2, txt:"Мне всё чаще кажется, что моя работа не имеет особого смысла",                             sc:"EG",rv:1},
-  {id:3, txt:"Я уверен(а), что хорошо справляюсь со своей ролью руководителя",                           sc:"CF",rv:0},
-  {id:4, txt:"У меня бывает ощущение, что я работаю на износ",                                           sc:"EN",rv:1},
-  {id:5, txt:"Мне действительно интересно то, чем я занимаюсь на работе",                                sc:"EG",rv:0},
-  {id:6, txt:"Я часто сомневаюсь в правильности своих управленческих решений",                            sc:"CF",rv:1},
-  {id:7, txt:"После выходных я чувствую себя достаточно отдохнувшим(ей), чтобы начать новую неделю",      sc:"EN",rv:0},
-  {id:8, txt:"Общение с командой и коллегами стало вызывать у меня больше усталости, чем интереса",       sc:"EG",rv:1},
-  {id:9, txt:"Когда возникает сложная ситуация, я верю, что смогу найти решение",                         sc:"CF",rv:0},
-  {id:10,txt:"Я замечаю, что стал(а) раздражительным(ой) по мелочам на работе",                           sc:"EN",rv:1},
-  {id:11,txt:"Я вижу, как мои усилия реально влияют на результаты команды",                                sc:"EG",rv:0},
-  {id:12,txt:"Мне кажется, что другой руководитель на моём месте справлялся бы лучше",                     sc:"CF",rv:1},
-  {id:13,txt:"Мне удаётся сохранять ясность мышления и концентрацию в течение рабочего дня",               sc:"EN",rv:0},
-  {id:14,txt:"В конце дня мне требуется всё больше времени в тишине, чтобы восстановиться после общения",                             sc:"EG",rv:1},
-  {id:15,txt:"Я чувствую, что расту и развиваюсь профессионально в своей роли",                            sc:"CF",rv:0},
-  {id:16,txt:"К концу рабочей недели я чувствую себя полностью опустошённым(ой)",                          sc:"EN",rv:1},
-  {id:17,txt:"Я готов(а) вкладываться в работу сверх минимума, когда вижу в этом ценность для дела",       sc:"EG",rv:0},
-  {id:18,txt:"Иногда мне кажется, что требования к моей позиции растут быстрее, чем я успеваю адаптироваться", sc:"CF",rv:1}
+var QS = [
+  {id:1,  txt:'Я просыпаюсь с энергией и готовностью к рабочему дню',                                       sc:'EN', rv:0},
+  {id:2,  txt:'Мне всё чаще кажется, что моя работа не имеет особого смысла',                               sc:'EG', rv:1},
+  {id:3,  txt:'Я уверен(а), что хорошо справляюсь со своей ролью руководителя',                             sc:'CF', rv:0},
+  {id:4,  txt:'У меня бывает ощущение, что я работаю на износ',                                             sc:'EN', rv:1},
+  {id:5,  txt:'Мне действительно интересно то, чем я занимаюсь на работе',                                  sc:'EG', rv:0},
+  {id:6,  txt:'Я часто сомневаюсь в правильности своих управленческих решений',                              sc:'CF', rv:1},
+  {id:7,  txt:'После выходных я чувствую себя достаточно отдохнувшим(ей), чтобы начать новую неделю',        sc:'EN', rv:0},
+  {id:8,  txt:'Общение с командой и коллегами стало вызывать у меня больше усталости, чем интереса',         sc:'EG', rv:1},
+  {id:9,  txt:'Когда возникает сложная ситуация, я верю, что смогу найти решение',                           sc:'CF', rv:0},
+  {id:10, txt:'Я замечаю, что стал(а) раздражительным(ой) по мелочам на работе',                             sc:'EN', rv:1},
+  {id:11, txt:'Я вижу, как мои усилия реально влияют на результаты команды',                                  sc:'EG', rv:0},
+  {id:12, txt:'Мне кажется, что другой руководитель на моём месте справлялся бы лучше',                       sc:'CF', rv:1},
+  {id:13, txt:'Мне удаётся сохранять ясность мышления и концентрацию в течение рабочего дня',                 sc:'EN', rv:0},
+  {id:14, txt:'В конце дня мне требуется всё больше времени в тишине, чтобы восстановиться после общения',    sc:'EG', rv:1},
+  {id:15, txt:'Я чувствую, что расту и развиваюсь профессионально в своей роли',                              sc:'CF', rv:0},
+  {id:16, txt:'К концу рабочей недели я чувствую себя полностью опустошённым(ой)',                            sc:'EN', rv:1},
+  {id:17, txt:'Я готов(а) вкладываться в работу сверх минимума, когда вижу в этом ценность для дела',         sc:'EG', rv:0},
+  {id:18, txt:'Иногда мне кажется, что требования к моей позиции растут быстрее, чем я успеваю адаптироваться', sc:'CF', rv:1}
 ];
-const N=QS.length,MAX=30,MIN=6,RNG=MAX-MIN;
-let cur=0;
-const ans=new Array(N).fill(null);
 
-function show(id){
-  document.querySelectorAll('.sd-v').forEach(v=>v.classList.remove('on'));
+var N = QS.length, MAX = 30, MIN = 6, RNG = MAX - MIN;
+var cur = 0;
+var ans = new Array(N).fill(null);
+
+function show(id) {
+  document.querySelectorAll('.sd-v').forEach(function(v) { v.classList.remove('on'); });
   document.getElementById(id).classList.add('on');
+  notifyHeight();
 }
-function start(){show('vQuiz');renderQ()}
 
-function renderQ(){
-  document.getElementById('qTxt').textContent=QS[cur].txt;
-  document.getElementById('pLbl').textContent=`Вопрос ${cur+1} из ${N}`;
-  document.getElementById('pFill').style.width=((cur+1)/N*100)+'%';
-  document.getElementById('bBack').disabled=(cur===0);
-  const bn=document.getElementById('bNext');
-  bn.textContent=(cur===N-1)?'Показать результаты':'Далее →';
-  const box=document.getElementById('qOpts');
-  box.innerHTML='';
-  for(let v=1;v<=5;v++){
-    const b=document.createElement('button');
-    b.className='sd-o'+(ans[cur]===v?' sel':'');
-    b.textContent=v;
-    b.onclick=()=>pick(v);
+function start() { show('vQuiz'); renderQ(); }
+
+function renderQ() {
+  document.getElementById('qTxt').textContent = QS[cur].txt;
+  document.getElementById('pLbl').textContent = 'Вопрос ' + (cur + 1) + ' из ' + N;
+  document.getElementById('pFill').style.width = ((cur + 1) / N * 100) + '%';
+  document.getElementById('bBack').disabled = (cur === 0);
+
+  var bn = document.getElementById('bNext');
+  bn.textContent = (cur === N - 1) ? 'Показать результаты' : 'Далее →';
+
+  var box = document.getElementById('qOpts');
+  box.innerHTML = '';
+  for (var v = 1; v <= 5; v++) {
+    var b = document.createElement('button');
+    b.className = 'sd-o' + (ans[cur] === v ? ' sel' : '');
+    b.textContent = v;
+    b.onclick = (function(val) { return function() { pick(val); }; })(v);
     box.appendChild(b);
   }
   updNext();
 }
 
-function pick(v){
-  ans[cur]=v;
-  document.querySelectorAll('.sd-o').forEach((b,i)=>b.classList.toggle('sel',i+1===v));
+function pick(v) {
+  ans[cur] = v;
+  document.querySelectorAll('.sd-o').forEach(function(b, i) { b.classList.toggle('sel', i + 1 === v); });
   updNext();
 }
 
-function updNext(){
-  const bn=document.getElementById('bNext');
-  ans[cur]!==null?bn.classList.add('go'):bn.classList.remove('go');
+function updNext() {
+  var bn = document.getElementById('bNext');
+  ans[cur] !== null ? bn.classList.add('go') : bn.classList.remove('go');
 }
 
-function next(){if(ans[cur]===null)return;cur<N-1?anim(cur+1):calc()}
-function prev(){if(cur>0)anim(cur-1)}
+function next() { if (ans[cur] === null) return; cur < N - 1 ? anim(cur + 1) : calc(); }
+function prev() { if (cur > 0) anim(cur - 1); }
 
-function anim(idx){
-  const c=document.getElementById('qCard');
+function anim(idx) {
+  var c = document.getElementById('qCard');
   c.classList.add('fade');
-  setTimeout(()=>{cur=idx;renderQ();requestAnimationFrame(()=>c.classList.remove('fade'))},200);
+  setTimeout(function() {
+    cur = idx; renderQ();
+    requestAnimationFrame(function() { c.classList.remove('fade'); });
+  }, 200);
 }
 
-function calc(){
-  const sc={EN:0,EG:0,CF:0};
-  QS.forEach((q,i)=>{const v=ans[i];sc[q.sc]+=q.rv?(6-v):v});
+function calc() {
+  var sc = {EN: 0, EG: 0, CF: 0};
+  QS.forEach(function(q, i) {
+    var v = ans[i];
+    sc[q.sc] += q.rv ? (6 - v) : v;
+  });
   showRes(sc);
 }
 
-function zone(s){return s>=24?'green':s>=16?'yellow':'red'}
-const ZL={green:'Ресурсное состояние',yellow:'Зона внимания',red:'Зона риска'};
-const SM={EN:'⚡ Энергия и ресурс',EG:'🎯 Вовлечённость и смысл',CF:'💪 Уверенность в себе'};
+function zone(s) { return s >= 24 ? 'green' : s >= 16 ? 'yellow' : 'red'; }
 
-function showRes(sc){
-  const zs={};
-  ['EN','EG','CF'].forEach(k=>zs[k]=zone(sc[k]));
+var ZL = { green: 'Ресурсное состояние', yellow: 'Зона внимания', red: 'Зона риска' };
+var SM = { EN: '⚡ Энергия и ресурс', EG: '🎯 Вовлечённость и смысл', CF: '💪 Уверенность в себе' };
 
-  let h=`<div class="sd-rc-hdr"><h2>Самодиагностика: ваш ресурс</h2>
-    <p>Энергия · Вовлечённость · Уверенность</p></div>`;
+function showRes(sc) {
+  var zs = {};
+  ['EN','EG','CF'].forEach(function(k) { zs[k] = zone(sc[k]); });
 
-  ['EN','EG','CF'].forEach(k=>{
-    const z=zs[k],pct=Math.round((sc[k]-MIN)/RNG*100);
-    h+=`<div class="sd-sr"><div class="sd-sr-top">
-      <span class="sd-sr-name">${SM[k]}</span>
-      <span class="sd-sr-sc ${z}">${sc[k]}/${MAX}</span></div>
-      <div class="sd-bt"><div class="sd-bf ${z}" data-p="${pct}"></div></div>
-      <span class="sd-zl ${z}">${ZL[z]}</span></div>`;
+  var h = '<div class="sd-rc-hdr">'
+    + '<h2>Самодиагностика: ваш ресурс</h2>'
+    + '<p>Энергия · Вовлечённость · Уверенность</p>'
+    + '</div>';
+
+  ['EN','EG','CF'].forEach(function(k) {
+    var z = zs[k], pct = Math.round((sc[k] - MIN) / RNG * 100);
+    h += '<div class="sd-sr"><div class="sd-sr-top">'
+      + '<span class="sd-sr-name">' + SM[k] + '</span>'
+      + '<span class="sd-sr-sc ' + z + '">' + sc[k] + '/' + MAX + '</span></div>'
+      + '<div class="sd-bt"><div class="sd-bf ' + z + '" data-p="' + pct + '"></div></div>'
+      + '<span class="sd-zl ' + z + '">' + ZL[z] + '</span></div>';
   });
 
-  const ov=overall(zs);
-  h+=`<div class="sd-ov"><div class="sd-ov-i">${ov.i}</div>
-    <h3 style="color:${ov.c}">${ov.t}</h3><p>${ov.p}</p></div>
-    <div class="sd-rc-ft">${new Date().toLocaleDateString('ru-RU',
-      {day:'numeric',month:'long',year:'numeric'})}</div>`;
+  var ov = overall(zs);
+  h += '<div class="sd-ov">'
+    + '<div class="sd-ov-i">' + ov.i + '</div>'
+    + '<h3 style="color:' + ov.c + '">' + ov.t + '</h3>'
+    + '<p>' + ov.p + '</p></div>'
+    + '<div class="sd-rc-ft">'
+    + new Date().toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'})
+    + '</div>';
 
-  document.getElementById('resCard').innerHTML=h;
+  document.getElementById('resCard').innerHTML = h;
   show('vRes');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    document.querySelectorAll('.sd-bf').forEach(b=>b.style.width=b.dataset.p+'%');
-  }));
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      document.querySelectorAll('.sd-bf').forEach(function(b) { b.style.width = b.dataset.p + '%'; });
+    });
+  });
 }
 
-function overall(z){
-  const v=Object.values(z),r=v.filter(x=>x==='red').length,g=v.filter(x=>x==='green').length;
-  if(g===3)return{i:'🟢',t:'Ресурсное состояние',c:'var(--g)',
-    p:'Все три показателя в зелёной зоне. Вы сохраняете энергию, вовлечённость и уверенность.'};
-  if(r===0&&g>=2)return{i:'🟢',t:'В целом хороший ресурс',c:'var(--g)',
-    p:'Большинство показателей в норме. Посмотрите, что требует внимания.'};
-  if(r===0)return{i:'🟡',t:'Обратите внимание на некоторые зоны',c:'var(--y)',
-    p:'Напряжение ощущается по нескольким направлениям. Хороший момент для профилактики.'};
-  if(r===1)return{i:'🟠',t:'Есть зона риска',c:'var(--r)',
-    p:'Один из компонентов в красной зоне — рекомендуем обсудить ситуацию с коучем или HR.'};
-  if(r===2)return{i:'🔴',t:'Выраженные признаки выгорания',c:'var(--r)',
-    p:'Два показателя в красной зоне. Вам нужна поддержка — поговорите с руководителем или психологом.'};
-  return{i:'🚨',t:'Высокий риск выгорания',c:'var(--r)',
-    p:'Все компоненты в красной зоне. Пожалуйста, обратитесь за профессиональной помощью.'};
+function overall(z) {
+  var v = Object.values(z);
+  var r = v.filter(function(x) { return x === 'red'; }).length;
+  var g = v.filter(function(x) { return x === 'green'; }).length;
+  if (g === 3) return { i:'🟢', t:'Ресурсное состояние',           c:'var(--g)',
+    p:'Все три показателя в зелёной зоне. Вы сохраняете энергию, вовлечённость и уверенность.' };
+  if (r === 0 && g >= 2) return { i:'🟢', t:'В целом хороший ресурс',       c:'var(--g)',
+    p:'Большинство показателей в норме. Посмотрите, что требует внимания.' };
+  if (r === 0) return { i:'🟡', t:'Обратите внимание на некоторые зоны', c:'var(--y)',
+    p:'Напряжение ощущается по нескольким направлениям. Хороший момент для профилактики.' };
+  if (r === 1) return { i:'🟠', t:'Есть зона риска',                   c:'var(--red)',
+    p:'Один из компонентов в красной зоне — рекомендуем обсудить ситуацию с коучем или HR.' };
+  if (r === 2) return { i:'🔴', t:'Выраженные признаки выгорания',     c:'var(--red)',
+    p:'Два показателя в красной зоне. Вам нужна поддержка — поговорите с руководителем или психологом.' };
+  return        { i:'🚨', t:'Высокий риск выгорания',               c:'var(--red)',
+    p:'Все компоненты в красной зоне. Пожалуйста, обратитесь за профессиональной помощью.' };
 }
 
-async function saveImg(){
-  const btn=document.getElementById('bSave'),card=document.getElementById('resCard');
-  if(typeof html2canvas==='undefined'){
-    alert('Сделайте скриншот экрана (PrtScr / Cmd+Shift+4)');return;
+function saveImg() {
+  var btn  = document.getElementById('bSave');
+  var card = document.getElementById('resCard');
+  if (typeof html2canvas === 'undefined') {
+    alert('Сделайте скриншот экрана (PrtScr / Cmd+Shift+4)'); return;
   }
-  btn.disabled=true;btn.innerHTML='⏳ Формирую…';
-  try{
-    const cvs=await html2canvas(card,{scale:2,backgroundColor:'#ffffff',logging:false,useCORS:true});
-    const a=document.createElement('a');
-    a.download='самодиагностика-'+new Date().toLocaleDateString('ru-RU')+'.png';
-    a.href=cvs.toDataURL('image/png');a.click();
-    btn.innerHTML='✓ Сохранено!';
-    setTimeout(()=>{btn.innerHTML='📸 Сохранить результат';btn.disabled=false},2500);
-  }catch(e){
-    alert('Не удалось сформировать изображение. Сделайте скриншот вручную.');
-    btn.innerHTML='📸 Сохранить результат';btn.disabled=false;
-  }
+  btn.disabled = true; btn.innerHTML = '⏳ Формирую…';
+  html2canvas(card, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true })
+    .then(function(cvs) {
+      var a = document.createElement('a');
+      a.download = 'самодиагностика-' + new Date().toLocaleDateString('ru-RU') + '.png';
+      a.href = cvs.toDataURL('image/png'); a.click();
+      btn.innerHTML = '✓ Сохранено!';
+      setTimeout(function() { btn.innerHTML = '📸 Сохранить результат'; btn.disabled = false; }, 2500);
+    })
+    .catch(function() {
+      alert('Не удалось сформировать изображение. Сделайте скриншот вручную.');
+      btn.innerHTML = '📸 Сохранить результат'; btn.disabled = false;
+    });
 }
 
-function restart(){ans.fill(null);cur=0;show('vIntro')}
+function restart() { ans.fill(null); cur = 0; show('vIntro'); }
 </script>
 </body>
 </html>
