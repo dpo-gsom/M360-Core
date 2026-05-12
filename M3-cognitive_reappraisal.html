@@ -4,557 +4,210 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Внутренний монолог руководителя</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+#app { max-width: 700px; margin: 0 auto; padding: 44px 20px 60px; }
 
-:root {
-  --red: #C31532;
-  --dark: #003B48;
-  --slate: #495761;
-  --cream: #FAF8F4;
-  --sand: #F0EDE6;
-  --border: #DDD8CF;
-  --white: #FFFFFF;
-  --green: #1A6B4A;
-  --green-bg: #EBF5EF;
-  --green-border: #A8D5BC;
-  --red-bg: #FEF0F2;
-  --red-border: #F2A0AC;
-}
-
-body {
-  font-family: 'Manrope', sans-serif;
-  background: var(--cream);
-  min-height: 100vh;
-  color: var(--dark);
-  overflow-x: hidden;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
-  z-index: 200;
-}
-
-#app {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 44px 20px 60px;
-}
-
-/* ─── INTRO ─── */
+/* ── INTRO ── */
 .intro { animation: fadeUp 0.5s ease both; text-align: center; }
 
-.eyebrow {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 18px;
-}
-
-.page-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(28px, 6vw, 48px);
-  font-weight: 900;
-  color: var(--dark);
-  line-height: 1.15;
-  margin-bottom: 6px;
-}
-
-.page-title span { color: var(--red); display: block; }
-
-.divider {
-  width: 50px; height: 2px;
-  background: var(--red);
-  margin: 20px auto;
-}
-
 .intro-body {
-  font-size: 14px;
-  line-height: 1.75;
-  color: var(--slate);
-  max-width: 520px;
-  margin: 0 auto 28px;
-  text-align: left;
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  padding: 20px 22px;
+  font-size: 14px; line-height: 1.75; color: var(--slate);
+  max-width: 520px; margin: 0 auto 28px; text-align: left;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-md); padding: 20px 22px;
 }
 
 .intro-meta {
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
+  display: flex; gap: 24px; justify-content: center;
+  margin-bottom: 32px; flex-wrap: wrap;
 }
-
 .meta-item { text-align: center; }
-.meta-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--dark);
+.meta-num  {
+  font-family: var(--font-display); font-size: 26px;
+  font-weight: 700; color: var(--dark);
 }
-.meta-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--slate);
-}
+.meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--slate); }
 
 .btn-start {
-  background: var(--dark);
-  color: var(--white);
-  border: none;
-  border-radius: 4px;
-  padding: 15px 36px;
-  font-family: 'Manrope', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  cursor: pointer;
+  background: var(--dark); color: var(--white); border: none;
+  border-radius: 4px; padding: 15px 36px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
   transition: background 0.2s, transform 0.15s;
 }
 .btn-start:hover { background: var(--red); transform: translateY(-1px); }
 
-/* ─── PROGRESS ─── */
-.progress-bar-wrap {
-  margin-bottom: 28px;
-}
+/* ── PROGRESS ── */
+.progress-bar-wrap { margin-bottom: 28px; }
 .progress-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 7px;
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px;
 }
-.progress-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--slate);
-}
-.progress-pct { font-size: 11px; font-weight: 700; color: var(--red); }
-.progress-track {
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background: var(--red);
-  border-radius: 2px;
-  transition: width 0.5s ease;
-}
+.progress-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); }
+.progress-pct   { font-size: 11px; font-weight: 700; color: var(--red); }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill  { height: 100%; background: var(--red); border-radius: 2px; transition: width 0.5s ease; }
 
-/* ─── RED ZONE ─── */
-.red-zone {
-  margin-bottom: 24px;
-  animation: slideIn 0.4s ease both;
-}
+/* ── КРАСНАЯ КАРТОЧКА ── */
+.red-zone { margin-bottom: 24px; animation: slideIn 0.4s ease both; }
 
 .red-zone-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
 }
-
-.red-zone-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--red-border);
-}
+.red-zone-label::after { content: ''; flex: 1; height: 1px; background: var(--red-border); }
 
 .red-card {
-  background: var(--red-bg);
-  border: 2px solid var(--red-border);
-  border-radius: 10px;
-  padding: 20px 22px;
-  position: relative;
+  background: var(--red-bg); border: 2px solid var(--red-border);
+  border-radius: var(--radius-md); padding: 20px 22px;
+  position: relative; min-height: 90px;
   transition: border-color 0.3s, background 0.3s, transform 0.3s;
-  min-height: 90px;
 }
-
-.red-card.drag-over {
-  border-color: var(--red);
-  background: #FDE8EB;
-  transform: scale(1.01);
-}
-
-.red-card.correct-flash {
-  border-color: var(--green);
-  background: var(--green-bg);
-  animation: correctPulse 0.6s ease;
-}
+.red-card.drag-over  { border-color: var(--red); background: #FDE8EB; transform: scale(1.01); }
+.red-card.correct-flash { border-color: var(--green); background: var(--green-bg); animation: correctPulse 0.6s ease; }
 
 .situation-tag {
-  display: inline-block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--red);
-  background: rgba(195,21,50,0.08);
-  border-radius: 3px;
-  padding: 2px 8px;
-  margin-bottom: 10px;
+  display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--red);
+  background: rgba(195,21,50,0.08); border-radius: 3px; padding: 2px 8px; margin-bottom: 10px;
 }
 
 .red-card-text {
-  font-size: 14px;
-  line-height: 1.65;
-  color: #7A1525;
-  font-style: italic;
-  font-weight: 500;
+  font-size: 14px; line-height: 1.65; color: #7A1525;
+  font-style: italic; font-weight: 500;
 }
 
 .drop-hint {
-  margin-top: 12px;
-  font-size: 11px;
-  color: var(--red-border);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
+  margin-top: 12px; font-size: 11px; color: var(--red-border);
+  display: flex; align-items: center; gap: 6px; font-weight: 600;
 }
-
 .drop-arrow {
-  width: 20px;
-  height: 20px;
-  border: 1.5px solid var(--red-border);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
+  width: 20px; height: 20px; border: 1.5px solid var(--red-border);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;
 }
 
-/* ─── GREEN SECTION ─── */
+/* ── ЗЕЛЁНЫЕ КАРТОЧКИ ── */
 .green-section-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--green); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
 }
-.green-section-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--green-border);
-}
+.green-section-label::after { content: ''; flex: 1; height: 1px; background: var(--green-border); }
 
-.green-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-}
+.green-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
 
 .green-card {
-  background: var(--green-bg);
-  border: 2px solid var(--green-border);
-  border-radius: 10px;
-  padding: 16px 16px;
-  cursor: grab;
+  background: var(--green-bg); border: 2px solid var(--green-border);
+  border-radius: var(--radius-md); padding: 16px; cursor: grab;
   transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-  user-select: none;
-  position: relative;
+  user-select: none; position: relative; overflow: hidden;
 }
-
 .green-card:hover {
-  border-color: var(--green);
-  transform: translateY(-2px);
+  border-color: var(--green); transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(26,107,74,0.14);
 }
+.green-card.dragging { opacity: 0.4; cursor: grabbing; transform: scale(0.97); }
 
-.green-card.dragging {
-  opacity: 0.4;
-  cursor: grabbing;
-  transform: scale(0.97);
-}
+.green-card-text { font-size: 12.5px; line-height: 1.6; color: #1A4A35; }
 
-.green-card.trap {
-  background: #FFFBF0;
-  border-color: #D4C07A;
-}
-
-.green-card.trap:hover {
-  border-color: #B8963E;
-  box-shadow: 0 6px 18px rgba(184,150,62,0.15);
-}
-
-.green-card-num {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(26,107,74,0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--green);
-  margin-bottom: 10px;
-}
-
-.trap .green-card-num {
-  background: rgba(184,150,62,0.15);
-  color: #8A6A0A;
-}
-
-.green-card-text {
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: #1A4A35;
-}
-
-.trap .green-card-text { color: #5A4A10; }
-
-.tap-hint {
-  margin-top: 10px;
-  font-size: 10px;
-  color: var(--green-border);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-/* ─── INLINE FEEDBACK ─── */
-.green-card { overflow: hidden; }
+/* ── ИНЛАЙН ФИДБЭК НА КАРТОЧКЕ ── */
 .card-feedback {
-  position: absolute;
-  inset: -2px;
-  border-radius: 10px;
-  padding: 14px 16px 14px 16px;
-  font-size: 13px;
-  line-height: 1.55;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  z-index: 10;
-  animation: fadeUp 0.25s ease both;
-  box-sizing: border-box;
+  position: absolute; inset: -2px; border-radius: var(--radius-md);
+  padding: 14px 16px; font-size: 13px; line-height: 1.55;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  z-index: 10; animation: fadeUp 0.25s ease both; box-sizing: border-box;
 }
 .card-feedback.error   { background: var(--red);   color: #fff; border: 2px solid var(--red); }
 .card-feedback.warning { background: #7A5A00;      color: #fff; border: 2px solid #B8963E; }
 .card-feedback.success { background: var(--green); color: #fff; border: 2px solid var(--green); }
+
 .card-feedback-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  gap: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px; gap: 8px;
 }
-.card-feedback-title {
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.5px;
-  flex: 1;
-}
+.card-feedback-title { font-weight: 700; font-size: 13px; letter-spacing: 0.5px; flex: 1; }
 .card-feedback-close {
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.25);
-  border: none;
-  color: #fff;
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,0.25); border: none; color: #fff;
+  font-size: 14px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   transition: background 0.15s;
 }
 .card-feedback-close:hover { background: rgba(255,255,255,0.4); }
 .card-feedback-body { font-size: 12.5px; line-height: 1.55; opacity: 0.92; }
 
-/* ─── SUCCESS FEEDBACK ─── */
-.pair-feedback {
-  background: var(--green-bg);
-  border: 1.5px solid var(--green-border);
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin-bottom: 20px;
-  font-size: 13px;
-  line-height: 1.6;
-  color: #1A4A35;
-  animation: fadeUp 0.4s ease both;
-  display: none;
-}
-
-.pair-feedback.visible { display: block; }
-
-/* ─── FINAL ─── */
-.final {
-  text-align: center;
-  animation: fadeUp 0.6s ease both;
-}
+/* ── ФИНАЛ ── */
+.final { text-align: center; animation: fadeUp 0.6s ease both; }
 
 .final-icon {
-  font-size: 52px;
-  margin-bottom: 20px;
+  font-size: 52px; margin-bottom: 20px;
   animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 
-.final-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(22px, 5vw, 34px);
-  font-weight: 900;
-  color: var(--dark);
-  margin-bottom: 16px;
-  line-height: 1.2;
-}
-
 .final-body {
-  font-size: 14px;
-  line-height: 1.75;
-  color: var(--slate);
-  max-width: 520px;
-  margin: 0 auto 32px;
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  padding: 20px 22px;
-  text-align: left;
-}
-
-.final-pairs {
-  margin-bottom: 28px;
+  font-size: 14px; line-height: 1.75; color: var(--slate);
+  max-width: 520px; margin: 0 auto 28px;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-md); padding: 20px 22px; text-align: left;
 }
 
 .final-pairs-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--slate);
-  margin-bottom: 14px;
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--slate); margin-bottom: 14px;
 }
 
 .final-pair-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-  align-items: flex-start;
+  display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start;
   animation: fadeUp 0.4s ease both;
 }
-
 .final-pair-row:nth-child(2) { animation-delay: 0.05s; }
-.final-pair-row:nth-child(3) { animation-delay: 0.1s; }
+.final-pair-row:nth-child(3) { animation-delay: 0.10s; }
 .final-pair-row:nth-child(4) { animation-delay: 0.15s; }
-.final-pair-row:nth-child(5) { animation-delay: 0.2s; }
+.final-pair-row:nth-child(5) { animation-delay: 0.20s; }
 .final-pair-row:nth-child(6) { animation-delay: 0.25s; }
 
 .final-pair-red {
-  flex: 1;
-  background: var(--red-bg);
-  border: 1px solid var(--red-border);
-  border-radius: 6px;
-  padding: 10px 12px;
-  font-size: 12px;
-  color: #7A1525;
-  line-height: 1.5;
+  flex: 1; background: var(--red-bg); border: 1px solid var(--red-border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  font-size: 12px; color: #7A1525; line-height: 1.5;
 }
-
-.final-pair-arrow {
-  font-size: 14px;
-  color: var(--green);
-  padding-top: 10px;
-  flex-shrink: 0;
-}
-
+.final-pair-arrow { font-size: 14px; color: var(--green); padding-top: 10px; flex-shrink: 0; }
 .final-pair-green {
-  flex: 1;
-  background: var(--green-bg);
-  border: 1px solid var(--green-border);
-  border-radius: 6px;
-  padding: 10px 12px;
-  font-size: 12px;
-  color: #1A4A35;
-  line-height: 1.5;
+  flex: 1; background: var(--green-bg); border: 1px solid var(--green-border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  font-size: 12px; color: #1A4A35; line-height: 1.5;
 }
 
 .btn-restart {
-  background: var(--white);
-  color: var(--dark);
-  border: 1.5px solid var(--border);
-  border-radius: 4px;
-  padding: 13px 28px;
-  font-family: 'Manrope', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
+  background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 4px; padding: 13px 28px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
 .btn-restart:hover { border-color: var(--dark); background: var(--sand); }
 
-/* ─── ANIMATIONS ─── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-12px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes correctPulse {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-
-@keyframes popIn {
-  from { opacity: 0; transform: scale(0.6); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes flyUp {
-  0%   { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-80px) scale(0.85); }
-}
-
-.fly-out { animation: flyUp 0.4s ease forwards; }
-
-/* ─── GHOST DRAG ─── */
+/* ── GHOST ── */
 .drag-ghost {
-  position: fixed;
-  pointer-events: none;
-  z-index: 500;
-  opacity: 0.85;
-  transform: rotate(2deg) scale(1.03);
-  max-width: 220px;
-  background: var(--green-bg);
-  border: 2px solid var(--green);
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: #1A4A35;
+  position: fixed; pointer-events: none; z-index: 500;
+  opacity: 0.85; transform: rotate(2deg) scale(1.03); max-width: 220px;
+  background: var(--green-bg); border: 2px solid var(--green);
+  border-radius: var(--radius-md); padding: 12px 14px;
+  font-size: 12px; line-height: 1.5; color: #1A4A35;
   box-shadow: 0 8px 24px rgba(26,107,74,0.2);
 }
+
+/* ── Анимации (не в styles.css) ── */
+@keyframes slideIn   { from { opacity:0; transform:translateX(-12px); } to { opacity:1; transform:translateX(0); } }
+@keyframes correctPulse { 0%,100%{transform:scale(1)} 40%{transform:scale(1.02)} }
+@keyframes popIn     { from { opacity:0; transform:scale(0.6); } to { opacity:1; transform:scale(1); } }
+@keyframes flyUp     { 0%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-80px) scale(0.85)} }
 
 @media (max-width: 480px) {
   .green-grid { grid-template-columns: 1fr; }
@@ -565,44 +218,44 @@ body::before {
 </head>
 <body>
 <div id="app"></div>
-<!-- toast removed -->
 
+<script src="common.js"></script>
 <script>
 const PAIRS = [
   {
     id: 1,
-    situation: "Катя — вопросы по мелочам",
-    red: "Катя дёргает меня по каждой мелочи! Вообще сама думать не хочет. Бесит невероятно, мне проще и быстрее самому всё сделать, чем объяснять!",
+    situation: 'Катя — вопросы по мелочам',
+    red: 'Катя дёргает меня по каждой мелочи! Вообще сама думать не хочет. Бесит невероятно, мне проще и быстрее самому всё сделать, чем объяснять!',
     greenId: 1
   },
   {
     id: 2,
-    situation: "Катя — срыв сроков",
-    red: "Опять Катя закопалась в деталях и сорвала сроки! Сколько можно возиться с одной задачей?! У неё вообще нет чувства времени!",
+    situation: 'Катя — срыв сроков',
+    red: 'Опять Катя закопалась в деталях и сорвала сроки! Сколько можно возиться с одной задачей?! У неё вообще нет чувства времени!',
     greenId: 2
   },
   {
     id: 3,
-    situation: "Алексей — игнорирование",
-    red: "Алексей специально игнорирует мои письма и тянет до последнего! Прямо выбешивает его игнор, как будто моих задач для него не существует!",
+    situation: 'Алексей — игнорирование',
+    red: 'Алексей специально игнорирует мои письма и тянет до последнего! Прямо выбешивает его игнор, как будто моих задач для него не существует!',
     greenId: 3
   },
   {
     id: 4,
-    situation: "Алексей — сопротивление",
-    red: "Вечно Алексей спорит на планёрках и критикует любую новую идею! Ему вообще ничего не надо, только бы сидеть в своём болоте и ничего не менять!",
+    situation: 'Алексей — сопротивление',
+    red: 'Вечно Алексей спорит на планёрках и критикует любую новую идею! Ему вообще ничего не надо, только бы сидеть в своём болоте и ничего не менять!',
     greenId: 4
   },
   {
     id: 5,
-    situation: "Клиент — придирки",
-    red: "Этот клиент просто невыносим! Бесит своими бесконечными придирками к каждой мелочи, мы уже пятый раз всё переделываем, а ему всё не так!",
+    situation: 'Клиент — придирки',
+    red: 'Этот клиент просто невыносим! Бесит своими бесконечными придирками к каждой мелочи, мы уже пятый раз всё переделываем, а ему всё не так!',
     greenId: 5
   },
   {
     id: 6,
-    situation: "Бюрократия",
-    red: "Опять система висит, а безопасники завернули договор из-за одной опечатки! Не работа, а сплошной дурдом, руки опускаются вообще что-то делать!",
+    situation: 'Бюрократия',
+    red: 'Опять система висит, а безопасники завернули договор из-за одной опечатки! Не работа, а сплошной дурдом, руки опускаются вообще что-то делать!',
     greenId: 6
   }
 ];
@@ -610,45 +263,45 @@ const PAIRS = [
 const GREEN_CARDS = [
   {
     id: 1,
-    text: "Раздражение показывает, что процесс адаптации не выстроен. Стоит выделить фиксированные слоты для консультаций и собирать вопросы в пулы, чтобы не отвлекаться в течение дня.",
+    text: 'Раздражение показывает, что процесс адаптации не выстроен. Стоит выделить фиксированные слоты для консультаций и собирать вопросы в пулы, чтобы не отвлекаться в течение дня.',
     trap: false
   },
   {
     id: 2,
-    text: "Злость — это сигнал об утрате контроля. Вместо того чтобы ждать финала, нужно дробить подобные задачи на мелкие этапы (чекпоинты) и регулярно сверять ожидания.",
+    text: 'Злость — это сигнал об утрате контроля. Вместо того чтобы ждать финала, нужно дробить подобные задачи на мелкие этапы (чекпоинты) и регулярно сверять ожидания.',
     trap: false
   },
   {
     id: 3,
-    text: "Я начинаю видеть злой умысел там, где, скорее всего, обычный перегруз или рассинхрон в приоритетах. Подойду лично или позвоню, чтобы снять вопрос за пару минут.",
+    text: 'Я начинаю видеть злой умысел там, где, скорее всего, обычный перегруз или рассинхрон в приоритетах. Подойду лично или позвоню, чтобы снять вопрос за пару минут.',
     trap: false
   },
   {
     id: 4,
-    text: "За агрессивным сопротивлением часто стоит страх потерять статус эксперта. Имеет смысл привлечь этого человека к пилотному тестированию, чтобы использовать его опыт.",
+    text: 'За агрессивным сопротивлением часто стоит страх потерять статус эксперта. Имеет смысл привлечь этого человека к пилотному тестированию, чтобы использовать его опыт.',
     trap: false
   },
   {
     id: 5,
-    text: "Бессилие возникает из-за размытых границ. Проблема не в человеке, а в отсутствии чётких критериев приёмки на старте. Нужно остановить процесс и зафиксировать правила.",
+    text: 'Бессилие возникает из-за размытых границ. Проблема не в человеке, а в отсутствии чётких критериев приёмки на старте. Нужно остановить процесс и зафиксировать правила.',
     trap: false
   },
   {
     id: 6,
-    text: "Гнев на то, что вне зоны влияния, только сжигает ресурс. Регламенты существуют для минимизации рисков. Эффективнее переключить внимание на то, чем я реально могу управлять.",
+    text: 'Гнев на то, что вне зоны влияния, только сжигает ресурс. Регламенты существуют для минимизации рисков. Эффективнее переключить внимание на то, чем я реально могу управлять.',
     trap: false
   },
   {
     id: 7,
-    text: "Нужно просто улыбнуться и найти в этом плюсы. Трудности делают нас сильнее, поэтому я не буду злиться, а буду излучать позитив для команды!",
+    text: 'Нужно просто улыбнуться и найти в этом плюсы. Трудности делают нас сильнее, поэтому я не буду злиться, а буду излучать позитив для команды!',
     trap: true,
-    trapMsg: "Это подавление эмоций, а не когнитивная переоценка. Если просто натянуть улыбку, проблема не решится, а раздражение со временем только накопится."
+    trapMsg: 'Это подавление эмоций, а не когнитивная переоценка. Если просто натянуть улыбку, проблема не решится, а раздражение со временем только накопится.'
   },
   {
     id: 8,
-    text: "Если процесс идёт так тяжело, значит, я просто не должен тратить на это нервы. Лучше делегировать это кому-то другому или вообще отказаться от задачи.",
+    text: 'Если процесс идёт так тяжело, значит, я просто не должен тратить на это нервы. Лучше делегировать это кому-то другому или вообще отказаться от задачи.',
     trap: true,
-    trapMsg: "Это избегание. Руководитель не должен сбегать от сложных коммуникаций — его задача трансформировать их в рабочий процесс."
+    trapMsg: 'Это избегание. Руководитель не должен сбегать от сложных коммуникаций — его задача трансформировать их в рабочий процесс.'
   }
 ];
 
@@ -667,16 +320,17 @@ let dragOffX = 0, dragOffY = 0;
 
 function render() {
   const app = document.getElementById('app');
-  if (state.screen === 'intro') app.innerHTML = renderIntro();
-  else if (state.screen === 'quiz') app.innerHTML = renderQuiz();
+  if      (state.screen === 'intro') app.innerHTML = renderIntro();
+  else if (state.screen === 'quiz')  app.innerHTML = renderQuiz();
   else if (state.screen === 'final') app.innerHTML = renderFinal();
   if (state.screen === 'quiz') bindDrag();
+  notifyHeight();
 }
 
 function renderIntro() {
   return `<div class="intro">
-    <div class="page-title">Внутренний монолог<span>руководителя</span></div>
-    <div class="divider"></div>
+    <h1 class="page-title">Внутренний монолог<span>руководителя</span></h1>
+    <div class="divider" style="margin:20px auto"></div>
     <div class="intro-body">
       Вспомните ситуации, когда рабочая рутина выводит из себя. Первая реакция часто бывает эмоциональной — мы злимся на коллег, клиентов или процессы.<br><br>
       Ваша задача — <strong>перехватить автоматическую мысль</strong> и переформулировать её так, чтобы найти конструктивное решение.
@@ -697,11 +351,10 @@ function renderQuiz() {
   const greenCards = shuffled.map(id => {
     const g = GREEN_CARDS.find(c => c.id === id);
     if (!g) return '';
-    return `<div class="green-card"
+    return `<div class="green-card ${g.trap ? 'trap' : ''}"
       data-id="${g.id}"
       draggable="true"
-      onclick="tapCard(${g.id})"
-      title="Нажмите или перетащите на красную карточку">
+      onclick="tapCard(${g.id})">
       <div class="green-card-text">${g.text}</div>
     </div>`;
   }).join('');
@@ -728,15 +381,13 @@ function renderQuiz() {
     </div>
 
     <div class="green-section-label">Варианты переоценки</div>
-    <div class="green-grid" id="green-grid">
-      ${greenCards}
-    </div>
+    <div class="green-grid" id="green-grid">${greenCards}</div>
   </div>`;
 }
 
 function renderFinal() {
   const pairsHtml = state.solvedPairs.map(p => {
-    const pair = PAIRS.find(x => x.id === p.pairId);
+    const pair  = PAIRS.find(x => x.id === p.pairId);
     const green = GREEN_CARDS.find(g => g.id === p.greenId);
     return `<div class="final-pair-row">
       <div class="final-pair-red">${pair.red.slice(0, 80)}…</div>
@@ -747,11 +398,11 @@ function renderFinal() {
 
   return `<div class="final">
     <div class="final-icon">🧠</div>
-    <div class="page-title" style="font-size:clamp(22px,5vw,34px);margin-bottom:16px;">Эмоциональный фон<span>стабилизирован!</span></div>
+    <h1 class="page-title" style="font-size:clamp(22px,5vw,34px);margin-bottom:16px;">Эмоциональный фон<span>стабилизирован!</span></h1>
     <div class="final-body">
       Вы перестали быть заложником своих автоматических реакций. Применяя самоконтроль и когнитивную переоценку к Кате, Алексею и другим участникам процесса, вы сэкономили массу энергии для реальной управленческой работы.
     </div>
-    <div class="final-pairs">
+    <div class="final-pairs" style="margin-bottom:28px">
       <div class="final-pairs-title">Собранные пары</div>
       ${pairsHtml}
     </div>
@@ -760,10 +411,11 @@ function renderFinal() {
 }
 
 function startQuiz() {
-  state.screen = 'quiz';
+  state.screen = 'intro';
   state.currentPairIdx = 0;
   state.remainingGreenIds = GREEN_CARDS.map(g => g.id).sort(() => Math.random() - 0.5);
   state.solvedPairs = [];
+  state.screen = 'quiz';
   render();
 }
 
@@ -772,14 +424,13 @@ function restartQuiz() {
   render();
 }
 
-// ─── TAP (mobile / click) handler
 function tapCard(greenId) {
-  if (dragEl) return; // ignore during drag
+  if (dragEl) return;
   tryMatch(greenId);
 }
 
 function tryMatch(greenId) {
-  const pair = PAIRS[state.currentPairIdx];
+  const pair  = PAIRS[state.currentPairIdx];
   const green = GREEN_CARDS.find(g => g.id === greenId);
 
   if (green.trap) {
@@ -792,7 +443,6 @@ function tryMatch(greenId) {
     return;
   }
 
-  // Correct!
   const redCard = document.getElementById('red-drop-zone');
   if (redCard) redCard.classList.add('correct-flash');
 
@@ -803,29 +453,25 @@ function tryMatch(greenId) {
 
   setTimeout(() => {
     state.currentPairIdx++;
-    if (state.currentPairIdx >= PAIRS.length) {
-      state.screen = 'final';
-    }
+    if (state.currentPairIdx >= PAIRS.length) state.screen = 'final';
     render();
   }, 1100);
 }
 
-// ─── DRAG & DROP
 function bindDrag() {
   const greenCards = document.querySelectorAll('.green-card');
-  const dropZone = document.getElementById('red-drop-zone');
+  const dropZone   = document.getElementById('red-drop-zone');
 
   greenCards.forEach(card => {
     card.addEventListener('dragstart', onDragStart);
-    card.addEventListener('dragend', onDragEnd);
-    // Touch
+    card.addEventListener('dragend',   onDragEnd);
     card.addEventListener('touchstart', onTouchStart, { passive: false });
   });
 
   if (dropZone) {
-    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-    dropZone.addEventListener('drop', onDrop);
+    dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop',      onDrop);
   }
 }
 
@@ -853,17 +499,15 @@ function onDrop(e) {
   }
 }
 
-// ─── TOUCH DRAG
 function onTouchStart(e) {
   e.preventDefault();
   const card = e.currentTarget;
-  const id = parseInt(card.dataset.id);
+  const id   = parseInt(card.dataset.id);
   const rect = card.getBoundingClientRect();
   const touch = e.touches[0];
   dragOffX = touch.clientX - rect.left;
   dragOffY = touch.clientY - rect.top;
 
-  // Create ghost
   ghostEl = document.createElement('div');
   ghostEl.className = 'drag-ghost';
   const g = GREEN_CARDS.find(c => c.id === id);
@@ -871,7 +515,6 @@ function onTouchStart(e) {
   ghostEl.style.left = (touch.clientX - dragOffX) + 'px';
   ghostEl.style.top  = (touch.clientY - dragOffY) + 'px';
   document.body.appendChild(ghostEl);
-
   card.classList.add('dragging');
 
   function onTouchMove(ev) {
@@ -887,29 +530,27 @@ function onTouchStart(e) {
     card.classList.remove('dragging');
     if (ghostEl) { ghostEl.remove(); ghostEl = null; }
     document.removeEventListener('touchmove', onTouchMove);
-    document.removeEventListener('touchend', onTouchEnd);
+    document.removeEventListener('touchend',  onTouchEnd);
 
-    const t = ev.changedTouches[0];
+    const t  = ev.changedTouches[0];
     const dz = document.getElementById('red-drop-zone');
     if (dz) {
       const r = dz.getBoundingClientRect();
-      if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+      if (t.clientX >= r.left && t.clientX <= r.right &&
+          t.clientY >= r.top  && t.clientY <= r.bottom) {
         tryMatch(id);
         return;
       }
     }
-    // If dropped outside — do nothing
   }
 
   document.addEventListener('touchmove', onTouchMove, { passive: false });
-  document.addEventListener('touchend', onTouchEnd);
+  document.addEventListener('touchend',  onTouchEnd);
 }
 
-// ─── INLINE CARD FEEDBACK
 function closeFeedback(fb) {
   if (!fb) return;
   fb.remove();
-  // Re-enable all cards
   document.querySelectorAll('.green-card').forEach(c => c.style.pointerEvents = '');
   if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
 }
@@ -919,27 +560,22 @@ function showCardFeedback(greenId, type, title, body) {
   if (!card) return;
 
   card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-  // Remove any existing feedback on any card
   document.querySelectorAll('.card-feedback').forEach(el => el.remove());
 
   const fb = document.createElement('div');
   fb.className = `card-feedback ${type}`;
 
   if (type === 'success') {
-    // Success: no close button, auto-dismiss as render() takes over
     fb.innerHTML = `<div class="card-feedback-header"><div class="card-feedback-title">${title}</div></div><div class="card-feedback-body">${body}</div>`;
   } else {
-    // Error: show X button, cards stay interactive after close
     fb.innerHTML = `<div class="card-feedback-header"><div class="card-feedback-title">${title}</div><button class="card-feedback-close" onclick="closeFeedback(this.closest('.card-feedback'))">✕</button></div><div class="card-feedback-body">${body}</div>`;
   }
 
   card.appendChild(fb);
+  notifyHeight();
 
-  // Auto-dismiss fallback timer (still active as safety net)
   if (toastTimer) clearTimeout(toastTimer);
-  const dur = type === 'success' ? 10000 : 10000;
-  toastTimer = setTimeout(() => closeFeedback(fb), dur);
+  toastTimer = setTimeout(() => closeFeedback(fb), 10000);
 }
 
 render();
