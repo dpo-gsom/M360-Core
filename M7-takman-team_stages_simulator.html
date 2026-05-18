@@ -4,128 +4,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Стадии развития команды</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="common.js"></script>
+
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --red: #C31532;
-  --dark: #003B48;
-  --slate: #495761;
-  --cream: #FAF8F4;
-  --sand: #F0EDE6;
-  --border: #DDD8CF;
-  --white: #FFFFFF;
-  --green: #1A6B4A;
-  --green-bg: #EBF5EF;
-  --green-border: #A8D5BC;
-  --red-bg: #FEF0F2;
-  --red-border: #F2A0AC;
-
-  --s1: #4A6FA5;
-  --s1-bg: #EEF3FB;
-  --s2: #C0392B;
-  --s2-bg: #FDECEA;
-  --s3: #8E6BBE;
-  --s3-bg: #F4EDFB;
-  --s4: #1A6B4A;
-  --s4-bg: #EBF5EF;
-}
-
-body {
-  font-family: 'Manrope', sans-serif;
-  background: var(--cream);
-  min-height: 100vh;
-  color: var(--dark);
-  overflow-x: hidden;
-}
-
-body::before {
-  content: '';
-  position: fixed; top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
-  z-index: 200;
-}
-
 #app { max-width: 680px; margin: 0 auto; padding: 44px 20px 60px; }
 
-/* ── SHARED ── */
-.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 18px; }
-.page-title { font-family: 'Playfair Display', serif; font-size: clamp(26px, 6vw, 44px); font-weight: 900; color: var(--dark); line-height: 1.15; margin-bottom: 6px; }
-.page-title span { color: var(--red); display: block; }
-.divider { width: 50px; height: 2px; background: var(--red); margin: 20px 0; }
+/* ── Цвета стадий ── */
+:root {
+  --s1: #4A6FA5; --s1-bg: #EEF3FB;
+  --s2: #C0392B; --s2-bg: #FDECEA;
+  --s3: #8E6BBE; --s3-bg: #F4EDFB;
+  --s4: #1A6B4A; --s4-bg: #EBF5EF;
+}
 
 /* ── INTRO ── */
-.intro { animation: fadeUp 0.5s ease both; }
-
-.intro-legend {
-  background: var(--dark); color: var(--white);
-  border-radius: 10px; padding: 20px 22px; margin: 24px 0;
-  font-size: 14px; line-height: 1.7;
-}
-.legend-tag {
-  display: inline-block; background: var(--red); color: var(--white);
-  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-  padding: 3px 10px; border-radius: 3px; margin-bottom: 12px;
-}
-
 .stages-grid {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0 28px;
 }
-.stage-chip {
-  border-radius: 8px; padding: 12px 14px; border: 1.5px solid;
-}
+.stage-chip { border-radius: var(--radius-md); padding: 12px 14px; border: 1.5px solid; }
 .stage-chip.s1 { background: var(--s1-bg); border-color: #9DBAE0; }
 .stage-chip.s2 { background: var(--s2-bg); border-color: #F0A89E; }
 .stage-chip.s3 { background: var(--s3-bg); border-color: #C9AAEA; }
 .stage-chip.s4 { background: var(--s4-bg); border-color: var(--green-border); }
-
 .stage-num { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
 .s1 .stage-num { color: var(--s1); }
 .s2 .stage-num { color: var(--s2); }
 .s3 .stage-num { color: var(--s3); }
 .s4 .stage-num { color: var(--s4); }
-
 .stage-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
 .stage-desc { font-size: 12px; color: var(--slate); line-height: 1.45; }
 
-.btn-start {
-  display: flex; align-items: center; justify-content: center; width: 100%;
-  background: var(--dark); color: var(--white); border: none; border-radius: 4px;
-  padding: 15px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-}
-.btn-start:hover { background: var(--red); transform: translateY(-1px); }
-
-/* ── INTERLUDE ── */
-.interlude {
-  text-align: center; animation: fadeUp 0.6s ease both;
-}
+/* ── ИНТЕРЛЮДИЯ ── */
+.interlude { text-align: center; animation: fadeUp 0.6s ease both; }
 .interlude-time {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: clamp(32px, 8vw, 64px); font-weight: 900;
   color: var(--dark); line-height: 1.1; margin-bottom: 10px;
 }
 .interlude-time span { color: var(--red); }
-.interlude-sub { font-size: 14px; color: var(--slate); margin-bottom: 32px; line-height: 1.6; }
+.interlude-sub { font-size: 14px; color: var(--slate); margin-bottom: 28px; line-height: 1.6; }
 .interlude-summary {
   background: var(--white); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 18px 20px; margin-bottom: 28px;
+  border-radius: var(--radius-md); padding: 18px 20px; margin-bottom: 28px;
   text-align: left; font-size: 13px; color: var(--slate); line-height: 1.65;
 }
-.interlude-summary-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dark); margin-bottom: 10px; }
-
-.btn-continue {
-  display: flex; align-items: center; justify-content: center; width: 100%;
-  background: var(--dark); color: var(--white); border: none; border-radius: 4px;
-  padding: 15px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
-  transition: background 0.2s;
+.interlude-summary-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--dark); margin-bottom: 10px;
 }
-.btn-continue:hover { background: var(--red); }
 
-/* ── EPISODE PROGRESS ── */
+/* ── ПРОГРЕСС ЭПИЗОДОВ ── */
 .ep-progress { margin-bottom: 28px; }
 .ep-dots { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
 .ep-dot {
@@ -134,14 +67,13 @@ body::before {
   font-size: 11px; font-weight: 700; color: var(--border);
   background: var(--white); transition: all 0.3s; flex-shrink: 0;
 }
-.ep-dot.done { background: var(--dark); border-color: var(--dark); color: var(--white); }
-.ep-dot.active { background: var(--red); border-color: var(--red); color: var(--white); }
+.ep-dot.done   { background: var(--dark); border-color: var(--dark); color: var(--white); }
+.ep-dot.active { background: var(--red);  border-color: var(--red);  color: var(--white); }
 .ep-line { flex: 1; height: 2px; background: var(--border); }
 .ep-line.done { background: var(--dark); }
-
 .ep-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); }
 
-/* ── EPISODE ── */
+/* ── ЭПИЗОД ── */
 .episode { animation: cardIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both; }
 
 .ep-stage-badge {
@@ -156,41 +88,41 @@ body::before {
 
 .ep-card {
   background: var(--white); border: 1.5px solid var(--border);
-  border-radius: 12px; overflow: hidden; margin-bottom: 18px;
+  border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 18px;
 }
-
-.ep-card-header {
-  padding: 16px 20px 0;
+.ep-card-header { padding: 16px 20px 0; }
+.ep-card-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 6px;
 }
-.ep-card-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
-.ep-card-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 14px; }
-
-.ep-scene {
-  padding: 0 20px 20px;
+.ep-card-title {
+  font-family: var(--font-display); font-size: 18px; font-weight: 700;
+  color: var(--dark); margin-bottom: 14px;
 }
+.ep-scene { padding: 0 20px 20px; }
 .ep-scene-text { font-size: 14px; line-height: 1.7; color: var(--slate); }
-
-.ep-chars {
-  display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0;
-}
+.ep-chars { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
 .char-bubble {
-  background: var(--sand); border-radius: 8px; padding: 8px 12px;
-  font-size: 12px; line-height: 1.5; color: var(--slate); max-width: 100%;
-  border-left: 3px solid var(--border);
+  background: var(--sand); border-radius: var(--radius-md); padding: 8px 12px;
+  font-size: 12px; line-height: 1.5; color: var(--slate);
+  border-left: 3px solid var(--border); flex: 1; min-width: 160px;
 }
 .char-name { font-weight: 700; color: var(--dark); font-size: 11px; margin-bottom: 3px; }
 
-/* ── OPTIONS ── */
-.options-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 10px; }
-
+/* ── ВАРИАНТЫ ОТВЕТА ── */
+.options-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--slate); margin-bottom: 10px;
+}
 .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
 
 .opt-btn {
-  background: var(--white); border: 2px solid var(--border); border-radius: 10px;
-  padding: 14px 16px; text-align: left; font-family: 'Manrope', sans-serif;
+  background: var(--white); border: 2px solid var(--border); border-radius: var(--radius-md);
+  padding: 14px 16px; text-align: left; font-family: var(--font-body);
   font-size: 13px; line-height: 1.55; color: var(--slate); cursor: pointer;
   transition: border-color 0.2s, background 0.2s, transform 0.15s;
   display: flex; align-items: flex-start; gap: 12px;
+  -webkit-tap-highlight-color: transparent;
 }
 .opt-btn:hover { border-color: var(--dark); background: var(--sand); transform: translateY(-1px); }
 .opt-btn:active { transform: translateY(0); }
@@ -202,79 +134,89 @@ body::before {
   font-size: 11px; font-weight: 700; color: var(--slate);
   flex-shrink: 0; margin-top: 1px; transition: all 0.2s;
 }
-
 .opt-btn.disabled { pointer-events: none; }
-
-.opt-btn.correct {
-  border-color: var(--green); background: var(--green-bg);
-}
+.opt-btn.correct { border-color: var(--green); background: var(--green-bg); }
 .opt-btn.correct .opt-letter { background: var(--green); color: var(--white); border-color: var(--green); }
 .opt-btn.correct .opt-text { color: #1A4A35; }
-
-.opt-btn.wrong {
-  border-color: var(--red); background: var(--red-bg);
-}
+.opt-btn.wrong { border-color: var(--red); background: var(--red-bg); }
 .opt-btn.wrong .opt-letter { background: var(--red); color: var(--white); border-color: var(--red); }
 .opt-btn.wrong .opt-text { color: #7A1525; }
+.opt-btn.neutral { opacity: 0.4; }
 
-.opt-btn.neutral { opacity: 0.45; }
-
-/* ── FEEDBACK ── */
+/* ── ФИДБЭК ── */
 .feedback-box {
-  border-radius: 10px; padding: 16px 18px; margin-bottom: 16px;
+  border-radius: var(--radius-md); padding: 16px 18px; margin-bottom: 16px;
   font-size: 14px; line-height: 1.65; display: none;
   animation: fadeUp 0.3s ease both;
 }
 .feedback-box.show { display: block; }
 .feedback-box.correct { background: var(--green-bg); border-left: 4px solid var(--green); color: #1A4A35; }
-.feedback-box.wrong { background: var(--red-bg); border-left: 4px solid var(--red); color: #7A1525; }
+.feedback-box.wrong   { background: var(--red-bg);   border-left: 4px solid var(--red);   color: #7A1525; }
 .feedback-head { font-weight: 700; margin-bottom: 6px; font-size: 13px; }
+
+/* ── КНОПКИ ── */
+.btn-start, .btn-continue {
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  background: var(--dark); color: var(--white); border: none; border-radius: 4px;
+  padding: 15px; font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-start:hover, .btn-continue:hover { background: var(--red); transform: translateY(-1px); }
 
 .btn-next {
   width: 100%; background: var(--dark); color: var(--white);
-  border: none; border-radius: 6px; padding: 14px;
-  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+  border: none; border-radius: 4px; padding: 14px;
+  font-family: var(--font-body); font-size: 14px; font-weight: 700;
   cursor: pointer; transition: background 0.2s; display: none;
 }
 .btn-next:hover { background: var(--red); }
-.btn-next.show { display: block; }
+.btn-next.show  { display: block; }
 
-/* ── FINAL ── */
-.final { animation: fadeUp 0.5s ease both; }
-
-.final-hero {
-  background: var(--dark); color: var(--white);
-  border-radius: 12px; padding: 28px 24px; text-align: center; margin-bottom: 24px;
+.btn-restart {
+  width: 100%; background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 4px; padding: 14px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
 }
-.final-icon { font-size: 44px; margin-bottom: 14px; }
-.final-title { font-family: 'Playfair Display', serif; font-size: clamp(20px,5vw,30px); font-weight: 900; margin-bottom: 10px; line-height: 1.2; }
-.final-sub { font-size: 14px; line-height: 1.65; color: rgba(255,255,255,0.75); }
+.btn-restart:hover { border-color: var(--dark); background: var(--sand); }
 
-.score-row { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
-.score-chip { flex: 1; min-width: 80px; background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
-.score-chip-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: var(--dark); }
+/* ── ФИНАЛ ── */
+.score-row {
+  display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap;
+}
+.score-chip {
+  flex: 1; min-width: 80px; background: var(--white);
+  border: 1.5px solid var(--border); border-radius: var(--radius-md);
+  padding: 12px; text-align: center;
+}
+.score-chip-num {
+  font-family: var(--font-display); font-size: 28px; font-weight: 900; color: var(--dark);
+}
 .score-chip-label { font-size: 11px; color: var(--slate); margin-top: 2px; }
 
-.journey-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 14px; }
-
+.journey-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--slate); margin-bottom: 14px;
+}
 .journey-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
 .journey-step {
-  border-radius: 10px; padding: 14px 16px;
-  border: 1.5px solid; display: flex; align-items: flex-start; gap: 14px;
-  animation: fadeUp 0.3s ease both;
+  border-radius: var(--radius-md); padding: 14px 16px; border: 1.5px solid;
+  display: flex; align-items: flex-start; gap: 14px; animation: fadeUp 0.3s ease both;
 }
 .journey-step.s1 { background: var(--s1-bg); border-color: #9DBAE0; }
 .journey-step.s2 { background: var(--s2-bg); border-color: #F0A89E; }
 .journey-step.s3 { background: var(--s3-bg); border-color: #C9AAEA; }
 .journey-step.s4 { background: var(--s4-bg); border-color: var(--green-border); }
-
-.journey-step-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
-.journey-step-stage { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3px; }
+.journey-step-stage {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; margin-bottom: 3px;
+}
 .s1 .journey-step-stage { color: var(--s1); }
 .s2 .journey-step-stage { color: var(--s2); }
 .s3 .journey-step-stage { color: var(--s3); }
 .s4 .journey-step-stage { color: var(--s4); }
-
 .journey-step-action { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
 .journey-step-result { font-size: 12px; color: var(--slate); line-height: 1.5; }
 .journey-step-badge {
@@ -283,21 +225,8 @@ body::before {
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 700;
 }
-.badge-ok { background: var(--green); color: var(--white); }
-.badge-err { background: var(--red); color: var(--white); }
-
-.btn-restart {
-  width: 100%; background: var(--white); color: var(--dark);
-  border: 1.5px solid var(--border); border-radius: 6px; padding: 14px;
-  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
-  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-}
-.btn-restart:hover { border-color: var(--dark); background: var(--sand); }
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-@keyframes cardIn { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+.badge-ok  { background: var(--green); color: var(--white); }
+.badge-err { background: var(--red);   color: var(--white); }
 
 @media (max-width: 440px) {
   .stages-grid { grid-template-columns: 1fr; }
@@ -306,8 +235,9 @@ body::before {
 </head>
 <body>
 <div id="app"></div>
+
 <script>
-const EPISODES = [
+var EPISODES = [
   {
     id: 1,
     stageCls: 's1',
@@ -316,9 +246,9 @@ const EPISODES = [
     title: 'Новая команда',
     situation: 'На планёрке все вежливы, но напряжены. Команда только формируется, правила игры ещё не определены, все осторожно ищут ориентиры.',
     chars: [
-      { name: 'Игорь', text: 'По каждому вопросу смотрит на вас, ожидая инструкций' },
+      { name: 'Игорь',   text: 'По каждому вопросу смотрит на вас, ожидая инструкций' },
       { name: 'Алексей', text: 'Молчит, сухо фиксирует задачи, нет инициативы' },
-      { name: 'Катя', text: 'Старается со всеми соглашаться, чтобы избежать пауз' }
+      { name: 'Катя',    text: 'Старается со всеми соглашаться, чтобы избежать пауз' }
     ],
     options: [
       {
@@ -356,34 +286,34 @@ const EPISODES = [
     situation: 'Напряжение растёт, сроки начинают ползти. Это нормальная стадия шторминга — важно пройти её правильно.',
     chars: [
       { name: 'Алексей', text: 'Открыто критикует предложения Игоря: «Новый метод — это выстрел в ногу»' },
-      { name: 'Игорь', text: 'Огрызается: «Старые методы Алексея тормозят процесс»' },
-      { name: 'Катя', text: 'Жалуется вам: «В такой атмосфере невозможно работать»' }
+      { name: 'Игорь',   text: 'Огрызается: «Старые методы Алексея тормозят процесс»' },
+      { name: 'Катя',    text: 'Жалуется вам: «В такой атмосфере невозможно работать»' }
     ],
     options: [
       {
         letter: 'А',
         text: 'Жёстко пресечь споры и запретить обсуждать методы работы до конца проекта.',
         correct: false,
-        feedback: 'Запрет не разрешает конфликт, а подавляет его. Напряжение уйдёт под поверхность и вырвется позже, уже в неподходящий момент. Кроме того, ценный профессиональный спор может содержать полезное зерно.'
+        feedback: 'Запрет не разрешает конфликт, а подавляет его. Напряжение уйдёт под поверхность и вырвется позже — уже в неподходящий момент. Кроме того, профессиональный спор может содержать полезное зерно: возможно, один из подходов действительно эффективнее.'
       },
       {
         letter: 'Б',
         text: 'Выступить модератором: дать обоим высказаться, помочь договориться о едином стандарте и поддержать команду эмоционально.',
         correct: true,
-        feedback: 'Шторминг требует поддержки и наставничества. Люди нуждаются в том, чтобы их услышали, и понять, что конфликт разрешается, а не замалчивается. Стиль — поддерживающий: активное участие плюс эмоциональная поддержка.'
+        feedback: 'Шторминг требует поддержки и наставничества. Люди нуждаются в том, чтобы их услышали, и в понимании, что конфликт разрешается, а не замалчивается. Стиль — поддерживающий: активное участие плюс эмоциональная поддержка.'
       },
       {
         letter: 'В',
         text: 'Перевести Игоря на другой проект до конца квартала, чтобы убрать напряжённость в команде.',
         correct: false,
-        feedback: 'Напряжённость внешне спадёт, но причина конфликта никуда не денется. Когда Игорь вернётся, всё начнётся снова. Побег от конфликта — не его решение. Кроме того, Игорь вернётся с ощущением, что его просто убрали с глаз — это демотивирует ещё сильнее.'
+        feedback: 'Напряжённость внешне спадёт, но причина конфликта никуда не денется. Когда Игорь вернётся, всё начнётся снова. Бегство от конфликта — не его решение. Кроме того, Игорь вернётся с ощущением, что его просто убрали с глаз — это демотивирует ещё сильнее.'
       }
     ],
     interlude: {
       time: 'Спустя',
       timeHighlight: '3 месяца',
       ok: 'Вы выступили честным медиатором. Конфликт стал основанием для общего стандарта. Алексей и Игорь нашли общий язык, команда начинает доверять друг другу…',
-      err: 'Напряжение внешне спало, но причина никуда не делась. Игорь вернулся в команду, но чувствует себя вытесненным. Алексей победил, но не узнал, почему. Отношения рабочие, но холодные…'
+      err: 'Конфликт был подавлен, а не разрешён. Алексей и Игорь работают без открытого столкновения, но и без доверия. Команда внешне спокойна, но напряжение никуда не ушло — оно просто ждёт следующего повода.'
     }
   },
   {
@@ -392,37 +322,37 @@ const EPISODES = [
     stageLabel: 'Нормирование',
     epLabel: 'Эпизод 3 · Спустя 3 месяца',
     title: 'Команда находит ритм',
-    situation: 'Конфликты утихли. Команда сама разработала шаблон отчётности. Участники команды начинают доверять друг другу и помогать без вашего участия.',
+    situation: 'Конфликты утихли. Команда сама разработала шаблон отчётности. Участники начинают доверять друг другу и помогают без вашего участия.',
     chars: [
       { name: 'Алексей', text: 'Начал делиться опытом с Игорем без просьбы' },
-      { name: 'Катя', text: 'Сама берёт на себя координацию встреч' },
-      { name: 'Игорь', text: 'Спрашивает меньше, делает больше' }
+      { name: 'Катя',    text: 'Сама берёт на себя координацию встреч' },
+      { name: 'Игорь',   text: 'Спрашивает меньше, делает больше' }
     ],
     options: [
       {
         letter: 'А',
         text: 'Сфокусироваться на делегировании: постепенно передавать команде право самостоятельно принимать операционные решения.',
         correct: true,
-        feedback: 'Нормирование — время постепенно передавать ответственность. Команда доказала, что может саморегулироваться. Стиль — поддерживающий: вы остаётесь доступным, но не строите больше.'
+        feedback: 'Нормирование — время постепенно передавать ответственность. Команда доказала, что может саморегулироваться. Стиль — поддерживающий: вы остаётесь доступным и подключаетесь по запросу, но перестаёте управлять каждым шагом.'
       },
       {
         letter: 'Б',
         text: 'Снова усилить контроль, чтобы сотрудники не расслабились на фоне затишья.',
         correct: false,
-        feedback: 'Контроль на этом этапе — ошибка. Команда заработала доверие и самостоятельность. Ужесточение контроля демотивирует людей и сигнализирует: руководитель нам не верит.'
+        feedback: 'Контроль на этом этапе — ошибка. Команда заработала доверие и самостоятельность. Ужесточение контроля демотивирует людей и посылает сигнал: «Я вам не верю».'
       },
       {
         letter: 'В',
         text: 'Ничего не менять — если всё проходит хорошо, не надо вмешиваться.',
         correct: false,
-        feedback: 'Пассивность — упущенная возможность. Команда готова принять больше ответственности — если не дать ей этого, она останется на плато без роста.'
+        feedback: 'Пассивность — упущенная возможность. Команда готова принять больше ответственности. Если не дать ей этого сейчас, она останется на плато без роста — и лучшие сотрудники начнут искать новые вызовы на стороне.'
       }
     ],
     interlude: {
       time: 'Спустя',
       timeHighlight: '6 месяцев',
       ok: 'Делегирование работает. Катя сама ведёт планёрки, Алексей и Игорь закрывают задачи без вашего участия. Пришло время сверяться на стратегию…',
-      err: 'Команда работает стабильно, но не растёт. Люди выполняют задачи, но инициативы выносят вам только попросив. Катя намекнула, что подумывает о другом месте работы…'
+      err: 'Команда работает стабильно, но не растёт. Люди исполняют задачи, но инициативу без вашего запроса не проявляют. Катя намекнула, что думает о смене работы — ей не хватает самостоятельности.'
     }
   },
   {
@@ -431,47 +361,45 @@ const EPISODES = [
     stageLabel: 'Высокая эффективность',
     epLabel: 'Эпизод 4 · Спустя 6 месяцев',
     title: 'Команда на пике',
-    situation: 'Команда работает автономно. Участники инициируют изменения сами, сами решают проблемы и приходят к вам уже с готовыми решениями.',
+    situation: 'Команда работает автономно. Участники инициируют изменения сами, решают проблемы и приходят к вам уже с готовыми решениями.',
     chars: [
       { name: 'Алексей', text: 'Ведёт наставничество с Игорем, встречается с ним регулярно' },
-      { name: 'Катя', text: 'Предложила улучшить процесс — вы узнали об этом от других' },
-      { name: 'Игорь', text: 'Закрыл сложную задачу без вашего участия' }
+      { name: 'Катя',    text: 'Предложила улучшить процесс — вы узнали об этом от других' },
+      { name: 'Игорь',   text: 'Закрыл сложную задачу без вашего участия' }
     ],
     options: [
       {
         letter: 'А',
         text: 'Полностью делегировать операционные вопросы и сфокусироваться на стратегии: ставить новые амбициозные вызовы и развивать команду дальше.',
         correct: true,
-        feedback: 'Стадия высокой эффективности требует делегирующего стиля. Команда компетентна и мотивирована. Ваша роль — стратегический партнёр: освобождаете команду для роста и сами занимаетесь развитием.'
+        feedback: 'Стадия высокой эффективности требует делегирующего стиля. Команда компетентна и мотивирована. Ваша роль — стратегический партнёр: освобождаете людей для роста и сами занимаетесь развитием.'
       },
       {
         letter: 'Б',
         text: 'Вернуться к жёсткому контролю, чтобы удержать высокий уровень результата.',
         correct: false,
-        feedback: 'Звёздная команда под жёстким контролем быстро демотивируется и теряет лучших сотрудников. Контроль должен соответствовать уровню зрелости команды.'
+        feedback: 'Звёздная команда под жёстким контролем быстро демотивируется и теряет лучших сотрудников. Стиль управления должен соответствовать уровню зрелости команды — а здесь он уже максимальный.'
       },
       {
         letter: 'В',
-        text: 'Стать незаменимым: самому решать все ключевые вопросы, чтобы не потерять контроль.',
+        text: 'Стать незаменимым: самому решать все ключевые вопросы, чтобы не потерять контроль над результатом.',
         correct: false,
-        feedback: 'Если вы всё решаете сами, команда перестаёт расти и вы становитесь узким местом в процессе. Принцип хорошего руководителя — сделать себя ненужным в операционном управлении.'
+        feedback: 'Если вы всё решаете сами, команда перестаёт расти, а вы становитесь узким местом в процессе. Признак сильного руководителя — сделать себя ненужным в операционном управлении.'
       }
     ],
     interlude: null
   }
 ];
 
-const STAGE_ICONS = ['s1','s2','s3','s4'];
-const STAGE_NAMES = ['Формирование','Шторминг','Нормирование','Высокая эффективность'];
-const STAGE_STYLES = ['Направляющий','Поддерживающий','Поддерживающий','Делегирующий'];
-const STAGE_RESULTS = [
+var STAGE_STYLES = ['Направляющий', 'Поддерживающий', 'Поддерживающий', 'Делегирующий'];
+var STAGE_RESULTS = [
   'Установлены роли, цели и правила',
   'Конфликт проработан, команда договорилась',
   'Делегирование запущено, команда растёт',
   'Полная автономия, вы занимаетесь стратегией'
 ];
 
-let state = {
+var state = {
   screen: 'intro',
   epIdx: 0,
   answered: false,
@@ -480,170 +408,193 @@ let state = {
 };
 
 function render() {
-  const app = document.getElementById('app');
-  if (state.screen === 'intro') app.innerHTML = renderIntro();
-  else if (state.screen === 'episode') app.innerHTML = renderEpisode();
+  var app = document.getElementById('app');
+  if      (state.screen === 'intro')     app.innerHTML = renderIntro();
+  else if (state.screen === 'episode')   app.innerHTML = renderEpisode();
   else if (state.screen === 'interlude') app.innerHTML = renderInterlude();
-  else if (state.screen === 'final') app.innerHTML = renderFinal();
+  else if (state.screen === 'final')     app.innerHTML = renderFinal();
+  notifyHeight();
 }
 
 function renderIntro() {
-  return `<div class="intro">
-    <div class="eyebrow">Модель Такмена</div>
-    <div class="page-title">Стадии<span>развития команды</span></div>
-    <div class="divider"></div>
-    <div class="intro-legend">
-      <div class="legend-tag">Контекст</div>
-      Вы — руководитель проектного отдела. В команде три человека: <strong>Алексей</strong> (ветеран), <strong>Катя</strong> (аккаунт-менеджер) и новичок <strong>Игорь</strong>.<br><br>
-      Ваша задача — по косвенным признакам определить <strong>стадию развития команды</strong> и применить верный стиль лидерства на каждом этапе.
-    </div>
-    <div class="stages-grid">
-      <div class="stage-chip s1"><div class="stage-num">1 этап</div><div class="stage-name">Формирование</div><div class="stage-desc">Вежливость, неопределённость, поиск ориентиров</div></div>
-      <div class="stage-chip s2"><div class="stage-num">2 этап</div><div class="stage-name">Шторм</div><div class="stage-desc">Конфликты, борьба за правила, эмоции</div></div>
-      <div class="stage-chip s3"><div class="stage-num">3 этап</div><div class="stage-name">Нормализация</div><div class="stage-desc">Саморегуляция, доверие, общие правила</div></div>
-      <div class="stage-chip s4"><div class="stage-num">4 этап</div><div class="stage-name">Высокая эффективность</div><div class="stage-desc">Автономия, высокая результативность</div></div>
-    </div>
-    <button class="btn-start" onclick="startSim()">Начать →</button>
-  </div>`;
+  return '<div class="intro anim-fade-up">'
+    + '<h1 class="page-title">Стадии<span>развития команды</span></h1>'
+    + '<div class="divider"></div>'
+    + '<div class="legend-box">'
+      + '<div class="legend-tag">Контекст</div>'
+      + 'Вы — руководитель проектного отдела. В команде три человека: <strong>Алексей</strong> (ветеран), <strong>Катя</strong> (аккаунт-менеджер) и новичок <strong>Игорь</strong>.<br><br>'
+      + 'Ваша задача — по косвенным признакам определить <strong>стадию развития команды</strong> и применить верный стиль лидерства на каждом этапе.'
+    + '</div>'
+    + '<div class="stages-grid">'
+      + '<div class="stage-chip s1"><div class="stage-num">1 этап</div><div class="stage-name">Формирование</div><div class="stage-desc">Вежливость, неопределённость, поиск ориентиров</div></div>'
+      + '<div class="stage-chip s2"><div class="stage-num">2 этап</div><div class="stage-name">Шторм</div><div class="stage-desc">Конфликты, борьба за правила, эмоции</div></div>'
+      + '<div class="stage-chip s3"><div class="stage-num">3 этап</div><div class="stage-name">Нормализация</div><div class="stage-desc">Саморегуляция, доверие, общие правила</div></div>'
+      + '<div class="stage-chip s4"><div class="stage-num">4 этап</div><div class="stage-name">Высокая эффективность</div><div class="stage-desc">Автономия, высокая результативность</div></div>'
+    + '</div>'
+    + '<button class="btn-start" onclick="startSim()">Начать →</button>'
+    + '</div>';
 }
 
 function renderEpProgress() {
-  const ep = EPISODES[state.epIdx];
-  let dots = '';
-  EPISODES.forEach((e, i) => {
-    const cls = i < state.epIdx ? 'done' : i === state.epIdx ? 'active' : '';
-    dots += `<div class="ep-dot ${cls}">${i+1}</div>`;
+  var ep = EPISODES[state.epIdx];
+  var dots = '';
+  EPISODES.forEach(function(e, i) {
+    var cls = i < state.epIdx ? 'done' : i === state.epIdx ? 'active' : '';
+    dots += '<div class="ep-dot ' + cls + '">' + (i + 1) + '</div>';
     if (i < EPISODES.length - 1) {
-      dots += `<div class="ep-line ${i < state.epIdx ? 'done' : ''}"></div>`;
+      dots += '<div class="ep-line ' + (i < state.epIdx ? 'done' : '') + '"></div>';
     }
   });
-  return `<div class="ep-progress">
-    <div class="ep-dots">${dots}</div>
-    <div class="ep-label">${ep.epLabel}</div>
-  </div>`;
+  return '<div class="ep-progress">'
+    + '<div class="ep-dots">' + dots + '</div>'
+    + '<div class="ep-label">' + ep.epLabel + '</div>'
+    + '</div>';
 }
 
 function renderEpisode() {
-  const ep = EPISODES[state.epIdx];
-  const opts = ep.options.map((o, i) => {
-    let cls = 'opt-btn';
+  var ep = EPISODES[state.epIdx];
+  var result    = state.results[state.epIdx];
+  var chosenIdx = result ? result.chosenIdx : undefined;
+  var isCorrect = result ? result.isCorrect  : undefined;
+  var chosenOpt = chosenIdx !== undefined ? ep.options[chosenIdx] : null;
+  var correctOpt = ep.options.find(function(o) { return o.correct; });
+
+  // Последний эпизод без интерлюдии → итоги
+  var btnText = ep.interlude
+    ? 'Посмотреть последствия →'
+    : 'Посмотреть итоги →';
+
+  var opts = ep.options.map(function(o, i) {
+    var cls = 'opt-btn';
     if (state.answered) {
-      cls += o.correct ? ' correct' : ' wrong';
-      if (!o.correct && !state.results[state.epIdx]?.chosenIdx?.includes?.(i)) cls += ' neutral';
+      if (o.correct) {
+        cls += ' correct disabled';
+      } else if (chosenIdx === i) {
+        cls += ' wrong disabled';
+      } else {
+        cls += ' neutral disabled';
+      }
     }
-    return `<button class="opt-btn ${state.answered ? (o.correct ? 'correct disabled' : (state.results[state.epIdx] && state.results[state.epIdx].chosenIdx === i ? 'wrong disabled' : 'neutral disabled')) : ''}"
-      onclick="chooseOption(${i})">
-      <div class="opt-letter">${o.letter}</div>
-      <div class="opt-text">${o.text}</div>
-    </button>`;
+    return '<button class="' + cls + '" onclick="chooseOption(' + i + ')">'
+      + '<div class="opt-letter">' + o.letter + '</div>'
+      + '<div class="opt-text">' + o.text + '</div>'
+      + '</button>';
   }).join('');
 
-  const chosenIdx = state.results[state.epIdx]?.chosenIdx;
-  const isCorrect = state.results[state.epIdx]?.isCorrect;
-  const chosenOpt = chosenIdx !== undefined ? ep.options[chosenIdx] : null;
+  var fbClass = state.answered ? ('feedback-box show ' + (isCorrect ? 'correct' : 'wrong')) : 'feedback-box';
+  var fbHead  = state.answered ? (isCorrect ? '✓ Верное решение' : '✕ Неверное решение') : '';
+  var fbBody  = '';
+  if (state.answered && chosenOpt) {
+    fbBody = chosenOpt.feedback;
+    if (!isCorrect) {
+      fbBody += '<br><br><strong style="color:var(--dark)">Правильное действие — вариант '
+        + correctOpt.letter + ':</strong> ' + correctOpt.text;
+    }
+  }
 
-  return `<div class="episode">
-    ${renderEpProgress()}
-    <div class="ep-stage-badge ${ep.stageCls}">${ep.stageLabel}</div>
-    <div class="ep-card">
-      <div class="ep-card-header">
-        <div class="ep-card-label">${ep.epLabel}</div>
-        <div class="ep-card-title">${ep.title}</div>
-      </div>
-      <div class="ep-scene">
-        <div class="ep-scene-text">${ep.situation}</div>
-        <div class="ep-chars">${ep.chars.map(c => `<div class="char-bubble"><div class="char-name">${c.name}</div>${c.text}</div>`).join('')}</div>
-      </div>
-    </div>
-    <div class="options-label">Выберите действие</div>
-    <div class="options">${opts}</div>
-    <div class="feedback-box ${state.answered ? (isCorrect ? 'correct show' : 'wrong show') : ''}" id="fb">
-      <div class="feedback-head">${isCorrect ? '✓ Верное решение' : '✕ Неверное решение'}</div>
-      ${chosenOpt ? chosenOpt.feedback : ''}
-      ${!isCorrect && chosenOpt ? `<br><strong style="color:var(--dark)">Правильное действие — вариант Б:</strong> ${ep.options.find(o=>o.correct).text}` : ''}
-    </div>
-    <button class="btn-next ${state.answered ? 'show' : ''}" id="btn-next" onclick="afterAnswer()">
-      ${ep.interlude ? 'Спустя месяц →' : ('Эпизод ' + (state.epIdx+2) + ' →')}
-    </button>
-  </div>`;
+  var chars = ep.chars.map(function(c) {
+    return '<div class="char-bubble"><div class="char-name">' + c.name + '</div>' + c.text + '</div>';
+  }).join('');
+
+  return '<div class="episode">'
+    + renderEpProgress()
+    + '<div class="ep-stage-badge ' + ep.stageCls + '">' + ep.stageLabel + '</div>'
+    + '<div class="ep-card">'
+      + '<div class="ep-card-header">'
+        + '<div class="ep-card-label">' + ep.epLabel + '</div>'
+        + '<div class="ep-card-title">' + ep.title + '</div>'
+      + '</div>'
+      + '<div class="ep-scene">'
+        + '<div class="ep-scene-text">' + ep.situation + '</div>'
+        + '<div class="ep-chars">' + chars + '</div>'
+      + '</div>'
+    + '</div>'
+    + '<div class="options-label">Выберите действие</div>'
+    + '<div class="options">' + opts + '</div>'
+    + '<div class="' + fbClass + '" id="fb">'
+      + (fbHead ? '<div class="feedback-head">' + fbHead + '</div>' : '')
+      + fbBody
+    + '</div>'
+    + '<button class="btn-next ' + (state.answered ? 'show' : '') + '" id="btn-next" onclick="afterAnswer()">'
+      + btnText
+    + '</button>'
+    + '</div>';
 }
 
 function renderInterlude() {
-  const ep = EPISODES[state.epIdx];
-  const il = ep.interlude;
-  const prevResult = state.results[state.epIdx];
-  const isOk = prevResult && prevResult.isCorrect;
-  const summaryText = isOk ? il.ok : il.err;
-  const summaryColor = isOk ? 'var(--green)' : 'var(--red)';
-  const summaryBg = isOk ? 'var(--green-bg)' : 'var(--red-bg)';
-  const summaryBorder = isOk ? 'var(--green-border)' : 'var(--red-border)';
-  return `<div class="interlude">
-    <div class="interlude-time">${il.time}<br><span>${il.timeHighlight}</span></div>
-    <div class="interlude-sub">Фаза прошла. Взгляните на команду...</div>
-    <div class="interlude-summary" style="border-left:4px solid ${summaryColor};background:${summaryBg};border-color:${summaryBorder}">
-      <div class="interlude-summary-title" style="color:${summaryColor}">${isOk ? 'Что изменилось к лучшему' : 'Последствия ошибки'}</div>
-      ${summaryText}
-    </div>
-    <button class="btn-continue" onclick="continueFromInterlude()">Продолжить →</button>
-  </div>`;
+  var ep = EPISODES[state.epIdx];
+  var il = ep.interlude;
+  var prevResult = state.results[state.epIdx];
+  var isOk = prevResult && prevResult.isCorrect;
+  var summaryText = isOk ? il.ok : il.err;
+  var color  = isOk ? 'var(--green)'        : 'var(--red)';
+  var bg     = isOk ? 'var(--green-bg)'     : 'var(--red-bg)';
+  var border = isOk ? 'var(--green-border)' : 'var(--red-border)';
+  var title  = isOk ? 'Что изменилось к лучшему' : 'Последствия ошибки';
+
+  return '<div class="interlude">'
+    + '<div class="interlude-time">' + il.time + '<br><span>' + il.timeHighlight + '</span></div>'
+    + '<div class="interlude-sub">Фаза прошла. Взгляните на команду...</div>'
+    + '<div class="interlude-summary" style="border-left:4px solid ' + color + ';background:' + bg + ';border-color:' + border + '">'
+      + '<div class="interlude-summary-title" style="color:' + color + '">' + title + '</div>'
+      + summaryText
+    + '</div>'
+    + '<button class="btn-continue" onclick="continueFromInterlude()">Продолжить →</button>'
+    + '</div>';
 }
 
 function renderFinal() {
-  const correct = state.correctCount;
-  const total = EPISODES.length;
-  const pct = Math.round((correct / total) * 100);
+  var correct = state.correctCount;
+  var total   = EPISODES.length;
+  var pct     = Math.round((correct / total) * 100);
 
-  const wrongEps = state.results.map((r,i) => r.isCorrect ? null : i+1).filter(Boolean);
+  var wrongEps = state.results.map(function(r, i) { return r.isCorrect ? null : i + 1; }).filter(Boolean);
 
-  let insight = '';
+  var insight = '';
   if (correct === 4) {
     insight = 'Отлично. Вы чётко распознали каждую стадию и подобрали стиль под неё. Игорь вырос в самостоятельного специалиста, Алексей стал ментором, а Катя взяла на себя роль координатора.';
-  } else if (wrongEps.includes(1) && wrongEps.includes(2)) {
-    insight = 'Отсутствие структуры на старте усилило шторминг. Команда дошла до высокой эффективности, но путь занял вдвое больше времени, чем мог. Игорь остался в отделе, но до сих пор не вышел на полную мощность.';
-  } else if (wrongEps.includes(1)) {
-    insight = 'Отсутствие чёткой структуры на старте добавило топлива шторминг. Вы выправились дальше — но если бы в эпизоде 1 вы заложили фундамент, путь к высокой эффективности был бы короче.';
-  } else if (wrongEps.includes(2)) {
+  } else if (wrongEps.indexOf(1) !== -1 && wrongEps.indexOf(2) !== -1) {
+    insight = 'Отсутствие структуры на старте усилило шторминг. Команда дошла до высокой эффективности, но путь занял вдвое больше времени, чем мог.';
+  } else if (wrongEps.indexOf(1) !== -1) {
+    insight = 'Отсутствие чёткой структуры на старте добавило топлива в шторминг. Вы выправились дальше — но если бы в эпизоде 1 вы заложили фундамент, путь к высокой эффективности был бы короче.';
+  } else if (wrongEps.indexOf(2) !== -1) {
     insight = 'Шторминг был подавлен, а не проработан. Команда двигается вперёд, но Алексей и Игорь всё ещё работают параллельно, а не в связке. Скрытые напряжения могут снова вырваться.';
-  } else if (wrongEps.includes(3)) {
-    insight = 'Слишком жёсткий контроль на этапе нормирования задержал рост команды. Катя всё же решила уйти, но вернулась после разговора. Игорь и Алексей вышли на уровень высокой эффективности.';
-  } else if (wrongEps.includes(4)) {
-    insight = 'Три этапа пройдены блестяще. Но в последний момент вы стали незаменимым, вместо того чтобы отпустить команду на автономию. Готовая к высокой эффективности команда немного застыла.';
+  } else if (wrongEps.indexOf(3) !== -1) {
+    insight = 'Слишком жёсткий контроль на этапе нормирования задержал рост команды. Игорь и Алексей всё равно вышли на высокую эффективность — но позже, чем могли.';
+  } else if (wrongEps.indexOf(4) !== -1) {
+    insight = 'Три этапа пройдены блестяще. Но в последний момент вместо того чтобы отпустить команду на автономию, вы снова взяли операционку на себя. Готовая к пику команда немного застыла.';
   } else {
     insight = 'Хороший результат. В некоторых моментах стиль не совпал со стадией, но команда всё равно вышла на хороший уровень.';
   }
 
-  const journeyHtml = state.results.map((r, i) => {
-    const ep = EPISODES[i];
-    return `<div class="journey-step ${ep.stageCls}" style="animation-delay:${i*0.08}s">
-      <div>
-        <div class="journey-step-stage">${ep.stageLabel}</div>
-        <div class="journey-step-action">${STAGE_STYLES[i]} стиль</div>
-        <div class="journey-step-result">${STAGE_RESULTS[i]}</div>
-      </div>
-      <div class="journey-step-badge ${r.isCorrect ? 'badge-ok' : 'badge-err'}">${r.isCorrect ? '✓' : '✕'}</div>
-    </div>`;
+  var journeyHtml = state.results.map(function(r, i) {
+    var ep = EPISODES[i];
+    return '<div class="journey-step ' + ep.stageCls + '" style="animation-delay:' + (i * 0.08) + 's">'
+      + '<div>'
+        + '<div class="journey-step-stage">' + ep.stageLabel + '</div>'
+        + '<div class="journey-step-action">' + STAGE_STYLES[i] + ' стиль</div>'
+        + '<div class="journey-step-result">' + STAGE_RESULTS[i] + '</div>'
+      + '</div>'
+      + '<div class="journey-step-badge ' + (r.isCorrect ? 'badge-ok' : 'badge-err') + '">'
+        + (r.isCorrect ? '✓' : '✕')
+      + '</div>'
+      + '</div>';
   }).join('');
 
-  return `<div class="final">
-    <div class="final-hero">
-      <div class="final-icon">🎯</div>
-      <div class="final-title">Симуляция завершена</div>
-      <div class="final-sub">${insight}</div>
-    </div>
-    <div class="score-row">
-      <div class="score-chip">
-        <div class="score-chip-num">${correct}<span style="font-size:18px;color:var(--slate)">/${total}</span></div>
-        <div class="score-chip-label">верных решений</div>
-      </div>
-      <div class="score-chip">
-        <div class="score-chip-num">${pct}%</div>
-        <div class="score-chip-label">точность</div>
-      </div>
-    </div>
-    <div class="journey-title">Путь команды</div>
-    <div class="journey-steps">${journeyHtml}</div>
-    <button class="btn-restart" onclick="restartSim()">↺ Пройти заново</button>
-  </div>`;
+  return '<div class="anim-fade-up">'
+    + '<div class="result-hero">'
+      + '<div class="result-hero__icon">🎯</div>'
+      + '<div class="result-hero__title">Симуляция завершена</div>'
+      + '<div class="result-hero__text">' + insight + '</div>'
+    + '</div>'
+    + '<div class="score-row mt-sm">'
+      + '<div class="score-chip"><div class="score-chip-num">' + correct + '<span style="font-size:18px;color:var(--slate)">/' + total + '</span></div><div class="score-chip-label">верных решений</div></div>'
+      + '<div class="score-chip"><div class="score-chip-num">' + pct + '%</div><div class="score-chip-label">точность</div></div>'
+    + '</div>'
+    + '<div class="journey-title mt-sm">Путь команды</div>'
+    + '<div class="journey-steps">' + journeyHtml + '</div>'
+    + '<button class="btn-restart" onclick="restartSim()">↺ Пройти заново</button>'
+    + '</div>';
 }
 
 function startSim() {
@@ -654,16 +605,16 @@ function startSim() {
 function chooseOption(idx) {
   if (state.answered) return;
   state.answered = true;
-  const ep = EPISODES[state.epIdx];
-  const opt = ep.options[idx];
-  const isCorrect = opt.correct;
+  var ep  = EPISODES[state.epIdx];
+  var opt = ep.options[idx];
+  var isCorrect = opt.correct;
   if (isCorrect) state.correctCount++;
-  state.results[state.epIdx] = { chosenIdx: idx, isCorrect };
+  state.results[state.epIdx] = { chosenIdx: idx, isCorrect: isCorrect };
   render();
 }
 
 function afterAnswer() {
-  const ep = EPISODES[state.epIdx];
+  var ep = EPISODES[state.epIdx];
   if (ep.interlude) {
     state.screen = 'interlude';
   } else {
@@ -681,11 +632,7 @@ function afterAnswer() {
 function continueFromInterlude() {
   state.epIdx++;
   state.answered = false;
-  if (state.epIdx >= EPISODES.length) {
-    state.screen = 'final';
-  } else {
-    state.screen = 'episode';
-  }
+  state.screen = state.epIdx >= EPISODES.length ? 'final' : 'episode';
   render();
 }
 
