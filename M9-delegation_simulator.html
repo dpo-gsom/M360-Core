@@ -4,110 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Симулятор делегирования</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="common.js"></script>
+
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --red: #C31532;
-  --dark: #003B48;
-  --slate: #495761;
-  --cream: #FAF8F4;
-  --sand: #F0EDE6;
-  --border: #DDD8CF;
-  --white: #FFFFFF;
-  --green: #1A6B4A;
-  --green-bg: #EBF5EF;
-  --green-border: #A8D5BC;
-  --red-bg: #FEF0F2;
-  --red-border: #F2A0AC;
-  --amber: #8A6200;
-  --amber-bg: #FFF8E6;
-  --amber-border: #E8C96A;
-}
-
-body {
-  font-family: 'Manrope', sans-serif;
-  background: var(--cream);
-  min-height: 100vh;
-  color: var(--dark);
-  overflow-x: hidden;
-}
-
-body::before {
-  content: '';
-  position: fixed; top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--red) 0%, var(--dark) 50%, var(--red) 100%);
-  z-index: 200;
-}
-
 #app { max-width: 680px; margin: 0 auto; padding: 44px 20px 60px; }
 
-.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 18px; }
-.page-title { font-family: 'Playfair Display', serif; font-size: clamp(26px, 6vw, 44px); font-weight: 900; color: var(--dark); line-height: 1.15; margin-bottom: 6px; }
-.page-title span { color: var(--red); display: block; }
-.divider { width: 50px; height: 2px; background: var(--red); margin: 20px 0; }
-
 /* ── INTRO ── */
-.intro { animation: fadeUp 0.5s ease both; }
-.legend-box {
-  background: var(--dark); color: var(--white);
-  border-radius: 10px; padding: 20px 22px; margin: 24px 0;
-  font-size: 14px; line-height: 1.7;
-}
-.legend-tag {
-  display: inline-block; background: var(--red); color: var(--white);
-  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-  padding: 3px 10px; border-radius: 3px; margin-bottom: 12px;
-}
 .stages-preview {
   display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0 28px;
 }
 .stage-prev {
-  border-radius: 8px; padding: 14px; border: 1.5px solid var(--border);
-  background: var(--white);
+  border-radius: var(--radius-md); padding: 14px;
+  border: 1.5px solid var(--border); background: var(--white);
 }
-.stage-prev-num { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
+.stage-prev-num   { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
 .stage-prev-title { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
-.stage-prev-desc { font-size: 12px; color: var(--slate); line-height: 1.5; }
-.btn-start {
-  display: flex; align-items: center; justify-content: center; width: 100%;
-  background: var(--dark); color: var(--white); border: none; border-radius: 4px;
-  padding: 15px; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-}
-.btn-start:hover { background: var(--red); transform: translateY(-1px); }
+.stage-prev-desc  { font-size: 12px; color: var(--slate); line-height: 1.5; }
 
 /* ── STAGE HEADER ── */
 .stage-header { margin-bottom: 24px; }
 .stage-badge {
   display: inline-flex; align-items: center; gap: 8px;
-  background: var(--dark); color: var(--white);
-  padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  background: var(--dark); color: var(--white); padding: 5px 14px;
+  border-radius: 20px; font-size: 11px; font-weight: 700;
   letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;
 }
-.stage-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+.stage-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
 .stage-task {
   background: var(--white); border: 1.5px solid var(--border);
-  border-radius: 8px; padding: 14px 16px; font-size: 14px; line-height: 1.65; color: var(--slate);
+  border-radius: var(--radius-md); padding: 14px 16px; font-size: 14px; line-height: 1.65; color: var(--slate);
 }
 
-/* ── EMPLOYEE CARDS ── */
-.employees-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;
-}
+/* ── КАРТОЧКИ СОТРУДНИКОВ ── */
+.employees-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 .emp-card {
   background: var(--white); border: 2px solid var(--border);
-  border-radius: 12px; padding: 16px; cursor: pointer;
+  border-radius: var(--radius-lg); padding: 16px; cursor: pointer;
   transition: border-color 0.18s, background 0.18s, transform 0.15s, box-shadow 0.18s;
-  position: relative;
 }
 .emp-card:hover { border-color: var(--dark); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,59,72,0.1); }
-.emp-card.selected-best { border-color: var(--green); background: var(--green-bg); }
-.emp-card.selected-ok   { border-color: var(--amber); background: var(--amber-bg); }
-.emp-card.selected-bad  { border-color: var(--red);   background: var(--red-bg); }
-.emp-card.dimmed { opacity: 0.4; pointer-events: none; }
+
+/* После выбора */
+.emp-card.selected     { border-color: var(--dark); background: #EEF3FB; box-shadow: 0 0 0 3px rgba(0,59,72,0.12); }
+.emp-card.dimmed       { opacity: 0.38; pointer-events: none; }
 
 .emp-avatar {
   width: 36px; height: 36px; border-radius: 50%;
@@ -115,137 +59,117 @@ body::before {
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 700; color: var(--slate); margin-bottom: 10px;
 }
-.emp-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+.emp-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+.emp-status {
+  font-size: 11px; font-weight: 600; color: var(--slate);
+  margin-bottom: 8px; display: flex; align-items: center; gap: 5px;
+}
+.emp-status.warn  { color: var(--amber); }
+.emp-status.good  { color: var(--green); }
 .emp-tag {
   display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px;
   text-transform: uppercase; padding: 2px 8px; border-radius: 3px; margin-bottom: 8px;
 }
-.emp-tag.novice  { background: var(--t-instr-bg,#EEF3FB); color: #1A5FA5; }
-.emp-tag.avoid   { background: var(--t-avoid-bg,#F2F2F2); color: #7A7A7A; }
-.emp-tag.unconf  { background: var(--amber-bg);            color: var(--amber); }
-.emp-tag.pro     { background: var(--green-bg);            color: var(--green); }
-.emp-tag.owner   { background: var(--red-bg);              color: var(--red); }
+.emp-tag.novice  { background: #EEF3FB; color: #1A5FA5; }
+.emp-tag.avoid   { background: #F2F2F2; color: #7A7A7A; }
+.emp-tag.unconf  { background: var(--amber-bg); color: var(--amber); }
+.emp-tag.pro     { background: var(--amber-bg); color: var(--amber); }
+.emp-tag.owner   { background: var(--green-bg);  color: var(--green); }
 .emp-desc { font-size: 12px; color: var(--slate); line-height: 1.5; }
 
-/* ── FEEDBACK BOX ── */
-.feedback-box {
-  border-radius: 10px; padding: 16px 18px; margin-bottom: 16px;
-  font-size: 14px; line-height: 1.65; display: none; animation: fadeUp 0.3s ease both;
+/* ── СОПКИ — БЛОКИ ── */
+.sopki-header {
+  display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px;
 }
-.feedback-box.show { display: block; }
-.feedback-box.best   { background: var(--green-bg); border-left: 4px solid var(--green); color: #1A4A35; }
-.feedback-box.ok     { background: var(--amber-bg); border-left: 4px solid var(--amber); color: var(--amber); }
-.feedback-box.bad    { background: var(--red-bg);   border-left: 4px solid var(--red);   color: #7A1525; }
-.feedback-box.correct { background: var(--green-bg); border-left: 4px solid var(--green); color: #1A4A35; }
-.feedback-box.wrong   { background: var(--red-bg);   border-left: 4px solid var(--red);   color: #7A1525; }
-.feedback-head { font-weight: 700; margin-bottom: 6px; font-size: 13px; }
-
-.btn-action {
-  width: 100%; background: var(--dark); color: var(--white);
-  border: none; border-radius: 6px; padding: 14px;
-  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
-  cursor: pointer; transition: background 0.2s; display: none;
+.sopki-counter {
+  font-size: 13px; color: var(--slate);
 }
-.btn-action:hover { background: var(--red); }
-.btn-action.show { display: block; }
+.sopki-counter strong { color: var(--dark); font-weight: 700; }
 
-/* ── SOPKI ── */
-.sopki-screen { animation: fadeUp 0.5s ease both; }
-
-.sopki-legend {
-  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
-}
-.sopki-letter {
-  padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
-  background: var(--white); border: 1.5px solid var(--border); color: var(--slate);
-}
-.sopki-letter span { color: var(--red); font-size: 14px; }
-
-.counter-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px; font-size: 13px; color: var(--slate);
-}
-.counter-num { font-weight: 700; color: var(--dark); font-size: 15px; }
-.counter-hint { font-size: 12px; color: var(--slate); }
-
-.blocks-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
-
+.blocks-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 .block-item {
-  border: 2px solid var(--border); border-radius: 10px;
-  background: var(--white); cursor: pointer;
-  transition: all 0.18s; overflow: hidden;
+  border: 2px solid var(--border); border-radius: var(--radius-md);
+  background: var(--white); cursor: pointer; transition: border-color 0.15s, background 0.15s;
 }
-.block-item:hover { border-color: var(--dark); background: var(--sand); }
-.block-item.selected { border-color: var(--dark); background: var(--sand); }
-.block-item.selected.trap { border-color: var(--red); background: var(--red-bg); }
-.block-item.trap-revealed { border-color: var(--red); background: var(--red-bg); pointer-events: none; }
-.block-item.required-revealed { border-color: var(--green); background: var(--green-bg); pointer-events: none; }
-.block-item.dimmed { opacity: 0.35; pointer-events: none; }
+.block-item:hover   { border-color: var(--dark); background: var(--sand); }
+.block-item.selected { border-color: var(--dark); background: #EEF3FB; }
+
+/* Revealed states (финал) */
+.block-item.reveal-good  { border-color: var(--green); background: var(--green-bg); pointer-events: none; }
+.block-item.reveal-trap  { border-color: var(--red);   background: var(--red-bg);   pointer-events: none; }
+.block-item.reveal-miss  { border-color: var(--amber); background: var(--amber-bg); pointer-events: none; }
+.block-item.reveal-skip  { opacity: 0.35; pointer-events: none; }
 
 .block-inner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; }
 .block-check {
-  width: 20px; height: 20px; border-radius: 4px;
-  border: 2px solid var(--border); flex-shrink: 0; margin-top: 2px;
+  width: 20px; height: 20px; border-radius: 4px; border: 2px solid var(--border);
+  flex-shrink: 0; margin-top: 2px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; transition: all 0.18s; background: var(--white);
+  font-size: 12px; transition: all 0.15s; background: var(--white);
 }
 .block-item.selected .block-check { background: var(--dark); border-color: var(--dark); color: var(--white); }
-.block-item.selected.trap .block-check { background: var(--red); border-color: var(--red); color: var(--white); }
-.block-item.trap-revealed .block-check { background: var(--red); border-color: var(--red); color: var(--white); }
-.block-item.required-revealed .block-check { background: var(--green); border-color: var(--green); color: var(--white); }
+.block-item.reveal-good .block-check { background: var(--green); border-color: var(--green); color: var(--white); }
+.block-item.reveal-trap .block-check { background: var(--red);   border-color: var(--red);   color: var(--white); }
+.block-item.reveal-miss .block-check { background: var(--amber); border-color: var(--amber); color: var(--white); }
 
-.block-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
-.block-item.selected:not(.trap) .block-label { color: var(--dark); }
-.block-item.selected.trap .block-label,
-.block-item.trap-revealed .block-label { color: var(--red); }
-.block-item.required-revealed .block-label { color: var(--green); }
+.block-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 4px; color: var(--slate);
+}
+.block-item.selected .block-label  { color: var(--dark); }
+.block-item.reveal-good .block-label { color: var(--green); }
+.block-item.reveal-trap .block-label { color: var(--red);   }
+.block-item.reveal-miss .block-label { color: var(--amber); }
 .block-text { font-size: 13px; line-height: 1.6; color: var(--slate); }
 
-.btn-check {
-  width: 100%; background: var(--dark); color: var(--white);
-  border: none; border-radius: 6px; padding: 14px;
-  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
-  cursor: pointer; transition: background 0.2s, opacity 0.2s;
-  opacity: 0.4; pointer-events: none;
+/* ── КНОПКИ ── */
+.btn-start, .btn-stage-next, .btn-sopki-proceed {
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  background: var(--dark); color: var(--white); border: none; border-radius: 4px;
+  padding: 14px; font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, transform 0.15s, opacity 0.2s;
 }
-.btn-check.ready { opacity: 1; pointer-events: all; }
-.btn-check:hover { background: var(--red); }
+.btn-start:hover, .btn-stage-next:hover { background: var(--red); transform: translateY(-1px); }
+.btn-sopki-proceed:hover:not(:disabled)  { background: var(--red); transform: translateY(-1px); }
+.btn-sopki-proceed:disabled { opacity: 0.35; cursor: not-allowed; }
 
-/* ── FINAL ── */
-.final { animation: fadeUp 0.5s ease both; }
-.final-hero {
-  background: var(--dark); color: var(--white);
-  border-radius: 12px; padding: 28px 24px; text-align: center; margin-bottom: 24px;
-}
-.final-icon { font-size: 44px; margin-bottom: 14px; }
-.final-title { font-family: 'Playfair Display', serif; font-size: clamp(20px,5vw,30px); font-weight: 900; margin-bottom: 10px; }
-.final-sub { font-size: 14px; line-height: 1.65; color: rgba(255,255,255,0.75); }
-
-.summary-stages { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-.summary-stage {
-  border-radius: 10px; padding: 16px 18px; border: 1.5px solid;
-}
-.summary-stage.best   { background: var(--green-bg); border-color: var(--green-border); }
-.summary-stage.ok     { background: var(--amber-bg); border-color: var(--amber-border); }
-.summary-stage.perfect { background: var(--green-bg); border-color: var(--green-border); }
-.summary-stage.partial { background: var(--amber-bg); border-color: var(--amber-border); }
-.summary-stage.trap-chosen { background: var(--red-bg); border-color: var(--red-border); }
-
-.summary-stage-num { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; color: var(--slate); }
-.summary-stage-title { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
-.summary-stage-text { font-size: 13px; line-height: 1.6; color: var(--slate); }
+.btn-stage-next:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .btn-restart {
   width: 100%; background: var(--white); color: var(--dark);
-  border: 1.5px solid var(--border); border-radius: 6px; padding: 14px;
-  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  border: 1.5px solid var(--border); border-radius: 4px; padding: 14px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
   letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
 .btn-restart:hover { border-color: var(--dark); background: var(--sand); }
 
-@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-@keyframes cardIn { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+/* ── ФИНАЛ ── */
+.sopki-breakdown {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 20px;
+}
+.breakdown-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--slate); margin-bottom: 14px;
+}
+.breakdown-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; line-height: 1.55; padding: 6px 0;
+  border-bottom: 1px solid var(--sand); color: var(--slate);
+}
+.breakdown-row:last-child { border-bottom: none; }
+.breakdown-icon { font-size: 14px; flex-shrink: 0; width: 20px; text-align: center; }
+
+.summary-stages { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.summary-stage { border-radius: var(--radius-md); padding: 16px 18px; border: 1.5px solid; }
+.summary-stage.best    { background: var(--green-bg); border-color: var(--green-border); }
+.summary-stage.ok      { background: var(--amber-bg); border-color: var(--amber-border); }
+.summary-stage.bad     { background: var(--red-bg);   border-color: var(--red-border);   }
+.summary-stage-num   { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; color: var(--slate); }
+.summary-stage-title { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+.summary-stage-text  { font-size: 13px; line-height: 1.6; color: var(--slate); }
 
 @media (max-width: 480px) {
   .employees-grid { grid-template-columns: 1fr; }
@@ -256,378 +180,371 @@ body::before {
 <body>
 <div id="app"></div>
 <script>
-const EMPLOYEES = [
+// ─── ДАННЫЕ ────────────────────────────────────────────────────────────────
+
+var EMPLOYEES = [
   {
-    id: 'igor', initials: 'ИГ', name: 'Игорь', tagCls: 'novice', tag: 'Новичок',
+    id: 'igor', initials: 'ИГ', name: 'Игорь', acc: 'Игоря', gen: 'Игоря',
     desc: 'В компании 2 месяца. Высокая энергия, готов браться за всё, но регулярно совершает ошибки в простых регламентах.',
     quality: 'bad',
-    feedbackHead: 'Делегирование не рекомендуется',
-    feedback: 'У Игоря нет необходимых компетенций для проекта такого масштаба. Делегирование здесь превратится в «бросание под танк» — он не справится, а вам придётся спасать ситуацию.'
+    outcome: {
+      perfect: 'Даже чёткая постановка не помогла — у Игоря просто нет нужных компетенций и связей. Несколько раз приходилось вмешиваться лично. Регламент появился, но с задержкой в три недели и при вашем прямом участии.',
+      partial:  'Нечёткая постановка плюс недостаточный опыт — Игорь быстро потерял ориентиры. Проект фактически вёлся вами, а не им.',
+      trap:     'Попытка проверять каждый шаг дала предсказуемый результат: Игорь ждал одобрения на любое действие — задача осталась вашей.'
+    }
   },
   {
-    id: 'marina', initials: 'МА', name: 'Марина', tagCls: 'avoid', tag: 'Избегательный тип',
+    id: 'marina', initials: 'МА', name: 'Марина', acc: 'Марину', gen: 'Марины',
     desc: 'В компании 2 года. Делает ровно то, что прописано в инструкции. На новые задачи отвечает: «Боюсь подвести отдел».',
     quality: 'bad',
-    feedbackHead: 'Делегирование не рекомендуется',
-    feedback: 'Тип мотивации Марины направлен на минимизацию усилий. Без жёсткого контроля на каждом шаге задача будет саботирована — не открыто, а через затягивание и отговорки.'
+    outcome: {
+      perfect: 'Марина получила отличное сообщение, но тип мотивации не поменяешь формулировками. Первые две недели «изучала вопрос», потом «уточняла детали». К дедлайну был готов черновик.',
+      partial:  'Без чётких ожиданий и понимания, что от неё хотят, Марина нашла десяток причин ничего не делать. Дедлайн провален, задача вернулась к вам.',
+      trap:     'Попытка контролировать каждый шаг дала Марине официальный повод тормозить: «Жду вашего ответа — пока ничего не могу сделать».'
+    }
   },
   {
-    id: 'katya', initials: 'КА', name: 'Катя', tagCls: 'unconf', tag: 'Способный, но неуверенный',
+    id: 'katya', initials: 'КА', name: 'Катя', acc: 'Катю', gen: 'Кати',
     desc: 'Высокие компетенции, знает процесс в деталях. При обсуждении новых задач спрашивает: «А вы уверены, что это должна делать я?»',
-    quality: 'bad',
-    feedbackHead: 'Делегирование не рекомендуется',
-    feedback: 'Низкая уверенность в себе приведёт к тому, что Катя будет запрашивать одобрение на каждое решение. Делегирования не случится — вы получите ту же нагрузку, только с задержкой.'
+    quality: 'ok',
+    outcome: {
+      perfect: 'Акцент на полномочиях и значимости помог Кате поверить в себя. Несколько уточняющих вопросов по ходу — но финал она провела сама. Качество высокое.',
+      partial:  'Без чёткого понимания, что именно её полномочия, Катя запрашивала одобрения на каждое решение. Де-факто делегирования не произошло — всё шло через вас.',
+      trap:     'Микроконтроль только укрепил её сомнения в своих силах. Формально она работала, но в копии каждого письма и каждого решения стояли вы.'
+    }
   },
   {
-    id: 'alexey', initials: 'АЛ', name: 'Алексей', tagCls: 'pro', tag: 'Профессионал',
+    id: 'alexey', initials: 'АЛ', name: 'Алексей', acc: 'Алексея', gen: 'Алексея',
     desc: 'Стабильный эксперт, выполняет задачи качественно, всегда на связи. Загрузка сейчас близка к максимальной.',
     quality: 'ok',
-    feedbackHead: 'Допустимый вариант',
-    feedback: 'Алексей справится с задачей — компетенции есть. Но вы перегрузите своего самого надёжного сотрудника. Риск выгорания реален. Это вынужденный выбор, а не оптимальный.'
+    outcome: {
+      perfect: 'Алексей справился и сдал вовремя — компетенции есть. Но через месяц пришёл с разговором: «Давай перераспределим нагрузку, иначе я не выдержу». Будьте готовы.',
+      partial:  'Неполная постановка заставила Алексея додумывать ожидания. Задача сделана, но с нервным напряжением и ощущением «меня опять нагрузили без объяснений».',
+      trap:     'Микроменеджмент поверх и без того критической загрузки сломал последний барьер. Задача выполнена — но на следующей неделе Алексей положил заявление на стол.'
+    }
   },
   {
-    id: 'boris', initials: 'БО', name: 'Борис', tagCls: 'owner', tag: 'Хозяйский тип',
+    id: 'boris', initials: 'БО', name: 'Борис', acc: 'Бориса', gen: 'Бориса',
     desc: 'Опытный специалист. Требует автономии, не терпит микроменеджмента. Готов отвечать за проект головой.',
     quality: 'best',
-    feedbackHead: 'Лучший кандидат',
-    feedback: 'Хозяйский тип мотивации идеально подходит для делегирования. Борис обладает волей и компетенциями взять проект целиком. Основной риск здесь — ваш собственный порыв его контролировать.'
+    outcome: {
+      perfect: 'Борис взял проект в полное управление. Регламент готов, смежники согласовали, команда обучена. Вы получили короткий email с итогами — и больше не думали об этой задаче.',
+      partial:  'Борис справился, хотя нечёткость по полномочиям несколько раз заставила его уточнять у вас мелкие вещи. Результат достойный — но могло быть чище.',
+      trap:     'Борис сделал задачу качественно. Но ваш микроконтроль его раздражал. По завершении сказал прямо: «В следующий раз — только полная автономия, иначе откажусь».'
+    }
   }
 ];
 
-const BLOCKS = [
+var BLOCKS = [
   {
-    id: 'essence', label: 'О задаче', trap: false, required: true,
-    text: 'Борис, поручаю тебе полностью взять на себя проект системы контроля качества. На выходе нужен работающий регламент к 20 числу.'
+    id: 'essence', label: 'Суть задачи', trap: false, required: true,
+    text: 'Поручаю тебе полностью взять на себя проект системы контроля качества. На выходе нужен работающий регламент к 20 числу.'
   },
   {
-    id: 'resp', label: 'О полномочиях', trap: false, required: true,
-    text: 'Финальное решение по методике проверки оставляю за тобой. Ты отвечаешь за то, чтобы смежники приняли этот формат.'
+    id: 'micro', label: 'Проверка каждого шага', trap: true, required: false,
+    text: 'Присылай мне черновик каждой страницы регламента — я буду лично проверять каждую формулировку и вносить правки.'
   },
   {
-    id: 'benefit', label: 'О значимости', trap: false, required: true,
+    id: 'benefit', label: 'Значимость', trap: false, required: true,
     text: 'Успех этого проекта позволит нам сократить ошибки вдвое, а тебе — подтвердить статус ведущего эксперта в управлении.'
   },
   {
-    id: 'control', label: 'О взаимодействии', trap: false, required: true,
-    text: 'Давай договоримся: ты сам присылаешь краткий статус по почте раз в две недели. Если возникнут блокирующие проблемы — выходи на связь сразу.'
+    id: 'exec', label: 'Взять переговоры на себя', trap: true, required: false,
+    text: 'Я сам договорюсь с IT-отделом о доступах для тебя — ты просто напиши текст.'
   },
   {
-    id: 'micro', label: 'О проверке материалов', trap: true, required: false,
-    text: 'Присылай мне черновик каждой страницы регламента, я буду лично проверять каждую формулировку и вносить правки.'
+    id: 'resp', label: 'Полномочия', trap: false, required: true,
+    text: 'Финальное решение по методике проверки оставляю за тобой. Ты отвечаешь за то, чтобы смежники приняли этот формат.'
   },
   {
-    id: 'exec', label: 'О координации с IT', trap: true, required: false,
-    text: 'Я сам договорюсь с IT-отделом о доступах для тебя, ты просто напиши текст.'
+    id: 'control', label: 'Формат связи', trap: false, required: true,
+    text: 'Договоримся так: ты сам присылаешь краткий статус раз в две недели. Если появятся блокирующие проблемы — выходи на связь сразу.'
   }
 ];
 
-const REQUIRED_IDS = ['essence', 'resp', 'benefit', 'control'];
-const TRAP_IDS = ['micro', 'exec'];
+var REQUIRED_IDS = ['essence', 'resp', 'benefit', 'control'];
+var TRAP_IDS     = ['micro', 'exec'];
 
-let state = {
+// ─── СОСТОЯНИЕ ─────────────────────────────────────────────────────────────
+var state = {
   screen: 'intro',
-  stage1Done: false,
   selectedEmployee: null,
-  stage1FeedbackShown: false,
-  selectedBlocks: [],
-  sopkiChecked: false
+  selectedBlocks: []
 };
 
+// ─── ВСПОМОГАТЕЛЬНЫЕ ───────────────────────────────────────────────────────
+function getSopkiQuality() {
+  var sel = state.selectedBlocks;
+  if (!sel.length) return 'partial';
+  var hasTrap = sel.some(function(id) { return TRAP_IDS.indexOf(id) >= 0; });
+  var allRequired = REQUIRED_IDS.every(function(id) { return sel.indexOf(id) >= 0; });
+  if (hasTrap) return 'trap';
+  if (allRequired) return 'perfect';
+  return 'partial';
+}
+
+// ─── РЕНДЕР ЭКРАНОВ ────────────────────────────────────────────────────────
 function render() {
-  const app = document.getElementById('app');
-  if (state.screen === 'intro')  app.innerHTML = renderIntro();
-  if (state.screen === 'stage1') app.innerHTML = renderStage1();
-  if (state.screen === 'stage2') app.innerHTML = renderStage2();
-  if (state.screen === 'final')  app.innerHTML = renderFinal();
+  var app = document.getElementById('app');
+  if      (state.screen === 'intro')  app.innerHTML = renderIntro();
+  else if (state.screen === 'stage1') app.innerHTML = renderStage1();
+  else if (state.screen === 'stage2') app.innerHTML = renderStage2();
+  else if (state.screen === 'final')  app.innerHTML = renderFinal();
+  window.scrollTo(0, 0);
+  notifyHeight();
 }
 
-// ── INTRO ──
 function renderIntro() {
-  return `<div class="intro">
-    <div class="eyebrow">Управленческий симулятор</div>
-    <div class="page-title">Делегирование:<span>выбор и постановка</span></div>
-    <div class="divider"></div>
-    <div class="legend-box">
-      <div class="legend-tag">Задача</div>
-      Вам необходимо делегировать разработку новой системы контроля качества внутри отдела. Задача требует знания процессов и готовности нести ответственность перед другими департаментами.<br><br>
-      Это проект, который <strong>серьёзно разгрузит вас в будущем</strong> — если вы правильно выберете исполнителя и грамотно поставите задачу.
-    </div>
-    <div class="stages-preview">
-      <div class="stage-prev">
-        <div class="stage-prev-num">Этап 1</div>
-        <div class="stage-prev-title">Аудит команды</div>
-        <div class="stage-prev-desc">Выберите оптимального кандидата из 5 сотрудников</div>
-      </div>
-      <div class="stage-prev">
-        <div class="stage-prev-num">Этап 2</div>
-        <div class="stage-prev-title">Постановка задачи</div>
-        <div class="stage-prev-desc">Составьте сообщение по модели СОПКИ</div>
-      </div>
-    </div>
-    <button class="btn-start" onclick="goStage1()">Начать →</button>
-  </div>`;
+  return '<div class="intro anim-fade-up">'
+    + '<h1 class="page-title">Делегирование:<span>выбор и постановка</span></h1>'
+    + '<div class="divider"></div>'
+    + '<div class="legend-box">'
+      + '<div class="legend-tag">Задача</div>'
+      + 'Вам необходимо делегировать разработку новой системы контроля качества внутри отдела. '
+      + 'Задача требует знания процессов и готовности нести ответственность перед другими департаментами.<br><br>'
+      + 'Это проект, который <strong>серьёзно разгрузит вас в будущем</strong> — если вы правильно выберете исполнителя и грамотно поставите задачу.'
+    + '</div>'
+    + '<div class="stages-preview">'
+      + '<div class="stage-prev"><div class="stage-prev-num">Этап 1</div><div class="stage-prev-title">Аудит команды</div><div class="stage-prev-desc">Выберите кандидата из 5 сотрудников</div></div>'
+      + '<div class="stage-prev"><div class="stage-prev-num">Этап 2</div><div class="stage-prev-title">Постановка задачи</div><div class="stage-prev-desc">Составьте сообщение по модели СОПКИ</div></div>'
+    + '</div>'
+    + '<button class="btn-start" onclick="goStage1()">Начать →</button>'
+    + '</div>';
 }
 
-// ── STAGE 1 ──
 function renderStage1() {
-  const sel = state.selectedEmployee;
-  const fb = state.stage1FeedbackShown && sel ? EMPLOYEES.find(e => e.id === sel) : null;
+  var sel = state.selectedEmployee;
 
-  const cards = EMPLOYEES.map(e => {
-    let cls = 'emp-card';
+  var cards = EMPLOYEES.map(function(e) {
+    var cls = 'emp-card';
     if (sel) {
-      if (e.id === sel) {
-        cls += e.quality === 'best' ? ' selected-best' : e.quality === 'ok' ? ' selected-ok' : ' selected-bad';
-      } else {
-        cls += ' dimmed';
-      }
-    }
-    const onclick = sel ? '' : `onclick="selectEmployee('${e.id}')"`;
-    return `<div class="${cls}" ${onclick}>
-      <div class="emp-avatar">${e.initials}</div>
-      <div class="emp-name">${e.name}</div>
-      <div class="emp-desc">${e.desc}</div>
-    </div>`;
-  }).join('');
-
-  let fbHtml = '';
-  if (fb) {
-    const fbCls = fb.quality === 'best' ? 'best' : fb.quality === 'ok' ? 'ok' : 'bad';
-    const icon = fb.quality === 'best' ? '✓' : fb.quality === 'ok' ? '!' : '✕';
-    fbHtml = `<div class="feedback-box ${fbCls} show">
-      <div class="feedback-head">${icon} ${fb.feedbackHead}</div>
-      ${fb.feedback}
-    </div>`;
-  }
-
-  const btnLabel = sel
-    ? (sel === 'boris' ? 'Перейти к постановке задачи →' : 'Всё равно выбрать Бориса →')
-    : '';
-  const btnShow = sel ? 'show' : '';
-
-  return `<div class="situation" style="animation: cardIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both;">
-    <div class="stage-header">
-      <div class="stage-badge">Этап 1 из 2</div>
-      <div class="stage-title">Выберите исполнителя</div>
-      <div class="stage-task">Вам нужно делегировать разработку системы контроля качества. Кому из команды вы поручите этот проект?</div>
-    </div>
-    <div class="employees-grid">${cards}</div>
-    ${fbHtml}
-    <button class="btn-action ${btnShow}" onclick="goStage2()">${btnLabel}</button>
-  </div>`;
-}
-
-// ── STAGE 2 ──
-function renderStage2() {
-  const sel = state.selectedBlocks;
-  const checked = state.sopkiChecked;
-  const count = sel.length;
-  const canCheck = count === 4;
-  const hasTrap = sel.some(id => TRAP_IDS.includes(id));
-
-  let btnFbHtml = '';
-  if (checked) {
-    const hasMissing = REQUIRED_IDS.some(id => !sel.includes(id));
-    let fbCls, fbHead, fbText;
-    if (hasTrap && hasMissing) {
-      fbCls = 'wrong'; fbHead = '✕ Есть ловушки и пропущены обязательные блоки';
-      fbText = 'Вы выбрали манипулятивные формулировки и при этом не включили все ключевые элементы. Борис почувствует недоверие ещё до старта.';
-    } else if (hasTrap) {
-      fbCls = 'wrong'; fbHead = '✕ Выбраны блоки-ловушки';
-      fbText = hasMicro()
-        ? 'Микроменеджмент — это сигнал о недоверии. Вы выбрали делегирование, но фактически оставили за собой контроль над каждой деталью. Борис это почувствует и потеряет мотивацию.'
-        : 'Взяв на себя переговоры с IT, вы урезаете полномочия Бориса. Хозяйскому типу нужна полнота власти над своим участком — без этого делегирование неполноценно.';
-    } else if (hasMissing) {
-      fbCls = 'ok'; fbHead = '! Не хватает обязательных элементов';
-      const missing = REQUIRED_IDS.filter(id => !sel.includes(id)).map(id => BLOCKS.find(b => b.id === id).label).join(', ');
-      fbText = `Сообщение неполное. Пропущены: ${missing}. Без этих элементов у Бориса не будет полной картины задачи.`;
-    } else {
-      fbCls = 'correct'; fbHead = '✓ Идеально';
-      fbText = 'Вы закрыли все элементы СОПКИ и учли психологический профиль сотрудника. Борис получил чёткую задачу, понял свою ответственность и ценность проекта, а контроль сформулирован так, что не воспринимается как вмешательство.';
-    }
-    btnFbHtml = `<div class="feedback-box ${fbCls} show" style="margin-top:16px;">
-      <div class="feedback-head">${fbHead}</div>${fbText}
-    </div>`;
-  }
-
-  const blocksHtml = BLOCKS.map(b => {
-    const isSelected = sel.includes(b.id);
-    let cls = 'block-item';
-    if (checked) {
-      if (b.trap && isSelected) cls += ' trap-revealed';
-      else if (!b.trap && isSelected) cls += ' required-revealed';
+      if (e.id === sel) cls += ' selected';
       else cls += ' dimmed';
-    } else {
-      if (isSelected) cls += ' selected';
-      if (!isSelected && count >= 4) cls += ' dimmed';
     }
-    const checkContent = isSelected ? '✓' : '';
-    return `<div class="${cls}" onclick="toggleBlock('${b.id}')">
-      <div class="block-inner">
-        <div class="block-check">${checkContent}</div>
-        <div>
-          <div class="block-label">${b.label}</div>
-          <div class="block-text">${b.text}</div>
-        </div>
-      </div>
-    </div>`;
+    var onclick = sel ? '' : 'onclick="selectEmployee(\'' + e.id + '\')"';
+    return '<div class="' + cls + '" ' + onclick + '>'
+      + '<div class="emp-avatar">' + e.initials + '</div>'
+      + '<div class="emp-name">' + e.name + '</div>'
+      + '<div class="emp-desc">' + e.desc + '</div>'
+      + '</div>';
   }).join('');
 
-  const nextBtnShow = checked ? 'show' : '';
-  const hasTrapChecked = checked && hasTrap;
+  var btnDisabled = sel ? '' : 'disabled';
 
-  return `<div class="sopki-screen">
-    <div class="stage-header">
-      <div class="stage-badge">Этап 2 из 2</div>
-      <div class="stage-title">Постановка задачи по СОПКИ</div>
-      <div class="stage-task">
-        Вы выбрали Бориса. Составьте сообщение — выберите ровно <strong>4 блока из 6</strong>, которые запустят делегирование и учтут его характер.
-      </div>
-    </div>
-
-    <div class="sopki-legend">
-      <div class="sopki-letter"><span>С</span>уть</div>
-      <div class="sopki-letter"><span>О</span>тветственность</div>
-      <div class="sopki-letter"><span>П</span>ольза</div>
-      <div class="sopki-letter"><span>К</span>онтроль</div>
-      <div class="sopki-letter"><span>И</span>нструменты</div>
-    </div>
-
-    <div class="counter-bar">
-      <span>Выбрано: <span class="counter-num">${count}</span> / 4</span>
-      <span class="counter-hint">${count < 4 ? `Ещё ${4 - count}` : count === 4 ? 'Готово к проверке' : ''}</span>
-    </div>
-
-    <div class="blocks-list">${blocksHtml}</div>
-
-    <button class="btn-check ${canCheck && !checked ? 'ready' : ''}" ${checked ? 'style="display:none"' : ''} onclick="checkSopki()">
-      Проверить сообщение →
-    </button>
-
-    ${btnFbHtml}
-
-    <button class="btn-action ${nextBtnShow}" style="margin-top:12px" onclick="goFinal()">
-      ${hasTrapChecked ? 'Исправить и попробовать снова' : 'Завершить симуляцию →'}
-    </button>
-  </div>`;
+  return '<div style="animation:fadeUp 0.4s ease both">'
+    + '<div class="stage-header">'
+      + '<div class="stage-badge">Этап 1 из 2</div>'
+      + '<div class="stage-title">Выберите исполнителя</div>'
+      + '<div class="stage-task">Кому из команды вы поручите разработку системы контроля качества?</div>'
+    + '</div>'
+    + '<div class="employees-grid">' + cards + '</div>'
+    + '<button class="btn-stage-next" ' + btnDisabled + ' onclick="goStage2()">Перейти к постановке задачи →</button>'
+    + '</div>';
 }
 
-function hasMicro() {
-  return state.selectedBlocks.includes('micro');
+function renderStage2() {
+  var emp = EMPLOYEES.find(function(e) { return e.id === state.selectedEmployee; });
+  var sel = state.selectedBlocks;
+  var count = sel.length;
+  var canProceed = count >= 1;
+
+  var blocksHtml = BLOCKS.map(function(b) {
+    var isSelected = sel.indexOf(b.id) >= 0;
+    var cls = 'block-item' + (isSelected ? ' selected' : '');
+    return '<div class="' + cls + '" data-block-id="' + b.id + '" onclick="toggleBlock(\'' + b.id + '\')">'
+      + '<div class="block-inner">'
+        + '<div class="block-check">' + (isSelected ? '✓' : '') + '</div>'
+        + '<div>'
+          + '<div class="block-label">' + b.label + '</div>'
+          + '<div class="block-text">' + b.text + '</div>'
+        + '</div>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+
+  return '<div class="anim-fade-up">'
+    + '<div class="stage-header">'
+      + '<div class="stage-badge">Этап 2 из 2</div>'
+      + '<div class="stage-title">Постановка задачи по СОПКИ</div>'
+      + '<div class="stage-task">'
+        + 'Составьте сообщение для <strong>' + emp.gen + '</strong> — '
+        + 'отметьте блоки из предложенных ниже, чтобы запустить процесс делегирования. '
+        + 'Учитывайте особенности личности ' + emp.gen + '.'
+      + '</div>'
+    + '</div>'
+    + '<div class="sopki-header">'
+      + '<div class="sopki-counter">Отмечено: <strong id="block-counter">' + count + '</strong> из ' + BLOCKS.length + '</div>'
+    + '</div>'
+    + '<div class="blocks-list">' + blocksHtml + '</div>'
+    + '<button class="btn-sopki-proceed" id="btn-sopki-proceed" '
+      + (canProceed ? '' : 'disabled')
+      + ' onclick="goFinal()">Завершить →</button>'
+    + '</div>';
 }
 
-// ── FINAL ──
 function renderFinal() {
-  const emp = EMPLOYEES.find(e => e.id === state.selectedEmployee);
-  const sel = state.selectedBlocks;
-  const hasTrap = sel.some(id => TRAP_IDS.includes(id));
-  const hasMissing = REQUIRED_IDS.some(id => !sel.includes(id));
-  const isPerfect = !hasTrap && !hasMissing;
-  const isEmpBest = emp && emp.quality === 'best';
+  var emp      = EMPLOYEES.find(function(e) { return e.id === state.selectedEmployee; });
+  var sopkiQ   = getSopkiQuality();
+  var sel      = state.selectedBlocks;
+  var hasTrap  = sopkiQ === 'trap';
+  var isPerfect= sopkiQ === 'perfect';
+  var isPartial= sopkiQ === 'partial';
 
-  let overallIcon, overallTitle, overallText;
-  if (isEmpBest && isPerfect) {
-    overallIcon = '🏆';
-    overallTitle = 'Делегирование выстроено идеально';
-    overallText = 'Вы выбрали лучшего кандидата и сформулировали задачу так, что Борис получил всё необходимое для автономной работы. Проект имеет все шансы на успех без вашего участия.';
-  } else if (isEmpBest) {
-    overallIcon = '✅';
-    overallTitle = 'Правильный выбор, но постановка неполная';
-    overallText = 'Борис — верный выбор. Но сообщение нуждается в доработке: либо не хватает элементов, либо включены формулировки, которые подрывают доверие.';
-  } else if (emp && emp.quality === 'ok') {
-    overallIcon = '⚠️';
-    overallTitle = 'Приемлемо, но не оптимально';
-    overallText = 'Алексей справится, но это решение создаёт риск выгорания. Попробуйте пройти ещё раз и рассмотреть Бориса.';
-  } else {
-    overallIcon = '❌';
-    overallTitle = 'Делегирование под угрозой';
-    overallText = 'Выбранный сотрудник не подходит для этой задачи. Без правильного кандидата даже идеальное сообщение не поможет.';
-  }
+  // ── Общий итог ──
+  var icons = { bad:'❌', ok:'⚠️', best:'🏆' };
+  var titles = {
+    bad:  'Задача вернулась к вам',
+    ok:   'Задача выполнена — но с трудом',
+    best: 'Делегирование состоялось'
+  };
+  var outcomeText = emp.outcome[sopkiQ];
 
-  const stage2Cls = hasTrap ? 'trap-chosen' : hasMissing ? 'partial' : 'perfect';
-  const stage2Title = hasTrap ? 'В сообщение попали ловушки' : hasMissing ? 'Сообщение неполное' : 'Сообщение составлено верно';
-  const stage2Text = hasTrap
-    ? 'Формулировки о микроконтроле или урезании полномочий подрывают мотивацию хозяйского типа ещё до старта.'
-    : hasMissing
-    ? `Пропущены блоки: ${REQUIRED_IDS.filter(id => !sel.includes(id)).map(id => BLOCKS.find(b => b.id === id).label).join(', ')}.`
-    : 'Все элементы СОПКИ на месте, контроль сформулирован мягко — именно так, как нужно для Бориса.';
+  // ── Сводка по этапу 1 ──
+  var stage1Cls = emp.quality;
+  var stage1Title = emp.quality === 'best'
+    ? emp.name + ' — оптимальный выбор'
+    : emp.quality === 'ok'
+    ? emp.name + ' — допустимый, но не идеальный выбор'
+    : emp.name + ' — слабый кандидат для этой задачи';
+  var stage1Text = emp.quality === 'best'
+    ? 'Хозяйский тип мотивации и наличие свободной ёмкости делают Бориса идеальным кандидатом для делегирования.'
+    : emp.quality === 'ok'
+    ? (emp.id === 'katya'
+        ? 'Катя компетентна, но её неуверенность в себе требует особого подхода в постановке — упора на полномочия и значимость.'
+        : 'Алексей справляется качественно, но делегирование ему в момент перегрузки создаёт реальный риск выгорания.')
+    : (emp.id === 'igor'
+        ? 'Игорю не хватает опыта для проекта такого масштаба — риск провала высок независимо от качества постановки.'
+        : 'Избегательный тип мотивации делает Марину ненадёжным исполнителем для ответственного самостоятельного проекта.');
 
-  return `<div class="final">
-    <div class="final-hero">
-      <div class="final-icon">${overallIcon}</div>
-      <div class="final-title">${overallTitle}</div>
-      <div class="final-sub">${overallText}</div>
-    </div>
+  // ── Сводка по этапу 2 (СОПКИ) ──
+  var stage2Cls = hasTrap ? 'bad' : isPerfect ? 'best' : 'ok';
+  var stage2Title = hasTrap
+    ? 'Постановка подрывает делегирование'
+    : isPerfect
+    ? 'Постановка выстроена верно'
+    : 'Постановка неполная';
 
-    <div class="summary-stages">
-      <div class="summary-stage ${isEmpBest ? 'best' : emp && emp.quality === 'ok' ? 'ok' : 'ok'}">
-        <div class="summary-stage-num">Этап 1 — Выбор исполнителя</div>
-        <div class="summary-stage-title">${emp ? emp.name : '—'} · ${emp ? emp.feedbackHead : ''}</div>
-        <div class="summary-stage-text">${emp ? emp.feedback : ''}</div>
-      </div>
-      <div class="summary-stage ${stage2Cls}">
-        <div class="summary-stage-num">Этап 2 — Постановка задачи</div>
-        <div class="summary-stage-title">${stage2Title}</div>
-        <div class="summary-stage-text">${stage2Text}</div>
-      </div>
-    </div>
+  var missing = REQUIRED_IDS.filter(function(id) { return sel.indexOf(id) < 0; });
+  var traps   = TRAP_IDS.filter(function(id) { return sel.indexOf(id) >= 0; });
 
-    <button class="btn-restart" onclick="restart()">↺ Пройти заново</button>
-  </div>`;
+  var stage2Text = hasTrap
+    ? 'Выбранные формулировки ('
+      + traps.map(function(id) { return BLOCKS.find(function(b) { return b.id === id; }).label; }).join(', ')
+      + ') сигнализируют о недоверии и урезают полномочия — это противоречит самой идее делегирования.'
+    : isPerfect
+    ? 'Все ключевые элементы СОПКИ включены. Контроль сформулирован так, что не воспринимается как слежка.'
+    : 'Не включены: ' + missing.map(function(id) { return BLOCKS.find(function(b) { return b.id === id; }).label; }).join(', ') + '. Без них у исполнителя нет полной картины.';
+
+  // ── Визуальный разбор блоков ──
+  var breakdownRows = BLOCKS.map(function(b) {
+    var wasSelected = sel.indexOf(b.id) >= 0;
+    var icon, comment;
+    if (wasSelected && b.required) {
+      icon = '✓'; comment = b.label + ' — ключевой элемент, включён';
+    } else if (wasSelected && b.trap) {
+      icon = '⚠'; comment = b.label + ' — ловушка: подрывает автономию';
+    } else if (!wasSelected && b.required) {
+      icon = '✗'; comment = b.label + ' — не включён (обязательный элемент)';
+    } else {
+      return '';
+    }
+    return '<div class="breakdown-row"><div class="breakdown-icon">' + icon + '</div><div>' + comment + '</div></div>';
+  }).join('');
+
+  return '<div class="anim-fade-up">'
+    + '<div class="result-hero">'
+      + '<div class="result-hero__icon">' + icons[emp.quality] + '</div>'
+      + '<div class="result-hero__title">' + titles[emp.quality] + '</div>'
+      + '<div class="result-hero__text">' + outcomeText + '</div>'
+    + '</div>'
+    + '<div class="summary-stages mt-sm">'
+      + '<div class="summary-stage ' + stage1Cls + '">'
+        + '<div class="summary-stage-num">Этап 1 — Выбор исполнителя</div>'
+        + '<div class="summary-stage-title">' + stage1Title + '</div>'
+        + '<div class="summary-stage-text">' + stage1Text + '</div>'
+      + '</div>'
+      + '<div class="summary-stage ' + stage2Cls + '">'
+        + '<div class="summary-stage-num">Этап 2 — Постановка задачи</div>'
+        + '<div class="summary-stage-title">' + stage2Title + '</div>'
+        + '<div class="summary-stage-text">' + stage2Text + '</div>'
+      + '</div>'
+    + '</div>'
+    + '<div class="sopki-breakdown">'
+      + '<div class="breakdown-title">Разбор выбранных блоков</div>'
+      + (breakdownRows || '<div class="breakdown-row"><div>Ни один блок не был выбран</div></div>')
+    + '</div>'
+    + '<button class="btn-restart" onclick="restart()">↺ Пройти заново</button>'
+    + '</div>';
 }
 
-// ── LOGIC ──
+// ─── ЛОГИКА ─────────────────────────────────────────────────────────────────
 function goStage1() {
   state.screen = 'stage1';
+  state.selectedEmployee = null;
+  state.selectedBlocks = [];
   render();
 }
 
 function selectEmployee(id) {
   state.selectedEmployee = id;
-  state.stage1FeedbackShown = true;
+
+  // Целевой апдейт карточек без перерендера всей страницы
+  document.querySelectorAll('.emp-card').forEach(function(card) {
+    card.onclick = null;
+    card.classList.add('dimmed');
+  });
+  var selCard = document.querySelector('.emp-card[onclick]');
+  // Перерисовываем только этап 1, так как нужно переключить состояние кнопки
   render();
 }
 
 function goStage2() {
+  if (!state.selectedEmployee) return;
   state.screen = 'stage2';
-  state.selectedEmployee = 'boris';
   state.selectedBlocks = [];
-  state.sopkiChecked = false;
   render();
 }
 
+// Целевой DOM-апдейт при выборе блока — без перерендера страницы
 function toggleBlock(id) {
-  if (state.sopkiChecked) return;
-  const idx = state.selectedBlocks.indexOf(id);
+  var idx = state.selectedBlocks.indexOf(id);
   if (idx > -1) {
     state.selectedBlocks.splice(idx, 1);
   } else {
-    if (state.selectedBlocks.length >= 4) return;
     state.selectedBlocks.push(id);
   }
-  render();
-}
+  var isNowSelected = state.selectedBlocks.indexOf(id) >= 0;
 
-function checkSopki() {
-  if (state.selectedBlocks.length !== 4) return;
-  state.sopkiChecked = true;
-  render();
+  // Обновляем только конкретный блок
+  var blockEl = document.querySelector('[data-block-id="' + id + '"]');
+  if (blockEl) {
+    blockEl.classList.toggle('selected', isNowSelected);
+    var checkEl = blockEl.querySelector('.block-check');
+    if (checkEl) checkEl.textContent = isNowSelected ? '✓' : '';
+  }
+
+  // Обновляем счётчик
+  var counterEl = document.getElementById('block-counter');
+  if (counterEl) counterEl.textContent = state.selectedBlocks.length;
+
+  // Обновляем кнопку
+  var btn = document.getElementById('btn-sopki-proceed');
+  if (btn) {
+    var canProceed = state.selectedBlocks.length >= 1;
+    btn.disabled = !canProceed;
+  }
+
+  notifyHeight();
 }
 
 function goFinal() {
-  const hasTrap = state.selectedBlocks.some(id => TRAP_IDS.includes(id));
-  if (hasTrap) {
-    state.selectedBlocks = [];
-    state.sopkiChecked = false;
-    render();
-    return;
-  }
+  if (!state.selectedBlocks.length) return;
   state.screen = 'final';
   render();
 }
 
 function restart() {
-  state = { screen: 'intro', stage1Done: false, selectedEmployee: null, stage1FeedbackShown: false, selectedBlocks: [], sopkiChecked: false };
+  state = { screen: 'intro', selectedEmployee: null, selectedBlocks: [] };
   render();
 }
 
