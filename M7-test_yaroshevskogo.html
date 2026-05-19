@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Опросник М. Г. Ярошевского — М360</title>
+
+  <!-- Шрифты: Inter + Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+
+  <!-- Общая дизайн-система M360 -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* Сетка для кнопок Да/Нет */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 440px) {
+      .options-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Выравнивание текста вопроса для единообразия высоты карточки */
+    .question-text-wrap {
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Кастомная стилизация кнопок выбора */
+    .option-btn {
+      justify-content: center;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px;
+    }
+
+    /* Карточки шкал в результатах */
+    .role-card {
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!-- Подключаем скрипт связи с Moodle/LMS -->
+<script src="common.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   БАЗА ВОПРОСОВ (Методика М. Г. Ярошевского)
+   Шкала А: Генератор идей | Шкала Б: Критик | Шкала В: Эрудит
+   key: 1 (Да), 0 (Нет)
+   ═══════════════════════════════════════════════════════════ */
+var questions = [
+  // Шкала А (Генератор идей)
+  { text: "Каждая новая творческая тема связана с большим числом возникающих у меня новых идей.", scale: 'A', key: 1 },
+  { text: "В своем коллективе чаще всего новые идеи предлагаю я.", scale: 'A', key: 1 },
+  { text: "Мои идеи всегда понятны окружающим.", scale: 'A', key: 1 },
+  { text: "Ряд моих идей воспринимается окружающими лишь после многократного их предъявления.", scale: 'A', key: 1 },
+  { text: "Иногда я бываю так поглощен какой-то творческой идеей, что, вероятно, произвожу странное впечатление на окружающих.", scale: 'A', key: 1 },
+  { text: "Я сам хороший критик собственных идей.", scale: 'A', key: 0 },
+  { text: "Я не испытываю трудности и не чувствую неудовольствие, когда вынужден переключать свои мысли на другой предмет.", scale: 'A', key: 0 },
+  { text: "Я считаю, что идея хороша лишь в том случае, когда с самого начала очевидна возможность ее использования.", scale: 'A', key: 0 },
+  { text: "Я против сумасшедших идей в науке и бизнесе.", scale: 'A', key: 0 },
+  { text: "Я не люблю фантазировать.", scale: 'A', key: 0 },
+
+  // Шкала Б (Критик)
+  { text: "Мне сразу бросаются в глаза слабые места работы.", scale: 'B', key: 1 },
+  { text: "В коллективе многие признают мои способности критически оценивать работу.", scale: 'B', key: 1 },
+  { text: "Я часто убеждаюсь, что новые идеи, которые возникают у меня, на поверку оказываются далеко не новыми.", scale: 'B', key: 1 },
+  { text: "Я больше, чем другие, вижу, что в моем коллективе есть люди, которым не стоит заниматься творческой работой.", scale: 'B', key: 1 },
+  { text: "Следует выдвигать только принципиально новые идеи.", scale: 'B', key: 1 },
+  { text: "Я могу не заметить какие-то недостатки в работе, если меня восхищает в ней какая-то идея.", scale: 'B', key: 0 },
+  { text: "Я не люблю и не умею давать оценку чьей-нибудь работе.", scale: 'B', key: 0 },
+  { text: "Частые дискуссии только мешают установить истину.", scale: 'B', key: 0 },
+  { text: "Я бы с большим удовольствием разработал какой-нибудь вопрос сам, чем писать критику.", scale: 'B', key: 0 },
+  { text: "Заниматься доработкой сырых идей не доставляет мне никакого удовольствия.", scale: 'B', key: 0 },
+
+  // Шкала В (Эрудит)
+  { text: "Больше меня привлекает та часть работы, которая связана с использованием литературных источников и чужого опыта.", scale: 'C', key: 1 },
+  { text: "Лучше не пожалеть времени и искать материал для решения проблемы в литературе, чем решать проблему самому.", scale: 'C', key: 1 },
+  { text: "Я очень люблю новые слова и профессиональные термины.", scale: 'C', key: 1 },
+  { text: "Я не представляю эксперта, основательно не знакомого с профильной литературой по своему предмету.", scale: 'C', key: 1 },
+  { text: "Нужно особое умение и интуиция, чтобы найти необходимую информацию в потоке данных.", scale: 'C', key: 1 },
+  { text: "Избыточная научная/профессиональная информация подавляет мою инициативу.", scale: 'C', key: 0 },
+  { text: "Я читаю достаточно много новой литературы, не имеющей непосредственного отношения к проблемам, которыми я занимаюсь.", scale: 'C', key: 0 },
+  { text: "Я не люблю делать обзоры литературы и чужих кейсов.", scale: 'C', key: 0 },
+  { text: "Я не люблю тратить рабочее время, чтобы консультировать своих сотрудников.", scale: 'C', key: 0 },
+  { text: "В экспертном плане я не чаще, чем другие сотрудники, информирую коллег.", scale: 'C', key: 0 }
+];
+
+/* ═══════════════════════════════════════════════════════════
+   СОСТОЯНИЕ И РЕНДЕР
+   ═══════════════════════════════════════════════════════════ */
+var state = {
+  screen: 'intro',
+  currentQ: 0,
+  answers: [],
+  scoreA: 0,
+  scoreB: 0,
+  scoreC: 0
+};
+
+function render() {
+  var app = document.getElementById('app');
+  if (state.screen === 'intro') app.innerHTML = renderIntro();
+  if (state.screen === 'main')  app.innerHTML = renderMain();
+  if (state.screen === 'final') app.innerHTML = renderFinal();
+  notifyHeight();
+}
+
+/* --- ЭКРАН 1: ВВЕДЕНИЕ --- */
+function renderIntro() {
+  return (
+    '<div class="page-wrap anim-fade-up">' +
+      '<div class="eyebrow">Опросник М. Г. Ярошевского</div>' +
+      '<h1 class="page-title">Роли в творческой <span>группе</span></h1>' +
+      '<div class="divider"></div>' +
+      
+      '<p class="lead-text">' +
+        'Этот тест выявляет вашу ведущую роль в ситуации командного взаимодействия. ' +
+        'Методика опирается на три ключевые позиции: Генератор идей, Критик и Эрудит.' +
+      '</p>' +
+
+      '<div class="legend-box mt-md">' +
+        '<div class="legend-tag">Инструкция</div>' +
+        'Вам предстоит ответить на <strong>30 утверждений</strong>. Выбирайте «Да», если вы согласны с утверждением, и «Нет», если не согласны. ' +
+        'Отвечайте быстро и искренне, опираясь на ваш реальный рабочий опыт.' +
+      '</div>' +
+
+      '<div class="mt-md">' +
+        '<button class="btn btn--primary btn--full" onclick="goMain()">' +
+          'Начать тест &rarr;' +
+        '</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+/* --- ЭКРАН 2: ВОПРОСЫ --- */
+function renderMain() {
+  var q = questions[state.currentQ];
+  var progressPct = Math.round((state.currentQ / questions.length) * 100);
+  
+  var ans = state.answers[state.currentQ];
+  var hasAnswer = (ans !== undefined);
+  var nextDisabled = !hasAnswer ? 'disabled' : '';
+
+  return (
+    '<div class="page-wrap--compact anim-card-in">' +
+      '<div class="stage-badge">Вопрос ' + (state.currentQ + 1) + ' из ' + questions.length + '</div>' +
+
+      '<div class="progress mt-sm">' +
+        '<div class="progress__meta">' +
+          '<span class="progress__label">Прогресс</span>' +
+          '<span class="progress__fraction">' + (state.currentQ + 1) + '<em>/' + questions.length + '</em></span>' +
+        '</div>' +
+        '<div class="progress__track">' +
+          '<div class="progress__fill" style="width: ' + progressPct + '%"></div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="question-text-wrap mt-md">' +
+        '<p class="question-text">' + q.text + '</p>' +
+      '</div>' +
+
+      '<div class="options-grid mt-md">' +
+        renderOption(1, 'Да', ans === 1) +
+        renderOption(0, 'Нет', ans === 0) +
+      '</div>' +
+
+      '<div class="nav-bar mt-lg">' +
+        '<button class="btn btn--secondary" onclick="prevQ()" ' + (state.currentQ === 0 ? 'disabled' : '') + '>&larr; Назад</button>' +
+        '<button class="btn btn--primary" onclick="nextQ()" ' + nextDisabled + '>' + 
+          (state.currentQ === questions.length - 1 ? 'Завершить' : 'Далее &rarr;') + 
+        '</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function renderOption(val, text, isSelected) {
+  var cls = 'card card--interactive option-btn' + (isSelected ? ' card--selected' : '');
+  return (
+    '<div class="' + cls + '" data-option="' + val + '" onclick="selectOption(' + val + ')">' +
+      text +
+    '</div>'
+  );
+}
+
+/* --- ЭКРАН 3: РЕЗУЛЬТАТЫ --- */
+function renderFinal() {
+  var scoreA = state.scoreA;
+  var scoreB = state.scoreB;
+  var scoreC = state.scoreC;
+  
+  var max = Math.max(scoreA, scoreB, scoreC);
+  var dominant = [];
+  if (scoreA === max) dominant.push("Генератор идей");
+  if (scoreB === max) dominant.push("Критик");
+  if (scoreC === max) dominant.push("Эрудит");
+  
+  var dominantText = dominant.join(" и ");
+  var descHtml = '';
+
+  if (dominant.indexOf("Генератор идей") !== -1) {
+    descHtml += '<div class="feedback feedback--success mt-sm"><div class="feedback__head">Генератор идей</div>Вы склонны продуцировать новые, нестандартные идеи и концепции. Вы увлечены творческим поиском и часто являетесь главным автором интеллектуальных инициатив в команде.</div>';
+  }
+  if (dominant.indexOf("Критик") !== -1) {
+    descHtml += '<div class="feedback feedback--warning mt-sm"><div class="feedback__head">Критик</div>Вы обладаете сильным аналитическим складом ума. Ваша сильная сторона — способность объективно оценивать чужие идеи, выявлять их слабые места и предотвращать поспешные, необоснованные решения.</div>';
+  }
+  if (dominant.indexOf("Эрудит") !== -1) {
+    descHtml += '<div class="feedback feedback--info mt-sm"><div class="feedback__head">Эрудит</div>Вы обладаете широкими знаниями и отлично ориентируетесь в информационном потоке. Ваша роль — находить необходимую фактуру, связывать концепции и выступать глубокой экспертной базой вашей команды.</div>';
+  }
+
+  return (
+    '<div class="page-wrap anim-fade-up">' +
+      '<div class="result-hero">' +
+        '<div class="result-hero__icon">\uD83C\uDFAF</div>' +
+        '<div class="result-hero__title">Тест завершен</div>' +
+        '<div class="result-hero__text">' +
+          'Ваша ведущая роль в группе: <strong>' + dominantText + '</strong>' +
+        '</div>' +
+      '</div>' +
+
+      '<h3 class="section-title mt-md">Результаты по шкалам:</h3>' +
+      
+      '<div class="card role-card">' +
+         '<div class="progress__meta"><span class="progress__label">Генератор идей</span><span class="progress__fraction">' + scoreA + '<em>/10</em></span></div>' +
+         '<div class="progress__track"><div class="progress__fill" style="width:' + (scoreA*10) + '%; background: var(--green);"></div></div>' +
+      '</div>' +
+
+      '<div class="card role-card">' +
+         '<div class="progress__meta"><span class="progress__label">Критик</span><span class="progress__fraction">' + scoreB + '<em>/10</em></span></div>' +
+         '<div class="progress__track"><div class="progress__fill" style="width:' + (scoreB*10) + '%; background: var(--amber);"></div></div>' +
+      '</div>' +
+
+      '<div class="card role-card">' +
+         '<div class="progress__meta"><span class="progress__label">Эрудит</span><span class="progress__fraction">' + scoreC + '<em>/10</em></span></div>' +
+         '<div class="progress__track"><div class="progress__fill" style="width:' + (scoreC*10) + '%; background: var(--dark);"></div></div>' +
+      '</div>' +
+
+      '<h3 class="section-title mt-lg">Описание роли:</h3>' +
+      descHtml +
+
+      '<button class="btn btn--secondary btn--full mt-xl" onclick="restart()">' +
+        '\u21BA\u00A0 Пройти заново' +
+      '</button>' +
+    '</div>'
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ЛОГИКА МАРШРУТИЗАЦИИ
+   ═══════════════════════════════════════════════════════════ */
+function goMain() { 
+  state.screen = 'main'; 
+  render(); 
+}
+
+function prevQ() {
+  if (state.currentQ > 0) {
+    state.currentQ--;
+    render();
+  }
+}
+
+function selectOption(val) {
+  state.answers[state.currentQ] = val;
+  
+  // Точечно переключаем стили для плавности перед рендером
+  document.querySelectorAll('[data-option]').forEach(function(el) {
+    el.classList.toggle('card--selected', parseInt(el.dataset.option) === val);
+  });
+  
+  // Авто-переход к следующему вопросу
+  setTimeout(function() {
+    nextQ();
+  }, 300);
+}
+
+function nextQ() {
+  if (state.answers[state.currentQ] === undefined) return;
+  
+  if (state.currentQ < questions.length - 1) {
+    state.currentQ++;
+    render();
+  } else {
+    calculateResults();
+  }
+}
+
+function calculateResults() {
+  var sA = 0, sB = 0, sC = 0;
+  
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    var ans = state.answers[i];
+    
+    // Если ответ совпадает с ключом
+    if (ans === q.key) {
+      if (q.scale === 'A') sA++;
+      else if (q.scale === 'B') sB++;
+      else if (q.scale === 'C') sC++;
+    }
+  }
+  
+  state.scoreA = sA;
+  state.scoreB = sB;
+  state.scoreC = sC;
+  state.screen = 'final';
+  render();
+}
+
+function restart() {
+  // Сбрасываем все настройки
+  state.screen = 'intro';
+  state.currentQ = 0;
+  state.answers = [];
+  state.scoreA = 0;
+  state.scoreB = 0;
+  state.scoreC = 0;
+  render();
+}
+
+/* Запуск приложения */
+render();
+</script>
+
+</body>
+</html>
