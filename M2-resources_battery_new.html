@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Батарейка ресурсов</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<style>
+body {
+  padding: 40px 20px 60px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Заголовок ── */
+.page-header { text-align: center; margin-bottom: 28px; }
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 5vw, 38px);
+  font-weight: 900;
+  color: var(--dark);
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.page-header h1 span { color: var(--red); }
+
+.page-header .subtitle {
+  font-size: 15px;
+  color: var(--slate);
+  line-height: 1.6;
+}
+
+.divider-center {
+  width: 50px; height: 2px;
+  background: var(--red);
+  margin: 14px auto 0;
+}
+
+/* ── Игровое поле ── */
+.game-board {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── Левая панель (Колода карточек) ── */
+.deck-section {
+  background: var(--sand);
+  padding: 32px 22px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 240px;
+}
+
+.deck-section h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+
+.deck-counter {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.deck-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* ── Перетаскиваемая карточка ── */
+.draggable-item {
+  display: none; /* Скрываем все карточки по умолчанию */
+  width: 100%;
+  max-width: 240px;
+  background: var(--dark);
+  color: var(--white);
+  padding: 24px 16px;
+  border-radius: var(--radius-md);
+  cursor: grab;
+  text-align: center;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.4;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+  user-select: none;
+  touch-action: none;
+  box-shadow: 0 4px 12px rgba(0,59,72,0.2);
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  margin: 0 auto;
+}
+
+/* Активная карточка (верхняя в колоде) */
+.draggable-item.active {
+  display: flex;
+  animation: popIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8) translateY(10px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.draggable-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,59,72,0.25);
+}
+
+.draggable-item.dragging      { opacity: 0.45; cursor: grabbing; }
+.draggable-item.touch-dragging {
+  position: fixed; z-index: 1000;
+  opacity: 0.9; transform: scale(1.05) !important;
+  pointer-events: none;
+  box-shadow: 0 12px 24px rgba(0,59,72,0.3);
+}
+
+/* ── Правая панель с батарейками ── */
+.zones-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.trash-wrapper {
+  grid-column: 1 / -1; /* Поглотители занимают всю ширину внизу */
+  margin-top: 8px;
+}
+
+/* ── Батарейка-зона ── */
+.drop-zone {
+  position: relative;
+  min-height: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+
+.drop-zone.drag-over .battery-container {
+  border-color: var(--slate);
+  filter: brightness(1.15);
+}
+
+.drop-zone.error .battery-container {
+  animation: shake 0.4s ease;
+  background: var(--red) !important;
+  border-color: var(--red) !important;
+}
+
+.drop-zone.error .battery-container::after {
+  background: var(--red) !important;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-10px); }
+  75%      { transform: translateX(10px); }
+}
+
+/* ── Корпус батарейки ── */
+.battery-container {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  background: var(--dark);
+  border: 3px solid var(--dark);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all 0.25s;
+}
+
+/* Кончик батарейки */
+.battery-container::after {
+  content: '';
+  position: absolute;
+  right: -9px; top: 50%;
+  transform: translateY(-50%);
+  width: 9px; height: 20px;
+  background: var(--dark);
+  border-radius: 0 4px 4px 0;
+  transition: background 0.25s;
+}
+
+/* Заливка */
+.battery-fill {
+  position: absolute;
+  left: 0; top: 0;
+  width: 0%; height: 100%;
+  background: rgba(255,255,255,0.32);
+  transition: width 0.5s ease;
+  z-index: 0;
+}
+
+/* Подпись */
+.zone-label {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  z-index: 1;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+/* Зона «Мусор» */
+.trash-zone .battery-container,
+.trash-zone .battery-container::after {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+/* ── Победная анимация ── */
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,59,72,0.55);
+  z-index: 1999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+
+.win-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.win-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 36px 40px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+  transform: scale(0.8);
+  transition: transform 0.5s cubic-bezier(0.34,1.2,0.64,1);
+  max-width: 340px;
+  width: 100%;
+}
+
+.win-overlay.show .win-card {
+  transform: scale(1);
+}
+
+.win-battery {
+  position: relative;
+  width: 180px; height: 80px;
+  background: var(--dark);
+  border: 5px solid var(--dark);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0 auto 20px;
+}
+
+.win-battery::after {
+  content: '';
+  position: absolute;
+  right: -20px; top: 50%;
+  transform: translateY(-50%);
+  width: 20px; height: 40px;
+  background: var(--dark);
+  border-radius: 0 7px 7px 0;
+}
+
+.win-battery-fill {
+  position: absolute;
+  left: 0; top: 0;
+  width: 0%; height: 100%;
+  background: linear-gradient(90deg, var(--green), #5abf84);
+  animation: fillBattery 1.8s ease-in-out forwards;
+}
+
+@keyframes fillBattery {
+  0%   { width: 0%; }
+  100% { width: 100%; }
+}
+
+.win-title {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 900;
+  color: var(--dark); margin-bottom: 8px;
+}
+
+.win-sub {
+  font-size: 14px; color: var(--slate);
+  line-height: 1.6; margin-bottom: 20px;
+}
+
+/* ── Адаптив ── */
+@media (max-width: 700px) {
+  body { padding: 28px 14px 48px; }
+  .game-board { grid-template-columns: 1fr; gap: 16px; }
+  .zones-section { grid-template-columns: 1fr; gap: 10px; }
+  
+  .deck-section { min-height: 200px; padding: 24px 16px; }
+  .draggable-item { font-size: 14px; min-height: 80px; padding: 16px; }
+  
+  .drop-zone { height: 50px; min-height: 50px; }
+  .battery-container { height: 40px; }
+  .battery-container::after { width: 8px; height: 16px; right: -8px; }
+  .zone-label { font-size: 12px; }
+  .win-card { padding: 28px 24px; }
+  .win-battery { width: 140px; height: 64px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="page-header">
+    <h1>Батарейка <span>ресурсов</span></h1>
+    <div class="divider-center"></div>
+    <p class="subtitle mt-sm">Распределите активности по 5 видам ресурсов, а поглотители времени отправьте в корзину</p>
+  </div>
+
+  <div class="game-board">
+
+    <!-- Левая панель: Колода -->
+    <div class="deck-section">
+      <h2>Активность</h2>
+      <div class="deck-counter" id="deckCounter">Осталось: 14</div>
+      <div class="deck-container" id="itemsDeck">
+        <div class="draggable-item" data-type="physical">Сон и развитие выносливости</div>
+        <div class="draggable-item" data-type="social">Поддержание связей с семьей</div>
+        <div class="draggable-item" data-type="affective">Управление своим настроением</div>
+        <div class="draggable-item" data-type="rational">Изучение новых знаний</div>
+        <div class="draggable-item" data-type="metaphysical">Формулирование личной миссии</div>
+        <div class="draggable-item" data-type="physical">Управление личными финансами</div>
+        <div class="draggable-item" data-type="trash">Скроллинг ленты соцсетей</div>
+        <div class="draggable-item" data-type="metaphysical">Следование профессиональной этике</div>
+        <div class="draggable-item" data-type="social">Менторство и обмен опытом</div>
+        <div class="draggable-item" data-type="affective">Выделение времени на хобби</div>
+        <div class="draggable-item" data-type="trash">Микроменеджмент сотрудников</div>
+        <div class="draggable-item" data-type="rational">Запрос совета у коллег</div>
+        <div class="draggable-item" data-type="physical">Обустройство жилья</div>
+        <div class="draggable-item" data-type="social">Встречи с друзьями</div>
+      </div>
+    </div>
+
+    <!-- Правая панель: Батарейки -->
+    <div class="zones-section">
+      <div class="drop-zone" data-zone="physical">
+        <div class="battery-container">
+          <div class="battery-fill"></div>
+          <span class="zone-label">Физические</span>
+        </div>
+      </div>
+
+      <div class="drop-zone" data-zone="social">
+        <div class="battery-container">
+          <div class="battery-fill"></div>
+          <span class="zone-label">Социальные</span>
+        </div>
+      </div>
+
+      <div class="drop-zone" data-zone="affective">
+        <div class="battery-container">
+          <div class="battery-fill"></div>
+          <span class="zone-label">Аффективные</span>
+        </div>
+      </div>
+
+      <div class="drop-zone" data-zone="rational">
+        <div class="battery-container">
+          <div class="battery-fill"></div>
+          <span class="zone-label">Рациональные</span>
+        </div>
+      </div>
+
+      <div class="drop-zone" data-zone="metaphysical">
+        <div class="battery-container">
+          <div class="battery-fill"></div>
+          <span class="zone-label">Метафизические</span>
+        </div>
+      </div>
+
+      <!-- Зона Поглотителей (снизу во всю ширину) -->
+      <div class="trash-wrapper">
+        <div class="drop-zone trash-zone" data-zone="trash">
+          <div class="battery-container">
+            <div class="battery-fill"></div>
+            <span class="zone-label">🗑️ Поглотители</span>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+  </div>
+</div>
+
+<!-- Победная карточка -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-card">
+    <div class="win-battery">
+      <div class="win-battery-fill"></div>
+    </div>
+    <div class="win-title">Все ресурсы пополнены!</div>
+    <div class="win-sub">Вы правильно определили внутренние и внешние источники восполнения энергии, избавившись от лишнего шума.</div>
+    <button class="btn btn--primary btn--full" onclick="restartGame()">Пройти заново</button>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+var draggedElement = null;
+var touchDragClone = null;
+var cards = [];
+var currentIndex = 0;
+
+// Настройки требуемого количества карточек для каждой зоны
+var zoneCounts = {
+  physical:     { current: 0, total: 3 },
+  social:       { current: 0, total: 3 },
+  affective:    { current: 0, total: 2 },
+  rational:     { current: 0, total: 2 },
+  metaphysical: { current: 0, total: 2 },
+  trash:        { current: 0, total: 2 }
+};
+
+// ── Инициализация ──────────────────────────────────────────
+function init() {
+  var deck = document.getElementById('itemsDeck');
+  
+  if (deck && deck.children.length > 0) {
+    // 1. Собираем элементы в массив и перемешиваем
+    var itemsArray = Array.from(deck.children);
+    itemsArray.sort(function() { return Math.random() - 0.5; });
+    
+    // 2. Возвращаем перемешанные элементы обратно в DOM
+    itemsArray.forEach(function(item) {
+      deck.appendChild(item);
+      cards.push(item);
+      
+      // Настраиваем Drag and Drop
+      item.setAttribute('draggable', 'true');
+
+      item.addEventListener('dragstart', function(e) {
+        draggedElement = item;
+        item.classList.add('dragging');
+        
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', item.dataset.type || '');
+        }
+      });
+
+      item.addEventListener('dragend', function() {
+        item.classList.remove('dragging');
+        draggedElement = null;
+      });
+
+      item.addEventListener('touchstart', handleTouchStart, { passive: false });
+      item.addEventListener('touchmove',  handleTouchMove,  { passive: false });
+      item.addEventListener('touchend',   handleTouchEnd,   { passive: false });
+    });
+    
+    // 3. Показываем первую карточку
+    if (cards.length > 0) {
+      cards[0].classList.add('active');
+    }
+    updateCounter();
+  }
+
+  // Настраиваем зоны (батарейки)
+  var zones = document.querySelectorAll('.drop-zone');
+  zones.forEach(function(zone) {
+    zone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+
+    zone.addEventListener('dragleave', function() {
+      zone.classList.remove('drag-over');
+    });
+
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      handleDrop(zone, draggedElement);
+    });
+  });
+}
+
+function showNextCard() {
+  currentIndex++;
+  if (currentIndex < cards.length) {
+    cards[currentIndex].classList.add('active');
+  }
+  updateCounter();
+}
+
+function updateCounter() {
+  var counterEl = document.getElementById('deckCounter');
+  var remaining = cards.length - currentIndex;
+  if (counterEl) {
+    if (remaining > 0) {
+      counterEl.textContent = 'Осталось: ' + remaining;
+    } else {
+      counterEl.textContent = 'Колода пуста';
+    }
+  }
+}
+
+// ── Touch ──────────────────────────────────────────────────
+function handleTouchStart(e) {
+  // Игнорируем свайпы, если карточка не активна (хотя скрытые и так не нажать)
+  if (!e.currentTarget.classList.contains('active')) return;
+  
+  e.preventDefault();
+  draggedElement = e.currentTarget;
+
+  var touch = e.touches[0];
+  touchDragClone = draggedElement.cloneNode(true);
+  touchDragClone.classList.add('touch-dragging');
+  // Фиксируем размеры клона
+  touchDragClone.style.width = draggedElement.offsetWidth + 'px';
+  touchDragClone.style.height = draggedElement.offsetHeight + 'px';
+  
+  touchDragClone.style.left  = touch.clientX - draggedElement.offsetWidth  / 2 + 'px';
+  touchDragClone.style.top   = touch.clientY - draggedElement.offsetHeight / 2 + 'px';
+  document.body.appendChild(touchDragClone);
+  draggedElement.style.opacity = '0.3';
+}
+
+function handleTouchMove(e) {
+  if (!touchDragClone) return;
+  e.preventDefault();
+  var touch = e.touches[0];
+  touchDragClone.style.left = touch.clientX - touchDragClone.offsetWidth  / 2 + 'px';
+  touchDragClone.style.top  = touch.clientY - touchDragClone.offsetHeight / 2 + 'px';
+}
+
+function handleTouchEnd(e) {
+  if (!touchDragClone) return;
+  e.preventDefault();
+
+  var touch = e.changedTouches[0];
+  // Временно прячем клон, чтобы определить элемент под ним
+  touchDragClone.style.display = 'none';
+  var target = document.elementFromPoint(touch.clientX, touch.clientY);
+  touchDragClone.style.display = 'flex';
+  
+  var zone = target;
+  while (zone && !zone.classList.contains('drop-zone')) zone = zone.parentElement;
+  
+  if (zone) {
+    handleDrop(zone, draggedElement);
+  } else {
+    // Если бросили мимо, возвращаем прозрачность оригиналу
+    if (draggedElement) draggedElement.style.opacity = '1';
+  }
+
+  touchDragClone.parentNode && touchDragClone.parentNode.removeChild(touchDragClone);
+  touchDragClone = null;
+  draggedElement = null;
+}
+
+// ── Drop-логика ────────────────────────────────────────────
+function handleDrop(zone, item) {
+  if (!item) return;
+  var itemType = item.dataset.type;
+  var zoneType = zone.dataset.zone;
+
+  if (itemType === zoneType) {
+    item.style.transition = 'all 0.25s ease';
+    item.style.opacity = '0';
+    item.style.transform = 'scale(0.4)';
+
+    setTimeout(function() {
+      item.remove();
+      updateBattery(zone, zoneType);
+      showNextCard();
+      checkWin();
+      if (typeof notifyHeight === 'function') notifyHeight();
+    }, 260);
+  } else {
+    zone.classList.add('error');
+    if (item) item.style.opacity = '1'; // Восстанавливаем, если тащили на таче
+    setTimeout(function() { zone.classList.remove('error'); }, 450);
+  }
+}
+
+function updateBattery(zone, type) {
+  zoneCounts[type].current++;
+  var fill = zone.querySelector('.battery-fill');
+  if (fill) {
+    fill.style.width = (zoneCounts[type].current / zoneCounts[type].total * 100) + '%';
+  }
+}
+
+function checkWin() {
+  var allDone = Object.keys(zoneCounts).every(function(z) { return zoneCounts[z].current === zoneCounts[z].total; });
+  if (allDone) {
+    var deckSection = document.querySelector('.deck-section');
+    if (deckSection) deckSection.style.display = 'none';
+    
+    setTimeout(function() {
+      document.getElementById('winOverlay').classList.add('show');
+    }, 400);
+  }
+}
+
+// ── Рестарт ────────────────────────────────────────────────
+function restartGame() {
+  document.getElementById('winOverlay').classList.remove('show');
+  location.reload();
+}
+
+// Запуск
+document.addEventListener("DOMContentLoaded", function() {
+  init();
+});
+</script>
+</body>
+</html>
