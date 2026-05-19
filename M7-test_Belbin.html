@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Командные роли Белбина — М360</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<style>
+/* ─── СПЕЦИФИЧНЫЕ ПЕРЕМЕННЫЕ ─── */
+:root {
+  --color-1: #1A5FA5; /* Интеллект */
+  --color-2: #B85C00; /* Социум */
+  --color-3: #1A6B4A; /* Действие */
+}
+
+#app { max-width: 800px; margin: 0 auto; padding: 44px 20px 60px; }
+
+/* ─── ВВЕДЕНИЕ ─── */
+.intro { animation: fadeUp 0.6s ease both; }
+.intro-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 20px;
+}
+.intro-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 6vw, 48px); font-weight: 900;
+  color: var(--dark); line-height: 1.1; margin-bottom: 8px;
+}
+.intro-title em { color: var(--red); font-style: normal; display: block; }
+.intro-divider { width: 60px; height: 2px; background: var(--red); margin: 24px 0; }
+.intro-lead { font-size: 15px; line-height: 1.75; color: var(--slate); margin-bottom: 28px; }
+
+.btn-start {
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  background: var(--dark); color: var(--white); border: none; border-radius: 4px;
+  padding: 16px; font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-start:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ─── ПРОГРЕСС ─── */
+.progress-bar-wrap { margin-bottom: 28px; }
+.progress-top {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+}
+.progress-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); }
+.progress-right { display: flex; align-items: center; gap: 14px; }
+.score-counter {
+  font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+  background: var(--sand); border: 1.5px solid var(--border);
+  color: var(--slate); transition: all 0.2s;
+}
+.score-counter.ready { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--red); border-radius: 2px; transition: width 0.4s ease; }
+
+/* ─── БЛОК ВОПРОСА ─── */
+.block-wrap { animation: cardIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both; }
+.block-zone {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 6px;
+}
+.block-title {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 4vw, 24px); font-weight: 700; color: var(--dark);
+  line-height: 1.3; margin-bottom: 24px;
+}
+
+/* ─── МАТРИЦА 10 БАЛЛОВ ─── */
+.matrix-wrap { overflow-x: auto; margin-bottom: 24px; padding-bottom: 10px; }
+/* Увеличена минимальная ширина, чтобы уместить 10 столбцов без сильного сжатия */
+.matrix { width: 100%; min-width: 580px; border-collapse: separate; border-spacing: 0; }
+
+.matrix th {
+  text-align: center; padding: 0 0 12px; font-size: 11px; font-weight: 700;
+  color: var(--slate); width: 34px;
+}
+.matrix th:first-child { text-align: left; width: auto; padding-left: 0; }
+
+.matrix th .score-head {
+  width: 28px; height: 28px; border-radius: 50%; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; border: 1.5px solid var(--border);
+  color: var(--slate); background: var(--white);
+}
+
+.matrix td { padding: 4px 0; vertical-align: middle; }
+.matrix td:first-child {
+  padding-right: 16px; font-size: 12px; line-height: 1.4; color: var(--dark);
+  padding-bottom: 12px; padding-top: 12px; border-bottom: 1px solid var(--border);
+}
+.matrix tr:last-child td:first-child { border-bottom: none; }
+.matrix td:not(:first-child) { text-align: center; border-bottom: 1px solid var(--border); }
+.matrix tr:last-child td:not(:first-child) { border-bottom: none; }
+
+.matrix-cell {
+  width: 28px; height: 28px; border-radius: 50%; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: 1.5px solid var(--border); background: var(--white);
+  transition: border-color 0.15s, background 0.15s, opacity 0.15s;
+  position: relative;
+}
+.matrix-cell:hover { border-color: var(--dark); }
+.matrix-cell::after {
+  content: ''; width: 14px; height: 14px; border-radius: 50%;
+  background: transparent; transition: background 0.15s;
+}
+.matrix-cell.selected::after { background: var(--dark); }
+.matrix-cell.selected { border-color: var(--dark); }
+.matrix-cell.impossible { opacity: 0.15; cursor: not-allowed; pointer-events: none; }
+
+/* ─── КНОПКА «ДАЛЕЕ» ─── */
+.btn-next {
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 4px; padding: 15px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s, opacity 0.2s, transform 0.15s;
+  opacity: 0.35; pointer-events: none;
+}
+.btn-next.ready { opacity: 1; pointer-events: all; }
+.btn-next.ready:hover { background: var(--red); transform: translateY(-1px); }
+
+/* ─── РЕЗУЛЬТАТЫ ─── */
+.results { animation: fadeUp 0.6s ease both; }
+.results-hero { text-align: center; margin-bottom: 32px; background: var(--dark); color: var(--white); border-radius: 12px; padding: 32px 20px; }
+.results-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 12px;
+}
+.dom-roles {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 5vw, 28px); font-weight: 900;
+  color: var(--white); line-height: 1.3; margin-bottom: 12px;
+}
+.results-sub { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+
+/* ─── ШКАЛЫ (ГРАФИКИ) ─── */
+.bars-section { margin-bottom: 32px; }
+.bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.bar-label { font-size: 12px; font-weight: 700; min-width: 150px; color: var(--dark); }
+.bar-track { flex: 1; height: 8px; background: var(--sand); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(0.4,0,0.2,1); background: var(--red); }
+.bar-score { font-size: 12px; font-weight: 700; color: var(--dark); min-width: 28px; text-align: right; }
+
+.cluster-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--slate); margin: 24px 0 12px; letter-spacing: 1px; }
+
+/* ─── КАРТОЧКИ РОЛЕЙ ─── */
+.roles-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 32px; }
+@media(min-width: 600px){ .roles-grid { grid-template-columns: 1fr 1fr; } }
+.role-card { border-radius: 8px; padding: 16px; border: 1.5px solid var(--border); background: var(--white); }
+.role-card.dominant { border-color: var(--dark); background: var(--sand); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+.role-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+.role-cluster { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; margin-bottom: 10px; background: var(--white); border: 1px solid var(--border); color: var(--slate); }
+.role-desc { font-size: 12px; color: var(--slate); line-height: 1.5; }
+
+/* ─── КНОПКИ РЕЗУЛЬТАТОВ ─── */
+.btn-save {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; background: var(--dark); color: var(--white);
+  border: none; border-radius: 4px; padding: 15px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: background 0.2s; margin-bottom: 12px;
+}
+.btn-save:hover { background: var(--red); }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-restart {
+  width: 100%; background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border); border-radius: 4px; padding: 14px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.btn-restart:hover { border-color: var(--dark); background: var(--sand); }
+
+/* ─── Кастомный скроллбар для матрицы ─── */
+.matrix-wrap::-webkit-scrollbar { height: 6px; }
+.matrix-wrap::-webkit-scrollbar-thumb { background: #CCC; border-radius: 3px; }
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<script src="common.js"></script>
+<script>
+// ── ДАННЫЕ МЕТОДИКИ БЕЛБИНА (9 РОЛЕЙ) ──
+
+const BLOCK_TITLES = [
+  'Мой вклад в работу команды',
+  'Мои недостатки в командной работе',
+  'Когда я участвую в совместном проекте',
+  'Мой стиль работы в группе',
+  'Я получаю удовлетворение от работы, когда',
+  'Если мне неожиданно поручают сложную задачу',
+  'Мои проблемы в команде обычно связаны с тем, что'
+];
+
+// Массив из 7 блоков. В каждом блоке 9 утверждений.
+// Индексы соответствуют ролям: 0:IMP, 1:CO, 2:SH, 3:PL, 4:RI, 5:ME, 6:TW, 7:CF, 8:SP
+const STATEMENTS = [
+  [
+    'Я легко превращаю идеи в практические действия.', // IMP
+    'Я умею находить компромиссы и организовывать людей.', // CO
+    'Я готов вести людей за собой и бросать вызов трудностям.', // SH
+    'Я часто предлагаю нестандартные, оригинальные идеи.', // PL
+    'Я легко устанавливаю контакты и нахожу полезные ресурсы вовне.', // RI
+    'Я объективно анализирую ситуацию и взвешиваю все «за» и «против».', // ME
+    'Я чувствую атмосферу в команде и умею сглаживать конфликты.', // TW
+    'Я всегда проверяю детали и довожу работу до идеала.', // CF
+    'Я предоставляю глубокие специализированные знания и навыки.' // SP
+  ],
+  [
+    'Мне трудно отступать от правил и адаптироваться к внезапным изменениям.', // IMP
+    'Меня иногда обвиняют в том, что я перекладываю свою работу на других.', // CO
+    'В стремлении к результату я бываю резок и раздражителен.', // SH
+    'Я могу слишком увлечься своими идеями и забыть о реальных деталях.', // PL
+    'Мой энтузиазм быстро угасает, когда проходит первоначальный интерес.', // RI
+    'Мне сложно вдохновлять других, я бываю излишне критичен.', // ME
+    'В моменты конфликтов мне трудно принимать жесткие решения.', // TW
+    'Я склонен к чрезмерному перфекционизму и излишне тревожусь.', // CF
+    'Я склонен концентрироваться только на своей узкой теме, игнорируя остальное.' // SP
+  ],
+  [
+    'Я стараюсь сразу составить четкий план и график работы.', // IMP
+    'Я слежу за тем, чтобы каждый член команды использовал свои сильные стороны.', // CO
+    'Я подгоняю команду, чтобы мы не теряли время зря.', // SH
+    'Я стараюсь найти принципиально новый подход к задаче.', // PL
+    'Я иду к смежникам и внешним экспертам, чтобы узнать, как они это делают.', // RI
+    'Я внимательно оцениваю все предложенные варианты, чтобы избежать ошибок.', // ME
+    'Я стараюсь поддерживать позитивный настрой и помогаю коллегам.', // TW
+    'Я лично проверяю качество на каждом этапе.', // CF
+    'Я беру на себя ту часть работы, в которой я признанный эксперт.' // SP
+  ],
+  [
+    'Я ценю стабильность, предсказуемость и четкие инструкции.', // IMP
+    'Я умею делегировать задачи тем, кто справится с ними лучше всего.', // CO
+    'Я готов спорить и доказывать свою правоту ради достижения цели.', // SH
+    'Я нуждаюсь в тишине и уединении, чтобы генерировать идеи.', // PL
+    'Я люблю находиться в центре событий, общаться и обмениваться новостями.', // RI
+    'Я не поддаюсь эмоциям и опираюсь только на факты и логику.', // ME
+    'Я внимательно слушаю других и стараюсь никого не обидеть.', // TW
+    'Меня беспокоит, если что-то идет не по плану или сделано небрежно.', // CF
+    'Я углубляюсь в технические или профессиональные тонкости задачи.' // SP
+  ],
+  [
+    'Вижу, как абстрактные идеи превращаются в работающий процесс.', // IMP
+    'Вижу, как люди объединяются для достижения общей цели.', // CO
+    'Мы преодолеваем серьезное препятствие и добиваемся результата.', // SH
+    'Мне удается придумать изящное и неочевидное решение проблемы.', // PL
+    'Я нахожу новый, перспективный контакт или неожиданную возможность.', // RI
+    'Мой анализ позволяет команде избежать серьезного провала.', // ME
+    'В команде царит атмосфера доверия и взаимопомощи.', // TW
+    'Итоговый продукт выглядит идеально, без единой ошибки.', // CF
+    'Я узнаю что-то новое в своей узкой профессиональной области.' // SP
+  ],
+  [
+    'Я сразу начну систематизировать информацию и готовить регламент.', // IMP
+    'Я соберу команду и распределю роли в зависимости от способностей каждого.', // CO
+    'Я возьму руководство на себя и буду жестко контролировать процесс.', // SH
+    'Я попытаюсь найти нестандартный выход из ситуации.', // PL
+    'Я начну звонить знакомым и искать, кто уже решал подобную проблему.', // RI
+    'Я сяду и проанализирую все возможные риски и варианты.', // ME
+    'Я постараюсь успокоить команду и помочь всем справиться со стрессом.', // TW
+    'Я сосредоточусь на том, чтобы ни одна важная деталь не была упущена.', // CF
+    'Я углублюсь в изучение специализированной литературы по этой теме.' // SP
+  ],
+  [
+    'Меня раздражают люди, которые постоянно меняют планы.', // IMP
+    'Мне бывает сложно работать, если команда не признает моего лидерства.', // CO
+    'Я могу обидеть людей своей резкостью и нетерпением.', // SH
+    'Я витаю в облаках и не всегда могу понятно объяснить свою идею.', // PL
+    'Я быстро теряю интерес к проекту, как только начинается рутина.', // RI
+    'Меня считают скучным и слишком медлительным при принятии решений.', // ME
+    'Я теряюсь, когда нужно открыто конфликтовать или наказывать людей.', // TW
+    'Я слишком сильно придираюсь к качеству работы коллег.', // CF
+    'Мне неинтересно обсуждать то, что не касается моей узкой специализации.' // SP
+  ]
+];
+
+// Рандомизация порядка строк внутри каждого блока
+const BLOCK_ORDER = STATEMENTS.map(() => {
+  let arr = [0,1,2,3,4,5,6,7,8];
+  return arr.sort(() => Math.random() - 0.5);
+});
+
+const ROLE_INFO = {
+  PL: { name: 'Генератор идей', cluster: 'Интеллектуальные роли', desc: 'Креативный мыслитель. Выдвигает новые идеи и подходы к решению проблем. Часто упускает детали.' },
+  ME: { name: 'Аналитик-стратег', cluster: 'Интеллектуальные роли', desc: 'Объективный критик. Взвешивает все варианты, предотвращает ошибки. Может казаться излишне сухим.' },
+  SP: { name: 'Специалист', cluster: 'Интеллектуальные роли', desc: 'Узкий эксперт. Предоставляет редкие знания и навыки. Склонен фокусироваться только на своей области.' },
+  
+  CO: { name: 'Координатор', cluster: 'Социальные роли', desc: 'Организатор работы. Видит таланты людей, распределяет задачи, направляет команду к цели.' },
+  TW: { name: 'Душа команды', cluster: 'Социальные роли', desc: 'Дипломат. Поддерживает атмосферу, слушает коллег, предотвращает трения и конфликты.' },
+  RI: { name: 'Исследователь ресурсов', cluster: 'Социальные роли', desc: 'Коммуникатор. Ищет новые возможности и контакты за пределами команды. Быстро теряет интерес.' },
+  
+  SH: { name: 'Мотиватор', cluster: 'Роли действия', desc: 'Драйвер процесса. Бросает вызов, настаивает на действии, преодолевает препятствия. Бывает резок.' },
+  IMP: { name: 'Реализатор', cluster: 'Роли действия', desc: 'Практик. Превращает абстрактные идеи в конкретные задачи и регламенты. Надежен и дисциплинирован.' },
+  CF: { name: 'Контролер', cluster: 'Роли действия', desc: 'Педант. Доводит проекты до конца, выискивает ошибки и недоработки. Тревожен, не любит делегировать.' }
+};
+
+// Соответствие индексов массива внутренним кодам ролей
+const INDEX_TO_ROLE = ['IMP', 'CO', 'SH', 'PL', 'RI', 'ME', 'TW', 'CF', 'SP'];
+
+// ── СОСТОЯНИЕ ──
+let state = {
+  screen: 'intro',
+  block: 0,
+  answers: Array.from({length: 7}, () => ({ row: [null,null,null,null,null,null,null,null,null] })),
+  scores: { IMP:0, CO:0, SH:0, PL:0, RI:0, ME:0, TW:0, CF:0, SP:0 }
+};
+
+// ── РЕНДЕР ──
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'intro') app.innerHTML = renderIntro();
+  else if (state.screen === 'quiz') app.innerHTML = renderQuiz();
+  else if (state.screen === 'results') app.innerHTML = renderResults();
+  notifyHeight();
+}
+
+function renderIntro() {
+  return `<div class="intro">
+    <div class="intro-eyebrow">Модель Р.М. Белбина</div>
+    <div class="intro-title">Командные роли <em>Белбина</em></div>
+    <div class="intro-divider"></div>
+    <p class="intro-lead">Успешная команда — это не сборище одинаковых людей, а идеальный баланс различных ролей. Этот опросник поможет выявить ваши сильные стороны в командной работе.</p>
+    <div class="legend-box">
+      <div class="legend-tag">Как проходить</div>
+      Тест состоит из 7 блоков. В каждом блоке вам даётся <strong>10 баллов</strong>. Распределите их между утверждениями, которые лучше всего описывают ваше поведение. <br><br>
+      Вы можете отдать все 10 баллов одному утверждению или разделить их (например, 5, 3 и 2). Утверждения, которые к вам не относятся, <strong>просто оставляйте пустыми</strong>.
+    </div>
+    <button class="btn-start mt-md" onclick="startQuiz()">Начать тест →</button>
+  </div>`;
+}
+
+function renderQuiz() {
+  const b = state.block;
+  const ans = state.answers[b];
+  const order = BLOCK_ORDER[b];
+  const pct = Math.round((b / 7) * 100);
+  
+  // Сумма заполненных баллов в текущем блоке
+  const total = ans.row.reduce((s, v) => s + (v || 0), 0);
+  const scoreReady = (total === 10);
+  
+  const scoresArr = [1,2,3,4,5,6,7,8,9,10];
+
+  const rows = order.map((roleIdx, rowIdx) => {
+    const text = STATEMENTS[b][roleIdx];
+    const rowScore = ans.row[rowIdx];
+    const cells = scoresArr.map(s => {
+      const isSelected = rowScore === s;
+      const cls = 'matrix-cell' + (isSelected ? ' selected' : '');
+      return `<td><div class="${cls}" data-row="${rowIdx}" data-score="${s}" onclick="setScore(${b},${rowIdx},${s})"></div></td>`;
+    }).join('');
+    return `<tr><td>${text}</td>${cells}</tr>`;
+  }).join('');
+
+  const scoreCounterCls = scoreReady ? 'score-counter ready' : 'score-counter';
+  const scoreLabel = scoreReady ? '✓ Распределено' : `Осталось баллов: ${10 - total}`;
+  const btnCls = scoreReady ? 'btn-next ready' : 'btn-next';
+  const isLast = b === 6;
+
+  return `<div class="block-wrap">
+    <div class="progress-bar-wrap">
+      <div class="progress-top">
+        <div class="progress-label">Блок ${b+1} из 7</div>
+        <div class="progress-right">
+          <div class="${scoreCounterCls}" id="score-counter">${scoreLabel}</div>
+          <div style="font-size:11px;font-weight:700;color:var(--red)">${pct}%</div>
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    
+    <div class="block-title">${BLOCK_TITLES[b]}</div>
+    
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>Утверждение</th>
+            <th><div class="score-head">1</div></th>
+            <th><div class="score-head">2</div></th>
+            <th><div class="score-head">3</div></th>
+            <th><div class="score-head">4</div></th>
+            <th><div class="score-head">5</div></th>
+            <th><div class="score-head">6</div></th>
+            <th><div class="score-head">7</div></th>
+            <th><div class="score-head">8</div></th>
+            <th><div class="score-head">9</div></th>
+            <th><div class="score-head">10</div></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <button class="${btnCls}" id="btn-next" onclick="nextBlock()">${isLast ? 'Получить результат →' : 'Следующий блок →'}</button>
+  </div>`;
+}
+
+function renderResults() {
+  const sc = state.scores;
+  
+  // Сортировка ролей по убыванию баллов
+  const sortedRoles = Object.keys(sc).sort((a, b) => sc[b] - sc[a]);
+  const maxScore = sc[sortedRoles[0]];
+  
+  // Определяем доминирующие роли (топ-2 или те, у которых баллы близки к максимуму)
+  let domKeys = [sortedRoles[0], sortedRoles[1]];
+  if(sc[sortedRoles[2]] === sc[sortedRoles[1]] && sc[sortedRoles[2]] > 0) {
+    domKeys.push(sortedRoles[2]); // Если есть ничья на втором месте
+  }
+  const domNames = domKeys.map(k => ROLE_INFO[k].name).join(' и ');
+
+  // Группировка графиков по кластерам для наглядности
+  const clusterOrder = [
+    { label: 'Интеллектуальные роли', keys: ['PL', 'ME', 'SP'] },
+    { label: 'Социальные роли', keys: ['CO', 'TW', 'RI'] },
+    { label: 'Роли действия', keys: ['SH', 'IMP', 'CF'] }
+  ];
+
+  let barsHtml = '';
+  clusterOrder.forEach(c => {
+    barsHtml += `<div class="cluster-title">${c.label}</div>`;
+    c.keys.forEach(k => {
+      const v = sc[k];
+      const pct = maxScore > 0 ? Math.round((v / maxScore) * 100) : 0;
+      barsHtml += `<div class="bar-row">
+        <div class="bar-label">${ROLE_INFO[k].name}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%" data-w="${pct}"></div></div>
+        <div class="bar-score">${v}</div>
+      </div>`;
+    });
+  });
+
+  // Карточки топ-ролей (показываем первые 3 роли)
+  const roleCards = sortedRoles.slice(0, 3).map((k, i) => {
+    const info = ROLE_INFO[k];
+    const isDom = i === 0 || sc[k] === maxScore;
+    return `<div class="role-card ${isDom ? 'dominant' : ''}">
+      <div class="role-cluster">${info.cluster}</div>
+      <div class="role-name">${info.name}</div>
+      <div class="role-desc">${info.desc}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="results">
+    <div class="results-hero">
+      <div class="results-eyebrow">Ваши доминирующие роли</div>
+      <div class="dom-roles">${domNames}</div>
+      <div class="results-sub">Именно эти роли даются вам наиболее естественно и приносят максимум пользы команде.</div>
+    </div>
+    
+    <div class="bars-section">
+      ${barsHtml}
+    </div>
+    
+    <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:12px;">Ваш Топ-3 профиль:</div>
+    <div class="roles-grid">${roleCards}</div>
+
+    <div style="display:flex;flex-direction:column;gap:0">
+      <button class="btn-save" id="btn-save" onclick="saveResult()">↓ Сохранить результат</button>
+      <button class="btn-restart" onclick="restart()">↺ Пройти заново</button>
+    </div>
+  </div>`;
+}
+
+// ── ЛОГИКА ──
+function startQuiz() { state.screen = 'quiz'; state.block = 0; render(); }
+
+function setScore(blockIdx, rowIdx, score) {
+  const ans = state.answers[blockIdx];
+  // Клик по уже выбранной ячейке снимает выбор
+  ans.row[rowIdx] = (ans.row[rowIdx] === score) ? null : score;
+
+  // Визуальное обновление только текущей строки (убираем selection)
+  document.querySelectorAll(`.matrix-cell[data-row="${rowIdx}"]`).forEach(cell => {
+    cell.classList.toggle('selected', parseInt(cell.dataset.score) === ans.row[rowIdx]);
+  });
+  
+  refreshMatrix(ans);
+}
+
+function refreshMatrix(ans) {
+  const total = ans.row.reduce((s, v) => s + (v || 0), 0);
+  const ready = (total === 10);
+
+  const counter = document.getElementById('score-counter');
+  if (counter) {
+    counter.textContent = ready ? '✓ Распределено' : `Осталось баллов: ${10 - total}`;
+    counter.className = ready ? 'score-counter ready' : 'score-counter';
+  }
+  const btn = document.getElementById('btn-next');
+  if (btn) btn.className = ready ? 'btn-next ready' : 'btn-next';
+
+  // Обновление доступности ячеек на основе оставшегося бюджета
+  for (let r = 0; r < 9; r++) {
+    const rowVal = ans.row[r];
+    const rowTotalExcluding = total - (rowVal || 0);
+    const pointsLeft = 10 - rowTotalExcluding;
+
+    document.querySelectorAll(`.matrix-cell[data-row="${r}"]`).forEach(cell => {
+      const s = parseInt(cell.dataset.score);
+      // Ячейка доступна, если ее вес не превышает остаток баллов
+      const allowed = (s >= 1 && s <= pointsLeft);
+      cell.classList.toggle('impossible', !allowed);
+    });
+  }
+  notifyHeight();
+}
+
+function nextBlock() {
+  const ans = state.answers[state.block];
+  const total = ans.row.reduce((s, v) => s + (v || 0), 0);
+  if (total !== 10) return;
+
+  const order = BLOCK_ORDER[state.block];
+  
+  // Добавляем баллы в общий зачет
+  ans.row.forEach((score, rowIdx) => {
+    if (score !== null) {
+      const roleKey = INDEX_TO_ROLE[order[rowIdx]];
+      state.scores[roleKey] += score;
+    }
+  });
+
+  if (state.block === 6) {
+    state.screen = 'results';
+    render();
+    setTimeout(animateBars, 100);
+  } else {
+    state.block++;
+    render();
+  }
+}
+
+function animateBars() {
+  document.querySelectorAll('.bar-fill').forEach(bar => { bar.style.width = bar.dataset.w + '%'; });
+}
+
+function saveResult() {
+  const btn = document.getElementById('btn-save');
+  if (btn) { btn.disabled = true; btn.textContent = 'Сохраняем...'; }
+
+  const sc = state.scores;
+  const sortedRoles = Object.keys(sc).sort((a, b) => sc[b] - sc[a]);
+  const domNames = ROLE_INFO[sortedRoles[0]].name + (sc[sortedRoles[1]] > 0 ? ' и ' + ROLE_INFO[sortedRoles[1]].name : '');
+
+  const W = 800, H = 500;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#FAF8F4';
+  ctx.fillRect(0, 0, W, H);
+
+  // Верхняя полоса
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
+  grad.addColorStop(0, '#C31532'); grad.addColorStop(0.5, '#003B48'); grad.addColorStop(1, '#C31532');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, 6);
+
+  // Текст
+  ctx.fillStyle = '#C31532';
+  ctx.font = '700 12px Inter, sans-serif';
+  ctx.fillText('МОДЕЛЬ КОМАНДНЫХ РОЛЕЙ БЕЛБИНА', 40, 50);
+
+  ctx.fillStyle = '#003B48';
+  ctx.font = '900 36px "Playfair Display", serif';
+  ctx.fillText('Доминирующие роли:', 40, 100);
+  
+  ctx.fillStyle = '#C31532';
+  ctx.fillText(domNames, 40, 145);
+
+  const barX = 40, barMaxW = 680, barH = 14, barGap = 34;
+  let yPos = 210;
+
+  ctx.font = '700 12px Inter, sans-serif';
+  ctx.fillStyle = '#495761';
+  ctx.fillText('БАЛЛЫ ПО ВСЕМ РОЛЯМ:', barX, yPos - 20);
+
+  const maxScore = sc[sortedRoles[0]] || 1;
+
+  sortedRoles.forEach((k) => {
+    const v = sc[k];
+    const pct = v / maxScore;
+    const bw = Math.round(pct * barMaxW);
+    
+    ctx.fillStyle = '#003B48';
+    ctx.font = '600 12px Inter, sans-serif';
+    ctx.fillText(ROLE_INFO[k].name, barX, yPos);
+
+    ctx.fillStyle = '#F0EDE6';
+    roundRect(ctx, barX + 160, yPos - 11, barMaxW - 160, barH, 7);
+
+    ctx.fillStyle = '#C31532';
+    if (bw > 0) roundRect(ctx, barX + 160, yPos - 11, (bw * (barMaxW-160)/barMaxW), barH, 7);
+
+    ctx.fillStyle = '#003B48';
+    ctx.font = '700 12px Inter, sans-serif';
+    ctx.fillText(v, barX + barMaxW + 12, yPos + 1);
+    
+    yPos += barGap;
+  });
+
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `belbin-result.png`; a.click();
+    URL.revokeObjectURL(url);
+    if (btn) { btn.disabled = false; btn.textContent = '↓ Сохранить результат'; }
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  if (w < 2*r) r = w/2; if (h < 2*r) r = h/2;
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath(); ctx.fill();
+}
+
+function restart() {
+  state = {
+    screen: 'intro', block: 0,
+    answers: Array.from({length: 7}, () => ({ row: [null,null,null,null,null,null,null,null,null] })),
+    scores: { IMP:0, CO:0, SH:0, PL:0, RI:0, ME:0, TW:0, CF:0, SP:0 }
+  };
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
