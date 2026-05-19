@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Карьерный инвестор</title>
+<title>Аудит вектора развития</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 
 <style>
 #app { max-width: 680px; margin: 0 auto; padding: 44px 20px 60px; }
@@ -48,9 +47,8 @@ input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); backgrou
 
 /* ── RESULTS ── */
 .scenario-row { background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
-.scenario-row.top { border-color: var(--dark); box-shadow: 0 2px 10px rgba(0,59,72,0.08); }
+.scenario-row.top { border-color: var(--dark); box-shadow: 0 4px 14px rgba(0,59,72,0.08); }
 .scenario-top-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-.scenario-icon { font-size: 18px; flex-shrink: 0; }
 .scenario-name { font-size: 13px; font-weight: 700; color: var(--dark); flex: 1; line-height: 1.4; }
 .scenario-pct { font-family: var(--font-display); font-size: 22px; font-weight: 900; color: var(--dark); flex-shrink: 0; }
 .scenario-row.top .scenario-pct { color: var(--red); }
@@ -58,11 +56,11 @@ input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); backgrou
 .scenario-bar-wrap { height: 6px; background: var(--sand); border-radius: 3px; overflow: hidden; }
 .scenario-bar-fill { height: 100%; border-radius: 3px; width: 0; transition: width 0.7s ease; }
 
-.scenario-hint { font-size: 11px; color: var(--slate); margin-top: 7px; line-height: 1.5; }
+.scenario-hint { font-size: 12px; color: var(--slate); margin-top: 10px; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 10px; }
 
 /* ── COLORS FOR BARS ── */
-.sb-0 { background: var(--c1); } .sb-1 { background: var(--c2); } .sb-2 { background: var(--c3); } .sb-3 { background: var(--c4); } .sb-4 { background: var(--c5); }
-.scenario-row.top .scenario-bar-fill { background: var(--dark); }
+.sb-0 { background: #4A6FA5; } .sb-1 { background: #C0392B; } .sb-2 { background: #8E6BBB; } .sb-3 { background: #1A6B4A; } .sb-4 { background: #D4850A; }
+.scenario-row.top .scenario-bar-fill { background: var(--red); }
 
 .warn-msg { font-size: 12px; color: var(--red); font-weight: 600; margin-top: 8px; display: none; text-align: center; }
 .warn-msg.show { display: block; }
@@ -74,14 +72,14 @@ input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); backgrou
 
   <!-- INPUT SECTION -->
   <div id="input-section">
-    <h1 class="page-title">Куда <span>инвестировать</span> себя?</h1>
+    <h1 class="page-title">Аудит вектора <span>развития</span></h1>
     <div class="divider"></div>
     <div class="legend-box">
       <div class="legend-tag">Задача</div>
-      У вас есть <strong>100 единиц</strong> энергии, времени и ресурсов на следующий год. Распределите их между пятью направлениями — и узнайте, к какому карьерному пути вы движетесь.
+      Оцените, как вы <strong>прямо сейчас</strong> распределяете свои 100 единиц энергии, времени и ресурсов. Распределите их между пятью направлениями — и узнайте, к какому карьерному пути вы движетесь в реальности.
     </div>
 
-    <div class="budget-row mt-m">
+    <div class="budget-row mt-md">
       <div class="budget-label">Распределено</div>
       <div class="budget-display">
         <div class="budget-num" id="spent-num">0</div>
@@ -93,8 +91,7 @@ input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); backgrou
     </div>
 
     <div class="sliders-list">
-      <!-- Слайдеры остаются такими же по ID, но мы обновим их класс в JS -->
-      <div class="slider-item si-1">
+      <div class="slider-item">
         <div class="slider-header">
           <div class="slider-icon">🎓</div>
           <div class="slider-text">
@@ -106,7 +103,7 @@ input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); backgrou
         <input type="range" min="0" max="100" step="5" value="0" id="sl-0" oninput="onSlide(0,this.value)">
       </div>
 
-      <div class="slider-item si-2">
+      <div class="slider-item">
         <div class="slider-header">
           <div class="slider-icon">🚀</div>
           <div class="slider-text">
@@ -118,7 +115,7 @@ input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); backgrou
         <input type="range" min="0" max="100" step="5" value="0" id="sl-1" oninput="onSlide(1,this.value)">
       </div>
 
-      <div class="slider-item si-3">
+      <div class="slider-item">
         <div class="slider-header">
           <div class="slider-icon">📈</div>
           <div class="slider-text">
@@ -130,7 +127,7 @@ input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); backgrou
         <input type="range" min="0" max="100" step="5" value="0" id="sl-2" oninput="onSlide(2,this.value)">
       </div>
 
-      <div class="slider-item si-4">
+      <div class="slider-item">
         <div class="slider-header">
           <div class="slider-icon">🤝</div>
           <div class="slider-text">
@@ -142,7 +139,7 @@ input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); backgrou
         <input type="range" min="0" max="100" step="5" value="0" id="sl-3" oninput="onSlide(3,this.value)">
       </div>
 
-      <div class="slider-item si-5">
+      <div class="slider-item">
         <div class="slider-header">
           <div class="slider-icon">⚖️</div>
           <div class="slider-text">
@@ -158,55 +155,50 @@ input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); backgrou
     <div class="warn-msg" id="warn-msg">Сумма должна быть ровно 100. Осталось распределить: <span id="warn-left"></span></div>
 
     <button class="btn btn--primary btn--full" id="btn-calc" onclick="calculate()" disabled>
-      Рассчитать прогноз →
+      Провести аудит траектории →
     </button>
   </div>
 
+  <!-- RESULTS SECTION -->
   <div id="results-section" style="display:none"></div>
 </div>
 
+<script src="common.js"></script>
 <script>
 const TOTAL = 100;
 const vals = [0, 0, 0, 0, 0];
 
-// ── Scenarios config ──
+// Конфигурация сценариев и советы по корректировке
 const SCENARIOS = [
   {
-    name: 'Вертикальный рост до уровня топ-менеджмента',
-    icon: '🏆',
+    name: 'Вертикальный рост (Топ-менеджмент)',
     weights: [5, 10, 40, 5, -10],
-    hint: 'Ваши инвестиции в лидерство и управление создают сильный сигнал готовности к руководящей роли. Чтобы усилить сценарий — добавьте инициативы и публичную видимость.'
+    advice: 'Сместите фокус на «Лидерство и стратегию», больше делегируйте узкопрофильные задачи сотрудникам.'
   },
   {
-    name: 'Независимый эксперт или внешний консультант',
-    icon: '💡',
+    name: 'Независимый эксперт / Консультант',
     weights: [35, 30, 5, 5, 5],
-    hint: 'Глубокая экспертиза плюс опыт запуска инициатив — классическая база для консультантского трека. Убедитесь, что у вас есть портфолио реальных кейсов.'
+    advice: 'Больше вкладывайте в «Экспертизу» и создание портфолио реальных кейсов через «Пилотные проекты».'
   },
   {
-    name: 'Идейный лидер и руководитель социальных проектов',
-    icon: '🌱',
+    name: 'Идейный лидер / Руководитель соц. проектов',
     weights: [5, 15, 10, 50, 0],
-    hint: 'Вы инвестируете в репутацию через людей. Наставничество и социальные инициативы формируют долгосрочный социальный капитал — это редкий и ценный актив.'
+    advice: 'Уделите максимум внимания «Волонтёрству и наставничеству», чтобы нарастить социальный капитал в компании.'
   },
   {
-    name: 'Высокооплачиваемый эксперт внутри компании',
-    icon: '🔑',
+    name: 'Внутренний высокооплачиваемый эксперт',
     weights: [40, 5, 0, 10, 30],
-    hint: 'Сочетание глубокой экспертизы и отлаженных личных процессов — идеальная формула для роли незаменимого внутреннего эксперта с высокой ценностью и комфортным ритмом.'
+    advice: 'Сфокусируйтесь на узкой «Экспертизе» и оттачивании рабочих процессов через «Личную эффективность».'
   },
   {
-    name: 'Собственный бизнес или корпоративный стартап',
-    icon: '🔥',
+    name: 'Собственный бизнес / Стартап',
     weights: [5, 50, 20, 5, -5],
-    hint: 'Предпринимательский трек требует высокой толерантности к неопределённости. Ваши инвестиции в инициативы — правильная ставка. Добавьте понимание финансов и стратегии.'
+    advice: 'Сделайте максимальный упор на «Пилотные проекты и инициативы», тренируя готовность к рискам.'
   }
 ];
 
-// ── Slider logic ──
 function onSlide(idx, rawVal) {
-  const newVal = parseInt(rawVal);
-  vals[idx] = newVal;
+  vals[idx] = parseInt(rawVal);
   updateUI();
 }
 
@@ -214,21 +206,19 @@ function updateUI() {
   const spent = vals.reduce((a, b) => a + b, 0);
   const left = TOTAL - spent;
 
-  // update value displays
+  // Обновление значений и градиентов
   vals.forEach((v, i) => {
     const valEl = document.getElementById('val-' + i);
     if (valEl) valEl.textContent = v;
     
-    // colour slider fill
     const sl = document.getElementById('sl-' + i);
     if (sl) {
-      const pct = v;
       const colors = ['#4A6FA5','#C0392B','#8E6BBB','#1A6B4A','#D4850A'];
-      sl.style.background = `linear-gradient(to right, ${colors[i]} 0%, ${colors[i]} ${pct}%, #F0EDE6 ${pct}%, #F0EDE6 100%)`;
+      sl.style.background = `linear-gradient(to right, ${colors[i]} 0%, ${colors[i]} ${v}%, #F0EDE6 ${v}%, #F0EDE6 100%)`;
     }
   });
 
-  // budget bar
+  // Прогресс-бар
   const bar = document.getElementById('budget-bar');
   const spentNum = document.getElementById('spent-num');
   if (bar) bar.style.width = Math.min(spent, 100) + '%';
@@ -247,7 +237,7 @@ function updateUI() {
     spentNum.classList.remove('warn', 'ok');
   }
 
-  // warn message
+  // Сообщение об ошибке
   const warnMsg = document.getElementById('warn-msg');
   const warnLeft = document.getElementById('warn-left');
   if (warnMsg) {
@@ -259,20 +249,17 @@ function updateUI() {
     }
   }
 
-  // button state
+  // Кнопка
   const btn = document.getElementById('btn-calc');
   if (btn) btn.disabled = (spent !== TOTAL);
   
-  notifyHeight();
+  if (typeof notifyHeight === 'function') notifyHeight();
 }
 
-// ── Scoring ──
 function calcScores() {
   return SCENARIOS.map(sc => {
     let raw = 0;
-    sc.weights.forEach((w, i) => {
-      raw += w * vals[i];
-    });
+    sc.weights.forEach((w, i) => { raw += w * vals[i]; });
     return raw;
   });
 }
@@ -283,12 +270,9 @@ function calculate() {
   const max = Math.max(...raw);
   const range = max - min || 1;
 
-  const pcts = raw.map(r => {
-    const norm = (r - min) / range;
-    return Math.round(5 + norm * 80);
-  });
-
+  const pcts = raw.map(r => Math.round(5 + ((r - min) / range) * 80));
   const order = pcts.map((p, i) => ({p, i})).sort((a, b) => b.p - a.p);
+  
   renderResults(pcts, order);
 }
 
@@ -297,10 +281,7 @@ function renderResults(pcts, order) {
   const inputEl = document.getElementById('input-section');
 
   const topIdx = order[0].i;
-  const top = SCENARIOS[topIdx];
-  const topPct = pcts[topIdx];
-
-  let heroSub = `На основе распределённых ресурсов система рассчитала вероятность каждого сценария в ближайшие 2–3 года. Помните: невозможно инвестировать во всё сразу без потери эффективности.`;
+  const topSc = SCENARIOS[topIdx];
 
   const rowsHtml = order.map((item, rank) => {
     const sc = SCENARIOS[item.i];
@@ -309,38 +290,51 @@ function renderResults(pcts, order) {
     return `
       <div class="scenario-row ${isTop ? 'top' : ''}" style="animation-delay:${rank * 0.1}s">
         <div class="scenario-top-row">
-          <div class="scenario-icon">${sc.icon}</div>
           <div class="scenario-name">${sc.name}</div>
           <div class="scenario-pct">${pct}%</div>
         </div>
         <div class="scenario-bar-wrap">
           <div class="scenario-bar-fill sb-${item.i}" data-pct="${pct}" style="width:0%"></div>
         </div>
-        ${isTop ? `<div class="scenario-hint">${sc.hint}</div>` : ''}
+        ${isTop ? `<div class="scenario-hint">Если это совпадает с вашей целью «Я через 5 лет» — отлично! Продолжайте в том же духе.</div>` : ''}
       </div>`;
   }).join('');
 
-  const areas = ['Экспертиза','Инициативы','Лидерство','Наставничество','Эффективность'];
-  const allocSummary = vals.map((a, i) => `<strong>${areas[i]}:</strong> ${a}`).join(' · ');
+  let adviceHtml = '';
+  SCENARIOS.forEach((sc, idx) => {
+    if (idx !== topIdx) {
+      adviceHtml += `
+        <div class="card" style="padding: 14px 16px; margin-bottom: 10px;">
+          <div style="font-weight:700; font-size:13px; color:var(--dark); margin-bottom:6px;">Если ваша цель: ${sc.name}</div>
+          <div style="font-size:12px; color:var(--slate); line-height:1.5;">${sc.advice}</div>
+        </div>`;
+    }
+  });
 
   resultsEl.innerHTML = `
-    <div class="results-section anim-fade-up">
-      <div class="results-hero">
-        <div class="results-hero-tag">Ваш прогноз</div>
-        <h2 class="page-title" style="color:var(--white); margin-bottom:10px;">${top.name}</h2>
-        <p class="results-hero-sub">${heroSub}</p>
+    <div class="anim-fade-up">
+      <div class="result-hero" style="margin-bottom: 24px;">
+        <div class="result-hero__icon">🎯</div>
+        <div class="result-hero__title">Ваш текущий вектор:</div>
+        <div class="result-hero__title" style="color: var(--red); font-size: clamp(20px, 4.5vw, 24px);">${topSc.name}</div>
+        <div class="result-hero__text" style="margin-top:12px;">
+          Текущее распределение вашего времени и энергии с наибольшей вероятностью приведет вас к этому сценарию.
+        </div>
       </div>
 
-      <div class="scenarios-label">Карьерные сценарии · вероятность реализации</div>
-      <div class="scenarios-list">${rowsHtml}</div>
+      <div style="font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--slate); margin-bottom:12px;">Анализ всех сценариев</div>
+      <div>${rowsHtml}</div>
 
-      <div class="feedback feedback--info mt-m">
-        <strong>Ваше распределение ресурсов:</strong><br>
-        ${allocSummary}<br><br>
-        Чтобы закрепить план, используйте эти данные для составления индивидуального плана развития.
+      <div class="mt-lg">
+        <h2 class="section-title">Как скорректировать курс?</h2>
+        <p class="lead-text" style="margin-bottom:16px;">Если вы стремитесь к другой карьерной цели, вам необходимо внести изменения в ваш Индивидуальный план развития:</p>
+        ${adviceHtml}
       </div>
 
-      <button class="btn btn--secondary btn--full mt-m" onclick="resetSim()">↺ Попробовать другое распределение</button>
+      <div class="mt-md" style="display:flex; flex-direction:column; gap:10px;">
+        <button class="btn btn--primary btn--full" onclick="saveResult(event)">↓ Сохранить прогноз</button>
+        <button class="btn btn--secondary btn--full" onclick="resetSim()">↺ Пройти аудит заново</button>
+      </div>
     </div>`;
 
   inputEl.style.display = 'none';
@@ -352,7 +346,7 @@ function renderResults(pcts, order) {
     });
   }, 100);
   
-  notifyHeight();
+  if (typeof notifyHeight === 'function') notifyHeight();
 }
 
 function resetSim() {
@@ -364,30 +358,26 @@ function resetSim() {
   updateUI();
   document.getElementById('results-section').style.display = 'none';
   document.getElementById('input-section').style.display = 'block';
-  document.getElementById('save-btn').disabled = true;
-  document.getElementById('restart-btn').classList.add('hidden');
+  if (typeof notifyHeight === 'function') notifyHeight();
 }
 
-async function saveResult() {
-  const btn = document.getElementById('save-btn');
+async function saveResult(event) {
+  const btn = event.currentTarget;
   const originalText = btn.innerText;
   btn.innerText = '⏳ Сохранение...';
   btn.disabled = true;
 
   try {
     const element = document.querySelector('.page-wrap');
-    const canvas = await html2canvas(element, {
-      backgroundColor: '#FAF8F4',
-      scale: 2,
-      useCORS: true
+    const canvas = await html2canvas(element, { 
+      backgroundColor: '#FAF8F4', // Устанавливаем непрозрачный фон
+      scale: 2 // Увеличиваем разрешение для Retina
     });
-
     const link = document.createElement('a');
-    link.download = 'career-investor-result.png';
+    link.download = 'career-audit.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
   } catch (error) {
-    console.error('Ошибка при сохранении:', error);
     alert('Ошибка при сохранении изображения.');
   } finally {
     btn.innerText = originalText;
@@ -395,7 +385,7 @@ async function saveResult() {
   }
 }
 
-// Init
+// Инициализация при старте
 updateUI();
 </script>
 </body>
