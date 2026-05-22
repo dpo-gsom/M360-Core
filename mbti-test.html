@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Типологический тест</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red:    #C31532;
+  --dark:   #003B48;
+  --slate:  #495761;
+  --cream:  #FAF8F4;
+  --sand:   #F0EDE6;
+  --border: #DDD8CF;
+  --white:  #FFFFFF;
+  --green:  #1A6B4A;
+  --green-bg: #EBF5EF;
+  --green-border: #A8D5BC;
+}
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--cream);
+  color: var(--dark);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app { max-width: 600px; margin: 0 auto; padding: 36px 18px 60px; }
+
+/* ── START ── */
+.start {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 48px 0 0;
+  animation: up 0.4s ease both;
+}
+.start-title { font-size: 20px; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
+.start-desc {
+  font-size: 14px; color: var(--slate); line-height: 1.65;
+  max-width: 380px; margin-bottom: 28px;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--dark); color: var(--white);
+  border: none; border-radius: 6px; padding: 12px 28px;
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background 0.18s, transform 0.12s;
+}
+.btn:hover { background: var(--red); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+.btn.full { width: 100%; }
+.btn.outline {
+  background: var(--white); color: var(--dark);
+  border: 1.5px solid var(--border);
+}
+.btn.outline:hover { border-color: var(--dark); background: var(--sand); transform: none; }
+
+/* ── GROUP HEADER ── */
+.group-head { margin-bottom: 22px; animation: up 0.4s ease both; }
+
+.progress-dots { display: flex; gap: 6px; margin-bottom: 14px; }
+.pdot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+.pdot.done   { background: var(--dark); }
+.pdot.active { background: var(--red); }
+
+.group-meta { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 4px; }
+.group-name { font-size: 17px; font-weight: 700; color: var(--dark); }
+
+.answered-line {
+  font-size: 12px; color: var(--slate); margin-bottom: 16px;
+  font-weight: 500;
+}
+.answered-line strong { color: var(--dark); font-weight: 700; }
+
+/* ── QUESTIONS ── */
+.q-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+.q-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+}
+.q-num {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 9px;
+}
+.q-opts { display: flex; flex-direction: column; gap: 6px; }
+
+.qopt {
+  display: flex; align-items: flex-start; gap: 9px;
+  background: var(--cream); border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 9px 12px;
+  font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.5;
+  color: var(--slate); cursor: pointer; text-align: left; width: 100%;
+  transition: border-color 0.14s, background 0.14s;
+  -webkit-tap-highlight-color: transparent;
+}
+.qopt:hover { border-color: var(--dark); background: var(--sand); }
+.qopt.sel {
+  border-color: var(--dark); background: var(--dark); color: var(--white);
+}
+.qopt-ltr {
+  font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; width: 12px;
+}
+.qopt.sel .qopt-ltr { color: rgba(255,255,255,0.55); }
+
+/* ── RESULT ── */
+.result-anim { animation: up 0.45s ease both; }
+
+.result-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 26px 22px; margin-bottom: 16px;
+}
+
+.type-code {
+  font-size: 44px; font-weight: 700; color: var(--dark);
+  letter-spacing: 6px; line-height: 1; margin-bottom: 6px;
+}
+.type-name {
+  font-size: 15px; font-weight: 700; color: var(--red);
+  letter-spacing: 0.3px; margin-bottom: 14px;
+}
+.type-desc {
+  font-size: 13px; line-height: 1.7; color: var(--slate);
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Шкалы */
+.scales { display: flex; flex-direction: column; gap: 10px; }
+.scale-row { display: flex; align-items: center; gap: 8px; }
+.sltr {
+  font-size: 12px; font-weight: 700; color: var(--border);
+  width: 16px; text-align: center; flex-shrink: 0;
+  transition: color 0.4s;
+}
+.sltr.win { color: var(--dark); }
+.sbar-wrap { flex: 1; height: 5px; background: var(--sand); border-radius: 3px; overflow: hidden; }
+.sbar-fill { height: 100%; background: var(--dark); border-radius: 3px; width: 0%; transition: width 0.7s cubic-bezier(0.4,0,0.2,1); }
+.sscore {
+  font-size: 11px; font-weight: 600; color: var(--slate);
+  width: 26px; text-align: center; flex-shrink: 0;
+}
+.sscore.win { color: var(--dark); font-weight: 700; }
+
+.result-date {
+  font-size: 11px; color: var(--slate); opacity: 0.6;
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Кнопки финала ── */
+.result-btns { display: flex; gap: 10px; }
+
+@keyframes up { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ── ДАННЫЕ ─────────────────────────────────────────────────────────────
+var GROUPS = [
+  {
+    meta: 'Блок 1 из 4',
+    name: 'Энергия и общение',
+    keys: ['E','I'],
+    qs: [
+      {a:'Зачастую я коммуникабельный.',
+       b:'Зачастую я спокойный и рассудительный.'},
+      {a:'Среди людей чувствую себя бодро и энергично.',
+       b:'Предпочитаю покой и сдержанность.'},
+      {a:'Мне больше нравится действовать и говорить сразу, не тратя время на обдумывание.',
+       b:'Мне больше нравится сначала всё продумать, после чего действовать или говорить.'},
+      {a:'Не очень люблю тишину.',
+       b:'В тишине чувствую себя комфортно.'},
+      {a:'Чтобы осознать мысль, сначала её проговариваю.',
+       b:'Чтобы осознать мысль, сначала долго над ней размышляю.'},
+      {a:'В компании чаще всего я начинаю разговор.',
+       b:'В компании я обычно молчу, пока со мной не заговорят.'},
+      {a:'Среди друзей я обычно разговариваю больше всех.',
+       b:'Среди друзей я обычно молчалив.'},
+      {a:'Мне нравится иметь много знакомых.',
+       b:'У меня мало знакомых.'},
+      {a:'Если со мной происходит какой-то конфуз, я предпочитаю отшучиваться.',
+       b:'Если со мной происходит конфуз, я потом долго раздумываю, что надо было сказать или сделать.'}
+    ]
+  },
+  {
+    meta: 'Блок 2 из 4',
+    name: 'Восприятие информации',
+    keys: ['S','N'],
+    qs: [
+      {a:'Мне кажется, я практичный человек.',
+       b:'Мне кажется, я человек с богатой фантазией.'},
+      {a:'В процессе работы предпочитаю двигаться стабильно, без каких-либо скачков активности.',
+       b:'В процессе работы предпочитаю действовать при наличии определённого настроения и энергии.'},
+      {a:'Мне больше нравится оперировать фактами.',
+       b:'Мне больше нравится рассуждать о теориях.'},
+      {a:'Предпочитаю думать о настоящем.',
+       b:'Предпочитаю размышлять о возможном будущем.'},
+      {a:'Обычно предлагаю решения, актуальные для данной ситуации.',
+       b:'Обычно предлагаю решения на перспективу.'},
+      {a:'Я предпочитаю брать за основу собственную рассудительность.',
+       b:'Я предпочитаю брать за основу свою интуицию.'},
+      {a:'Мне нравится пользоваться уже изобретёнными и проверенными способами работы.',
+       b:'Мне нравится придумывать более удобные и новаторские способы труда.'},
+      {a:'Предпочитаю основываться на практичности и достоверных фактах.',
+       b:'Предпочитаю брать за основу ощущения и вдохновение.'},
+      {a:'Тем сильнее признание человека, чем выше оценка его практичности и благоразумности.',
+       b:'Тем сильнее признание человека, чем выше оценка его творческих способностей и интуиции.'}
+    ]
+  },
+  {
+    meta: 'Блок 3 из 4',
+    name: 'Принятие решений',
+    keys: ['T','F'],
+    qs: [
+      {a:'Для меня логика важнее чувств.',
+       b:'Для меня чувства важнее логики.'},
+      {a:'Здравомыслие превыше всего.',
+       b:'Индивидуальность превыше всего.'},
+      {a:'Предпочитаю подходить ко всему объективно.',
+       b:'Предпочитаю в первую очередь обращать внимание на человеческий фактор.'},
+      {a:'Для меня важнее изучать вопрос с точки зрения логики.',
+       b:'Для меня важнее собственные ощущения и конкретная ситуация.'},
+      {a:'Я хочу знать больше данных в области науки, техники, быть в курсе политической и экономической ситуации.',
+       b:'Я хочу знать больше данных в области искусства, литературы или гуманитарных наук.'},
+      {a:'Мне кажется, я достаточно критичен.',
+       b:'Мне кажется, я достаточно мягок.'},
+      {a:'Я больше доверяю своей логике.',
+       b:'Я больше основываюсь на своих чувствах.'},
+      {a:'С недоверием и опасением воспринимаю новую информацию.',
+       b:'Я доверяю новым данным.'},
+      {a:'Моими чувствами руководит голова.',
+       b:'Моей головой руководят чувства.'}
+    ]
+  },
+  {
+    meta: 'Блок 4 из 4',
+    name: 'Образ жизни',
+    keys: ['J','P'],
+    qs: [
+      {a:'Предпочитаю, чтобы всё было заранее спланировано и продумано.',
+       b:'Предпочитаю спонтанность, чрезмерная чёткость не оставляет простора для творчества.'},
+      {a:'Уже принятые решения и планы лучше не менять.',
+       b:'Всё поддаётся изменению.'},
+      {a:'Люблю начинать работу как можно раньше, чтобы к концу дня быть свободным.',
+       b:'Всё делаю в последний момент.'},
+      {a:'В жизни тоже необходимо придерживаться определённого плана, не только в работе.',
+       b:'В жизни необходимо ориентироваться на ситуацию.'},
+      {a:'Я злюсь от моментов, которые меня расстраивают.',
+       b:'Я умею подстроиться под ситуации, которые меня расстраивают.'},
+      {a:'Обычно я изучаю каждую деталь работы перед тем, как начать.',
+       b:'Обычно я выявляю какие-то детали в процессе.'},
+      {a:'Я не люблю перемены, мне сложно привыкнуть к новым условиям.',
+       b:'Я не люблю однообразие.'},
+      {a:'Я предпочитаю упорядоченный образ жизни.',
+       b:'Мне не нравится упорядоченность, это сильно ограничивает.'},
+      {a:'Мне нравится назначать встречи, как личные, так и рабочие, заранее.',
+       b:'Мне нравится спонтанность.'}
+    ]
+  }
+];
+
+var TYPES = {
+  ISTJ:{name:'Хранитель',      desc:'Надёжный, ответственный, последовательный. Опирается на факты и личный опыт, придерживается правил и доводит начатое до конца — будь то рабочий проект или долгосрочные обязательства.'},
+  ISFJ:{name:'Защитник',       desc:'Заботливый и внимательный к деталям. Хорошо помнит нюансы о важных людях, предан и стабилен. Комфортно чувствует себя в привычной, знакомой среде.'},
+  INFJ:{name:'Советник',       desc:'Интуитивный и глубокий. Стремится к смыслу и подлинности, умеет слышать то, что не сказано вслух. Держит высокую планку для себя и помогает другим расти.'},
+  INTJ:{name:'Стратег',        desc:'Независимый и амбициозный. Видит закономерности там, где другие видят хаос, и строит долгосрочные планы. Требователен к себе и к окружающим.'},
+  ISTP:{name:'Мастер',         desc:'Наблюдательный и прагматичный. Решает проблемы спокойно и эффективно, без лишних слов. Ценит свободу действий и практический результат.'},
+  ISFP:{name:'Художник',       desc:'Мягкий, гибкий, чуткий. Живёт настоящим моментом, ценит красоту и гармонию. Действует в согласии с личными ценностями, избегает конфликтов.'},
+  INFP:{name:'Посредник',      desc:'Идеалист с богатым внутренним миром. Ищет смысл в отношениях и работе. Чуткий и творческий — при этом неожиданно упорный в том, что для него важно.'},
+  INTP:{name:'Мыслитель',      desc:'Аналитик, влюблённый в идеи и теории. Логичен и независим, любит находить противоречия в устоявшихся системах. Не терпит поверхностных суждений.'},
+  ESTP:{name:'Делец',          desc:'Энергичный и находчивый. Живёт в моменте, быстро реагирует на изменения. Умеет убеждать, брать инициативу и превращать возможности в конкретный результат.'},
+  ESFP:{name:'Артист',         desc:'Жизнерадостный и открытый. Заряжает окружающих энергией, обожает быть в гуще событий. Действует по ощущениям и умеет делать жизнь ярче.'},
+  ENFP:{name:'Чемпион',        desc:'Вдохновляющий энтузиаст с широким взглядом на мир. Видит потенциал в людях и идеях, умеет зажигать. Гибкий, открытый и неистощимый на новые замыслы.'},
+  ENTP:{name:'Полемист',       desc:'Изобретательный и остроумный. Любит дискуссии, нестандартные идеи и бросает вызов привычному порядку. Скучает без интеллектуального напряжения.'},
+  ESTJ:{name:'Администратор',  desc:'Организованный, прямолинейный, надёжный. Берёт на себя ответственность, расставляет приоритеты и доводит дело до конца. Уважает традиции и чёткие правила.'},
+  ESFJ:{name:'Консул',         desc:'Заботливый и общительный. Старается сделать всех счастливыми, поддерживает гармонию. Чуток к нуждам конкретных людей вокруг него.'},
+  ENFJ:{name:'Наставник',      desc:'Харизматичный и вдохновляющий. Умеет мотивировать людей и помогать им раскрыться. Чуток к настроениям в группе и думает о развитии своей команды.'},
+  ENTJ:{name:'Командир',       desc:'Решительный стратег с даром лидерства. Видит возможности для роста и умеет мобилизовать людей вокруг цели. Требователен, прямолинеен и эффективен.'}
+};
+
+// ── СОСТОЯНИЕ ─────────────────────────────────────────────────────────────
+var state = {
+  screen: 'start',
+  gi: 0,
+  ans: [
+    [null,null,null,null,null,null,null,null,null],
+    [null,null,null,null,null,null,null,null,null],
+    [null,null,null,null,null,null,null,null,null],
+    [null,null,null,null,null,null,null,null,null]
+  ]
+};
+
+// ── РЕНДЕР ────────────────────────────────────────────────────────────────
+function render() {
+  var app = document.getElementById('app');
+  if      (state.screen === 'start')  app.innerHTML = renderStart();
+  else if (state.screen === 'group')  { app.innerHTML = renderGroup(); window.scrollTo(0,0); }
+  else if (state.screen === 'result') { app.innerHTML = renderResult(); window.scrollTo(0,0); setTimeout(animBars, 80); }
+}
+
+function renderStart() {
+  return '<div class="start">'
+    + '<div class="start-title">Типологический тест</div>'
+    + '<div class="start-desc">36 вопросов в четырёх блоках. На каждый вопрос — два варианта, выберите тот, что ближе вам. Нет правильных или неправильных ответов.</div>'
+    + '<button class="btn" onclick="go()">Пройти тест →</button>'
+    + '</div>';
+}
+
+function renderGroup() {
+  var g   = GROUPS[state.gi];
+  var ans = state.ans[state.gi];
+  var done = ans.filter(function(v){ return v !== null; }).length;
+  var isLast = state.gi === GROUPS.length - 1;
+
+  var dots = GROUPS.map(function(_, i) {
+    var c = i < state.gi ? 'done' : i === state.gi ? 'active' : '';
+    return '<div class="pdot ' + c + '"></div>';
+  }).join('');
+
+  var qs = g.qs.map(function(q, qi) {
+    var selA = ans[qi] === 'A';
+    var selB = ans[qi] === 'B';
+    var globalN = state.gi * 9 + qi + 1;
+    return '<div class="q-card">'
+      + '<div class="q-num">Вопрос ' + globalN + '</div>'
+      + '<div class="q-opts">'
+        + '<button class="qopt' + (selA ? ' sel' : '') + '" onclick="pick(' + qi + ',\'A\')">'
+          + '<span class="qopt-ltr">А</span><span>' + q.a + '</span>'
+        + '</button>'
+        + '<button class="qopt' + (selB ? ' sel' : '') + '" onclick="pick(' + qi + ',\'B\')">'
+          + '<span class="qopt-ltr">Б</span><span>' + q.b + '</span>'
+        + '</button>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+
+  return '<div class="group-head">'
+      + '<div class="progress-dots">' + dots + '</div>'
+      + '<div class="group-meta">' + g.meta + '</div>'
+      + '<div class="group-name">' + g.name + '</div>'
+    + '</div>'
+    + '<div class="answered-line">Отвечено: <strong id="done-cnt">' + done + '</strong> из 9</div>'
+    + '<div class="q-list">' + qs + '</div>'
+    + '<button class="btn full" id="next-btn" ' + (done === 9 ? '' : 'disabled') + ' onclick="next()">'
+      + (isLast ? 'Посмотреть результат →' : 'Следующий блок →')
+    + '</button>';
+}
+
+function renderResult() {
+  var sc = scores();
+  var code = sc.map(function(s, i) { return s.a > s.b ? GROUPS[i].keys[0] : GROUPS[i].keys[1]; }).join('');
+  var info = TYPES[code] || {name:'', desc:''};
+
+  var scalesHtml = sc.map(function(s, i) {
+    var g = GROUPS[i];
+    var winA = s.a > s.b;
+    var pct  = Math.round(s.a / 9 * 100);
+    return '<div class="scale-row">'
+      + '<span class="sltr' + (winA ? ' win' : '') + '">' + g.keys[0] + '</span>'
+      + '<div class="sbar-wrap"><div class="sbar-fill" data-pct="' + pct + '" style="width:0%"></div></div>'
+      + '<span class="sscore' + (winA ? ' win' : '') + '">' + s.a + '</span>'
+      + '<span style="color:var(--border);font-size:11px;margin:0 2px">|</span>'
+      + '<span class="sscore' + (!winA ? ' win' : '') + '">' + s.b + '</span>'
+      + '<div class="sbar-wrap" style="transform:scaleX(-1)"><div class="sbar-fill" data-pct="' + (100-pct) + '" style="width:0%;background:var(--slate);opacity:0.35"></div></div>'
+      + '<span class="sltr' + (!winA ? ' win' : '') + '">' + g.keys[1] + '</span>'
+      + '</div>';
+  }).join('');
+
+  var date = new Date().toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'});
+
+  return '<div class="result-anim">'
+    + '<div class="result-card" id="res-card">'
+      + '<div class="type-code">' + code + '</div>'
+      + '<div class="type-name">' + info.name + '</div>'
+      + '<div class="type-desc">' + info.desc + '</div>'
+      + '<div class="scales">' + scalesHtml + '</div>'
+      + '<div class="result-date">' + date + '</div>'
+    + '</div>'
+    + '<div class="result-btns">'
+      + '<button class="btn outline" onclick="restart()">↺ Заново</button>'
+      + '<button class="btn" style="flex:1" id="btn-save" onclick="saveImg()">📸 Сохранить результат</button>'
+    + '</div>'
+    + '</div>';
+}
+
+// ── ЛОГИКА ────────────────────────────────────────────────────────────────
+function scores() {
+  return state.ans.map(function(a) {
+    return {
+      a: a.filter(function(v){ return v==='A'; }).length,
+      b: a.filter(function(v){ return v==='B'; }).length
+    };
+  });
+}
+
+function animBars() {
+  document.querySelectorAll('.sbar-fill').forEach(function(el) {
+    el.style.width = el.dataset.pct + '%';
+  });
+}
+
+function go()    { state.screen='group'; state.gi=0; render(); }
+function next()  {
+  var done = state.ans[state.gi].filter(function(v){ return v!==null; }).length;
+  if (done < 9) return;
+  if (state.gi < GROUPS.length-1) { state.gi++; state.screen='group'; }
+  else state.screen = 'result';
+  render();
+}
+function restart() {
+  state = {
+    screen:'start', gi:0,
+    ans:[[null,null,null,null,null,null,null,null,null],
+         [null,null,null,null,null,null,null,null,null],
+         [null,null,null,null,null,null,null,null,null],
+         [null,null,null,null,null,null,null,null,null]]
+  };
+  render();
+}
+
+// Целевой апдейт без перерендера страницы
+function pick(qi, val) {
+  state.ans[state.gi][qi] = val;
+
+  var cards = document.querySelectorAll('.q-card');
+  var card  = cards[qi];
+  if (card) {
+    var btns = card.querySelectorAll('.qopt');
+    btns[0].classList.toggle('sel', val==='A');
+    btns[1].classList.toggle('sel', val==='B');
+  }
+
+  var done = state.ans[state.gi].filter(function(v){ return v!==null; }).length;
+  var cnt  = document.getElementById('done-cnt');
+  if (cnt) cnt.textContent = done;
+  var btn  = document.getElementById('next-btn');
+  if (btn) btn.disabled = (done !== 9);
+}
+
+function saveImg() {
+  var btn  = document.getElementById('btn-save');
+  var card = document.getElementById('res-card');
+  if (typeof html2canvas === 'undefined') { alert('Сделайте скриншот вручную'); return; }
+  btn.disabled = true; btn.textContent = '⏳ Формирую…';
+  var sc = scores();
+  var code = sc.map(function(s,i){ return s.a>s.b ? GROUPS[i].keys[0] : GROUPS[i].keys[1]; }).join('');
+  html2canvas(card, {scale:2, backgroundColor:'#ffffff', useCORS:true})
+    .then(function(cvs) {
+      var a = document.createElement('a');
+      a.download = 'тип-' + code + '.png';
+      a.href = cvs.toDataURL('image/png');
+      a.click();
+      btn.textContent = '✓ Сохранено!';
+      setTimeout(function(){ btn.textContent='📸 Сохранить результат'; btn.disabled=false; }, 2500);
+    })
+    .catch(function() {
+      alert('Не удалось. Сделайте скриншот вручную.');
+      btn.textContent='📸 Сохранить результат'; btn.disabled=false;
+    });
+}
+
+render();
+</script>
+</body>
+</html>
