@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Год одной команды</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ─── Экран: фиксированная высота, чтобы iframe не прыгал ─── */
+  .screen { min-height: 684px; }
+  .screen__body { flex: 1; display: flex; flex-direction: column; }
+  .screen__body--center { justify-content: center; }
+
+  /* ─── Сквозной таймлайн года ─── */
+  .tl { position: relative; height: 44px; margin: 4px 6px 0; }
+  .tl__line { position: absolute; left: 0; right: 0; top: 11px; height: 2px; background: var(--border); }
+  .tl__fill { position: absolute; left: 0; top: 11px; height: 2px; background: var(--dark); transition: width 0.4s ease; }
+  .tl__tick { position: absolute; top: 8px; width: 2px; height: 8px; margin-left: -1px; background: var(--border); }
+  .tl__dot {
+    position: absolute; top: 4px;
+    width: 16px; height: 16px; margin-left: -8px;
+    border-radius: 50%;
+    background: var(--cream);
+    border: 2px solid var(--border);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .tl__dot--current { border-color: var(--red); background: var(--white); box-shadow: 0 0 0 4px rgba(195, 21, 50, 0.15); }
+  .tl__dot--ok  { background: var(--green); border-color: var(--green); }
+  .tl__dot--mid { background: var(--amber); border-color: var(--amber); }
+  .tl__dot--bad { background: var(--red);   border-color: var(--red); }
+  .tl__label {
+    position: absolute; top: 25px;
+    transform: translateX(-50%);
+    font-size: 10px; font-weight: 600; letter-spacing: 0.3px;
+    color: var(--slate); white-space: nowrap;
+  }
+  .tl__label--current { color: var(--red); font-weight: 700; }
+
+  /* ─── Ситуация ─── */
+  .case-month { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--dark); line-height: 1.2; }
+  .case-title { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
+  .case-text { font-size: 14.5px; line-height: 1.6; color: var(--dark); margin-top: 6px; }
+
+  /* ─── Шесть стилей ─── */
+  .styles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .style-opt { padding: 11px 8px; text-align: center; font-size: 13.5px; font-weight: 600; color: var(--dark); line-height: 1.25; }
+  .style-opt--locked { cursor: default; pointer-events: none; }
+
+  /* ─── Обратная связь ─── */
+  .fb-zone { min-height: 172px; }
+  .fb-zone .hint {
+    font-size: 13px; color: var(--slate); text-align: center;
+    padding: 16px 10px;
+    border: 1.5px dashed var(--border); border-radius: var(--radius-md);
+  }
+  .feedback p + p { margin-top: 6px; }
+
+  /* ─── Вводный экран: шпаргалка по стилям ─── */
+  .cheat { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; }
+  .cheat__item { font-size: 13px; line-height: 1.45; color: var(--slate); }
+  .cheat__item b { color: var(--dark); display: block; font-size: 13.5px; }
+
+  /* ─── Итог: вертикальная лента года ─── */
+  .year { position: relative; padding-left: 26px; }
+  .year::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--border); }
+  .year__item { position: relative; padding: 7px 0; }
+  .year__dot { position: absolute; left: -26px; top: 11px; width: 16px; height: 16px; border-radius: 50%; }
+  .year__dot--ok  { background: var(--green); }
+  .year__dot--mid { background: var(--amber); }
+  .year__dot--bad { background: var(--red); }
+  .year__head { font-size: 12px; color: var(--slate); }
+  .year__head b { color: var(--dark); }
+  .year__style { font-size: 15px; font-weight: 700; color: var(--dark); line-height: 1.3; }
+  .year__note { font-size: 12px; color: var(--slate); }
+
+  @media (max-width: 560px) {
+    .screen { min-height: 898px; }
+    .styles { grid-template-columns: 1fr 1fr; }
+    .cheat { grid-template-columns: 1fr; }
+    .fb-zone { min-height: 230px; }
+    .tl__label { font-size: 9px; letter-spacing: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script src="common.js"></script>
+<script>
+/* =========================================================
+   Год одной команды: шесть стилей лидерства по Гоулману
+   Модуль 1 · шесть ситуаций одного года, в каждой — свой стиль
+   Без подсчёта очков
+   ========================================================= */
+
+var STYLES = [
+  { name: 'Принуждающий',   when: 'хорош в кризисе, когда решения нужно принимать очень быстро',                    cheat: '«Делай, как я сказал». Кризис, быстрые решения' },
+  { name: 'Авторитетный',   when: 'хорош во время перемен, когда команду нужно вдохновить и повести за собой',      cheat: 'Вдохновляет и ведёт за собой. Перемены' },
+  { name: 'Отеческий',      when: 'хорош, когда нужно позаботиться о людях: при обучении и в конфликтах',          cheat: '«Главное — это люди». Обучение, конфликты' },
+  { name: 'Демократический', when: 'хорош, когда нужно вовлечь сотрудников через диалог и совместные решения',      cheat: 'Доверие и диалог. Совместные решения' },
+  { name: 'Эталонный',      when: 'хорош, когда лидер задаёт высокую планку и показывает пример: «Делай как я»',    cheat: '«Делай как я». Высокие стандарты' },
+  { name: 'Наставнический', when: 'хорош, когда нужно развивать профессиональные навыки сотрудника',                cheat: '«Попробуй сделать так». Развитие навыков' }
+];
+
+/* m — номер месяца (0 = январь); right — верный стиль; mid — допустимый стиль (жёлтый) */
+var CASES = [
+  { m: 1, month: 'Февраль', title: 'Новая модель работы',
+    text: 'Компания решила перейти от разовых проектов к долгосрочным контрактам на поддержку клиентов. Для команды это новая работа: другие сроки, другая ответственность. Люди тревожатся и не понимают, зачем всё менять.',
+    right: 1,
+    need: 'людям нужно понять, куда и зачем движется компания, и поверить в перемены',
+    fb: 'Во время перемен команде нужен лидер, который объяснит, куда мы идём и зачем, и вдохновит двигаться дальше. Приказ здесь сработает хуже: люди начнут выполнять, но не поверят.' },
+  { m: 3, month: 'Апрель', title: 'Авария в серверной',
+    text: 'В офисе прорвало трубу над серверной. У части клиентов уже сбои, служба поддержки получает поток жалоб. Действовать нужно быстро, чтобы спасти и оборудование, и репутацию компании.',
+    right: 0,
+    need: 'нужны быстрые и чёткие решения, на обсуждения времени нет',
+    fb: 'В кризисе нет времени на обсуждения: руководитель сам принимает решения, раздаёт задачи и берёт ответственность на себя. Когда авария позади, к этому стилю лучше не возвращаться — он гасит инициативу.' },
+  { m: 4, month: 'Май', title: 'Рост младшего инженера',
+    text: 'Сильный младший инженер просит задачи посложнее: через год он хочет стать ведущим. Опыта ему пока не хватает, но учится он быстро.',
+    right: 5, mid: 2,
+    need: 'нужно развивать его профессиональные навыки',
+    midFb: 'Поддержка и похвала ему не помешают, так что выбор допустимый. Но здесь нужна не столько забота, сколько развитие навыков.',
+    fb: 'Задача руководителя — помочь сотруднику научиться самому: дать сложную задачу, подсказать подход («Попробуй сделать так») и вместе разобрать результат. Так растут будущие ведущие.' },
+  { m: 5, month: 'Июнь', title: 'Контракт с крупным банком',
+    text: 'Компания выиграла контракт с крупным банком. Требования к качеству жёсткие, любая ошибка будет на виду. В команде сильные профессионалы, а руководитель сам хорошо знает эту работу.',
+    right: 4,
+    need: 'нужно задать высокую планку качества и показать её на своём примере',
+    fb: 'Сильной команде не нужно объяснять, что делать. Ей нужно увидеть планку: руководитель сам работает по высоким стандартам и предлагает равняться на него — «Делай как я».' },
+  { m: 8, month: 'Сентябрь', title: 'Команда после аврала',
+    text: 'Проект для банка сдали, но три месяца аврала не прошли даром. Люди раздражены, ссорятся по мелочам, доверие в команде падает. Сейчас сохранить людей важнее, чем выдать новый результат.',
+    right: 2,
+    need: 'нужно позаботиться о людях и снять конфликты',
+    fb: 'После аврала главное — люди. Руководитель уделяет внимание каждому, замечает, кто как выложился, и помогает разрешить конфликты. Без сохранённой команды новых результатов не будет.' },
+  { m: 10, month: 'Ноябрь', title: 'Стратегия на следующий год',
+    text: 'Пора готовить стратегию на следующий год. В команде опытные эксперты, каждый знает свой рынок лучше вас. Вам нужно, чтобы они взяли ответственность за план на себя.',
+    right: 3,
+    need: 'нужно, чтобы эксперты сами участвовали в решении и отвечали за план',
+    fb: 'Ответственность за план берут те, кто его составлял. Руководитель приглашает экспертов к диалогу, спрашивает их мнение и собирает решение вместе с ними. Их знания попадают в стратегию, а мотивация растёт.' }
+];
+
+var MONTHS = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+
+var state = { screen: 'intro', i: 0, answers: [] };
+
+/* ─── Вспомогательные ───────────────────────────────────── */
+
+function resultOf(n) {
+  var a = state.answers[n];
+  if (a === undefined || a === null) return null;
+  if (a === CASES[n].right) return 'ok';
+  if (a === CASES[n].mid) return 'mid';
+  return 'bad';
+}
+
+function pos(m) { return ((m + 0.5) / 12 * 100) + '%'; }
+
+function timelineHtml() {
+  var h = '<div class="tl"><div class="tl__line"></div>';
+  var cur = CASES[state.i].m;
+  var answered = resultOf(state.i) !== null;
+  var fillTo = answered ? (cur + 0.5) / 12 * 100 : (state.i > 0 ? (CASES[state.i - 1].m + 0.5) / 12 * 100 : 0);
+  h += '<div class="tl__fill" id="tlfill" style="width:' + fillTo + '%"></div>';
+  var k;
+  for (k = 0; k < 12; k++) h += '<div class="tl__tick" style="left:' + pos(k) + '"></div>';
+  for (k = 0; k < CASES.length; k++) {
+    var r = resultOf(k);
+    var cls = 'tl__dot';
+    if (r) cls += ' tl__dot--' + r;
+    else if (k === state.i) cls += ' tl__dot--current';
+    h += '<div class="' + cls + '" id="tldot' + k + '" style="left:' + pos(CASES[k].m) + '"></div>'
+       + '<div class="tl__label' + (k === state.i ? ' tl__label--current' : '') + '" style="left:' + pos(CASES[k].m) + '">' + MONTHS[CASES[k].m] + '</div>';
+  }
+  return h + '</div>';
+}
+
+function optClass(k, ans, c) {
+  if (ans === undefined || ans === null) return 'card card--interactive style-opt';
+  var base = 'card style-opt style-opt--locked';
+  if (k === c.right) return base + ' card--correct';
+  if (k === ans && k === c.mid) return base + ' card--warning';
+  if (k === ans) return base + ' card--wrong';
+  return base + ' card--dimmed';
+}
+
+function stylesHtml() {
+  var c = CASES[state.i];
+  var ans = state.answers[state.i];
+  var answered = (ans !== undefined && ans !== null);
+  var h = '<div class="styles">';
+  for (var k = 0; k < STYLES.length; k++) {
+    h += '<div class="' + optClass(k, ans, c) + '" data-opt="' + k + '"'
+       + (answered ? '' : ' onclick="pick(' + k + ')"') + '>' + STYLES[k].name + '</div>';
+  }
+  return h + '</div>';
+}
+
+function feedbackHtml(ans) {
+  if (ans === undefined || ans === null) {
+    return '<div class="hint">Выберите стиль — здесь появится разбор.</div>';
+  }
+  var c = CASES[state.i];
+  var right = STYLES[c.right].name;
+  if (ans === c.right) {
+    return '<div class="feedback feedback--success"><div class="feedback__head">Верно · ' + right + '</div>' + c.fb + '</div>';
+  }
+  if (ans === c.mid) {
+    return '<div class="feedback feedback--warning"><div class="feedback__head">Допустимо, но лучше подойдёт ' + right.toLowerCase() + '</div>'
+      + '<p>' + c.midFb + '</p><p>' + c.fb + '</p></div>';
+  }
+  return '<div class="feedback feedback--error"><div class="feedback__head">Здесь лучше подойдёт ' + right.toLowerCase() + '</div>'
+    + '<p>' + STYLES[ans].name + ' стиль ' + STYLES[ans].when + '. А здесь ' + c.need + '.</p>'
+    + '<p>' + c.fb + '</p></div>';
+}
+
+/* ─── Экраны ────────────────────────────────────────────── */
+
+function renderIntro() {
+  var cheat = '';
+  for (var k = 0; k < STYLES.length; k++) {
+    cheat += '<div class="cheat__item"><b>' + STYLES[k].name + '</b>' + STYLES[k].cheat + '</div>';
+  }
+  return '<div class="screen__body screen__body--center">'
+    +   '<h1 class="page-title">Год<span>одной команды</span></h1>'
+    +   '<div class="divider"></div>'
+    +   '<p class="lead-text">Один руководитель, одна команда и шесть ситуаций за год. В каждой выберите стиль лидерства, который сработает лучше всего.</p>'
+    +   '<div class="card mt-md"><div class="cheat">' + cheat + '</div></div>'
+    + '</div>'
+    + '<button class="btn btn--primary btn--full mt-md" onclick="start()">Начать год →</button>';
+}
+
+function renderQuestion() {
+  var c = CASES[state.i];
+  var ans = state.answers[state.i];
+  var answered = (ans !== undefined && ans !== null);
+  var last = (state.i === CASES.length - 1);
+  return '<div class="screen__body">'
+    +   timelineHtml()
+    +   '<div class="card mt-sm">'
+    +     '<div class="case-title">' + c.title + '</div>'
+    +     '<div class="case-month">' + c.month + '</div>'
+    +     '<p class="case-text">' + c.text + '</p>'
+    +   '</div>'
+    +   '<p class="question-text mt-md">Какой стиль включить?</p>'
+    +   '<div id="optbox" class="mt-sm">' + stylesHtml() + '</div>'
+    +   '<div id="fbbox" class="fb-zone mt-sm">' + feedbackHtml(ans) + '</div>'
+    + '</div>'
+    + '<div class="nav-bar">'
+    +   '<button id="next-btn" class="btn btn--primary btn--full" onclick="next()"' + (answered ? '' : ' disabled') + '>'
+    +     (last ? 'Итоги года →' : 'Дальше по году →')
+    +   '</button>'
+    + '</div>';
+}
+
+function renderFinal() {
+  var items = '';
+  for (var k = 0; k < CASES.length; k++) {
+    var c = CASES[k];
+    var r = resultOf(k);
+    var note = (r === 'ok') ? '' : '<div class="year__note">Вы выбрали: ' + STYLES[state.answers[k]].name.toLowerCase() + '</div>';
+    items += '<div class="year__item">'
+      + '<span class="year__dot year__dot--' + r + '"></span>'
+      + '<div class="year__head"><b>' + c.month + '</b> · ' + c.title + '</div>'
+      + '<div class="year__style">' + STYLES[c.right].name + '</div>'
+      + note
+      + '</div>';
+  }
+  return '<div class="screen__body screen__body--center">'
+    +   '<h2 class="section-title">Шесть стилей за один год</h2>'
+    +   '<div class="divider"></div>'
+    +   '<div class="year">' + items + '</div>'
+    +   '<p class="lead-text mt-md">За год руководитель сменил стиль шесть раз — каждый раз под ситуацию. Универсального стиля нет: успешный руководитель умеет переключаться между ними.</p>'
+    + '</div>'
+    + '<button class="btn btn--secondary btn--full mt-md" onclick="restart()">Пройти заново</button>';
+}
+
+/* ─── Управление ────────────────────────────────────────── */
+
+function render() {
+  var body;
+  if (state.screen === 'intro') body = renderIntro();
+  else if (state.screen === 'q') body = renderQuestion();
+  else body = renderFinal();
+  document.getElementById('app').innerHTML = '<div class="page-wrap--compact screen anim-fade-up">' + body + '</div>';
+  notifyHeight();
+}
+
+function start() {
+  state.screen = 'q';
+  state.i = 0;
+  state.answers = [];
+  render();
+}
+
+/* Выбор обновляет блоки на месте: экран не перерисовывается и не вздрагивает */
+function pick(idx) {
+  var ans = state.answers[state.i];
+  if (ans !== undefined && ans !== null) return;
+  state.answers[state.i] = idx;
+  var c = CASES[state.i];
+  var cards = document.querySelectorAll('#optbox [data-opt]');
+  for (var k = 0; k < cards.length; k++) {
+    cards[k].className = optClass(k, idx, c);
+    cards[k].onclick = null;
+  }
+  document.getElementById('tldot' + state.i).className = 'tl__dot tl__dot--' + resultOf(state.i);
+  document.getElementById('tlfill').style.width = ((c.m + 0.5) / 12 * 100) + '%';
+  document.getElementById('fbbox').innerHTML = feedbackHtml(idx);
+  document.getElementById('next-btn').disabled = false;
+  notifyHeight();
+}
+
+function next() {
+  if (state.i === CASES.length - 1) state.screen = 'final';
+  else state.i++;
+  render();
+}
+
+function restart() {
+  state.screen = 'intro';
+  state.i = 0;
+  state.answers = [];
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
