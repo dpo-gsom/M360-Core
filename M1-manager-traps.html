@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ловушки руководителя</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ─── Экран: фиксированная высота, чтобы iframe не прыгал ─── */
+  .screen { min-height: 748px; }
+  .screen__body { flex: 1; display: flex; flex-direction: column; }
+  .screen__body--center { justify-content: center; }
+
+  /* ─── Ситуация ─── */
+  .case-text { font-size: 14.5px; line-height: 1.65; color: var(--dark); }
+  /* Подсветка ключевых фраз: без отступов, чтобы текст не сдвигался */
+  .case-text mark { background: transparent; color: inherit; border-radius: 3px; transition: background 0.3s; }
+  .case-text.is-revealed mark { background: var(--amber-bg); box-shadow: 0 0 0 2px var(--amber-bg); }
+
+  .step-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 4px 11px; border-radius: 20px;
+  }
+  .step-chip--ok  { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .step-chip--bad { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-border); }
+
+  /* ─── Варианты ответа ─── */
+  .opts { display: flex; flex-direction: column; gap: 7px; }
+  .opt { padding: 11px 14px; font-size: 14px; line-height: 1.5; color: var(--dark); }
+  .opt--locked { cursor: default; pointer-events: none; }
+
+  /* ─── Обратная связь ─── */
+  .fb-zone { min-height: 148px; }
+  .fb-zone .hint {
+    font-size: 13px; color: var(--slate); text-align: center;
+    padding: 16px 10px;
+    border: 1.5px dashed var(--border); border-radius: var(--radius-md);
+  }
+
+  /* ─── Итог ─── */
+  .trap-row { padding: 12px 0; border-top: 1px solid var(--border); }
+  .trap-row:last-child { border-bottom: 1px solid var(--border); }
+  .trap-row__name { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+  .trap-row__line { font-size: 13.5px; line-height: 1.55; color: var(--slate); }
+  .trap-row__line b { color: var(--dark); font-weight: 600; }
+
+  @media (max-width: 560px) {
+    .screen { min-height: 950px; }
+    .fb-zone { min-height: 216px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script src="common.js"></script>
+<script>
+/* =========================================================
+   Ловушки руководителя: два шага на каждую ситуацию
+   Шаг 1 — узнать ловушку, шаг 2 — посоветовать, как из неё выйти
+   Без подсчёта очков
+   ========================================================= */
+
+var CASES = [
+  {
+    text: 'До сдачи презентации клиенту 2 часа. Сотрудник прислал черновик, но формулировки слабые. Руководитель понимает: <mark>объяснять правки — 30 минут, исправить самому — 15 минут.</mark> Он пишет сотруднику <mark>«Ок, я сам докручу»</mark> и садится за работу.',
+    trap: {
+      opts: [
+        { t: 'Ловушка «Я сам сделаю быстрее и лучше»', ok: true,
+          fb: 'Руководитель сравнивает время одного раза: 30 минут против 15. Но в следующий раз сотрудник опять пришлёт слабый черновик, и снова придётся переписывать самому. Полчаса на объяснение тратятся один раз и экономят время на всех следующих презентациях.' },
+        { t: 'Микроменеджмент',
+          fb: 'Руководитель не контролирует каждый шаг сотрудника — он просто забрал задачу себе. Это ловушка «Я сам сделаю быстрее и лучше».' },
+        { t: 'Синдром незаменимого эксперта',
+          fb: 'Здесь нет стремления держать всё в своих руках: решение принято на ходу, из-за нехватки времени. Это ловушка «Я сам сделаю быстрее и лучше».' }
+      ]
+    },
+    advice: {
+      opts: [
+        { t: 'Доделать презентацию самому, а после сдачи сказать сотруднику, что черновик был слабым.',
+          fb: 'Сотрудник узнает, что работа плохая, но не узнает, что именно не так. В следующий раз черновик будет таким же — и руководитель снова сядет его переписывать.' },
+        { t: 'Отправить сотруднику правки к двум-трём слайдам как образец, а остальное пусть доработает сам. Двух часов на это хватит.', ok: true,
+          fb: 'Срочность — не повод отказываться от объяснений. Хватит показать на паре примеров, что не так: дальше сотрудник справится сам, а руководитель вернётся к своим задачам. И следующий черновик будет сильнее.' },
+        { t: 'Отправить клиенту черновик как есть: пусть сотрудник учится на последствиях.',
+          fb: 'Это другая крайность. За ошибку заплатит клиент и репутация команды, а сотрудник так и не поймёт, как было надо. Учить лучше до сдачи, а не после.' }
+      ]
+    },
+    sign: 'объяснять дольше, чем сделать самому',
+    exit: 'объяснить один раз на примерах и вернуть задачу сотруднику'
+  },
+  {
+    text: 'Руководитель требует <mark>ставить его в скрытую копию во всей переписке</mark> с ключевыми клиентами. Он <mark>проверяет каждое письмо</mark> и часто пишет сотрудникам в личку: <mark>«Зачем ты так ответил? Надо было мягче».</mark>',
+    trap: {
+      opts: [
+        { t: 'Микроменеджмент', ok: true,
+          fb: 'Скрытая копия, проверка каждого письма, замечания в личку. Сотрудники работают сами, но под постоянным контролем. Скоро они начнут писать не так, как считают правильным, а так, чтобы руководитель не придрался.' },
+        { t: 'Синдром незаменимого эксперта',
+          fb: 'Руководитель не держит знания и доступы при себе — наоборот, он следит за чужой работой. Это микроменеджмент.' },
+        { t: 'Ловушка «Я сам сделаю быстрее и лучше»',
+          fb: 'Работу у сотрудников никто не забирает: письма пишут они сами. Руководитель контролирует, как они это делают, — это микроменеджмент.' }
+      ]
+    },
+    advice: {
+      opts: [
+        { t: 'Продолжать проверять письма, но замечания писать не в личку, а в общий чат: так научатся все.',
+          fb: 'Контроль остаётся прежним, к нему добавляется публичная критика. Доверия от этого не прибавится, а желания проявлять инициативу станет ещё меньше.' },
+        { t: 'Совсем перестать смотреть переписку: сотрудники взрослые, разберутся сами.',
+          fb: 'Это другая крайность. Речь о ключевых клиентах, и полностью убирать контроль рискованно. Задача не в том, чтобы отказаться от контроля, а в том, чтобы оставить его там, где он действительно нужен.' },
+        { t: 'Договориться, какие письма он хочет видеть до отправки — например, ответы на жалобы. Остальное смотреть выборочно и обсуждать раз в неделю.', ok: true,
+          fb: 'Контроль остаётся там, где цена ошибки высока, а за остальное сотрудники отвечают сами. Руководитель перестаёт их отвлекать, а у команды появляется место для инициативы.' }
+      ]
+    },
+    sign: 'контроль каждого шага и замечания по мелочам',
+    exit: 'договориться, где контроль действительно нужен, а остальное проверять выборочно'
+  },
+  {
+    text: 'Руководитель IT-отдела уходит в отпуск, но берёт с собой ноутбук. Он говорит: <mark>«Если упадёт сервер, звоните в любое время, пароли только у меня».</mark> <mark>Команда боится что-то менять в системе без него.</mark>',
+    trap: {
+      opts: [
+        { t: 'Ловушка «Я сам сделаю быстрее и лучше»',
+          fb: 'Он не переделывает работу за сотрудниками — он не дал им ни доступа, ни знаний. Это синдром незаменимого эксперта.' },
+        { t: 'Микроменеджмент',
+          fb: 'Он не проверяет каждое действие команды. Просто без него команда не может действовать, потому что всё замкнуто на нём. Это синдром незаменимого эксперта.' },
+        { t: 'Синдром незаменимого эксперта', ok: true,
+          fb: '«Пароли только у меня», и команда боится что-то менять без руководителя. Работа зависит от одного человека даже во время его отпуска. Если он заболеет или уволится, отдел останется без доступа к собственной системе.' }
+      ]
+    },
+    advice: {
+      opts: [
+        { t: 'До отпуска передать доступы и короткую инструкцию двум сотрудникам, а одного из них назначить ответственным на это время.', ok: true,
+          fb: 'Команда получает и доступ, и право принимать решения. Руководитель отдыхает, а отдел больше не зависит от одного человека.' },
+        { t: 'Взять ноутбук, но пообещать отвечать только в экстренных случаях.',
+          fb: 'Решения всё равно остаются за ним, а отпуск превращается в дежурство. Команда так и не научится справляться сама.' },
+        { t: 'Записать все пароли в общий файл, чтобы любой мог зайти при необходимости.',
+          fb: 'Доступ появится, но ответственного и инструкции нет — команда по-прежнему побоится что-то менять. К тому же общий файл с паролями небезопасен.' }
+      ]
+    },
+    sign: 'без руководителя работа встаёт',
+    exit: 'передать доступы, знания и право решать'
+  }
+];
+
+var TRAP_NAMES = ['«Я сам сделаю быстрее и лучше»', 'Микроменеджмент', 'Синдром незаменимого эксперта'];
+
+var state = { screen: 'intro', i: 0, step: 1, a1: [], a2: [] };
+
+/* ─── Вспомогательные ───────────────────────────────────── */
+
+function stepData() {
+  var c = CASES[state.i];
+  return state.step === 1 ? c.trap : c.advice;
+}
+
+function answer() {
+  return state.step === 1 ? state.a1[state.i] : state.a2[state.i];
+}
+
+function rightIdx(block) {
+  for (var k = 0; k < block.opts.length; k++) if (block.opts[k].ok) return k;
+  return -1;
+}
+
+function optClass(k, ans, right) {
+  if (ans === undefined || ans === null) return 'card card--interactive opt';
+  if (k === right) return 'card opt opt--locked card--correct';
+  if (k === ans) return 'card opt opt--locked card--wrong';
+  return 'card opt opt--locked card--dimmed';
+}
+
+function optsHtml() {
+  var block = stepData();
+  var ans = answer();
+  var right = rightIdx(block);
+  var h = '<div class="opts">';
+  for (var k = 0; k < block.opts.length; k++) {
+    var answered = (ans !== undefined && ans !== null);
+    h += '<div class="' + optClass(k, ans, right) + '" data-opt="' + k + '"'
+       + (answered ? '' : ' onclick="pick(' + k + ')"') + '>' + block.opts[k].t + '</div>';
+  }
+  return h + '</div>';
+}
+
+function feedbackHtml(ans) {
+  if (ans === undefined || ans === null) {
+    return '<div class="hint">Выберите вариант — здесь появится разбор.</div>';
+  }
+  var block = stepData();
+  var o = block.opts[ans];
+  var head;
+  if (state.step === 1) head = o.ok ? 'Верно' : 'Не совсем';
+  else head = o.ok ? 'Хороший совет' : 'Не лучший совет';
+  return '<div class="feedback ' + (o.ok ? 'feedback--success' : 'feedback--error') + '">'
+    + '<div class="feedback__head">' + head + '</div>' + o.fb + '</div>';
+}
+
+function progressHtml() {
+  var done = state.i * 2 + (state.step - 1);
+  return '<div class="progress">'
+    + '<div class="progress__meta">'
+    +   '<span class="progress__label">Ситуация · шаг ' + state.step + ' из 2</span>'
+    +   '<span class="progress__fraction"><em>' + (state.i + 1) + '</em> / ' + CASES.length + '</span>'
+    + '</div>'
+    + '<div class="progress__track"><div class="progress__fill" style="width:' + (done / (CASES.length * 2) * 100) + '%"></div></div>'
+    + '</div>';
+}
+
+/* ─── Экраны ────────────────────────────────────────────── */
+
+function renderIntro() {
+  return '<div class="screen__body screen__body--center">'
+    +   '<h1 class="page-title">Ловушки<span>руководителя</span></h1>'
+    +   '<div class="divider"></div>'
+    +   '<p class="lead-text">Три ситуации из жизни руководителя. В каждой два шага: сначала определите, в какую ловушку он попал, а потом выберите совет, который поможет из неё выйти.</p>'
+    +   '<div class="card mt-md">'
+    +     '<div class="trap-row__name">«Я сам сделаю быстрее и лучше»</div>'
+    +     '<div class="trap-row__line">Руководитель делает работу за сотрудников и остаётся в роли исполнителя.</div>'
+    +     '<div class="trap-row__name mt-sm">Микроменеджмент</div>'
+    +     '<div class="trap-row__line">Руководитель пытается контролировать каждый шаг сотрудников.</div>'
+    +     '<div class="trap-row__name mt-sm">Синдром незаменимого эксперта</div>'
+    +     '<div class="trap-row__line">Руководитель считает себя лучшим специалистом, и все решения замыкаются на нём.</div>'
+    +   '</div>'
+    + '</div>'
+    + '<button class="btn btn--primary btn--full mt-md" onclick="start()">Начать →</button>';
+}
+
+function renderQuestion() {
+  var c = CASES[state.i];
+  var ans = answer();
+  var answered = (ans !== undefined && ans !== null);
+  var revealed = (state.step === 2 || answered);
+
+  var top;
+  if (state.step === 1) {
+    top = '<p class="question-text">В какую ловушку попал руководитель?</p>';
+  } else {
+    var a1 = state.a1[state.i];
+    var ok1 = c.trap.opts[a1].ok;
+    top = '<span class="step-chip ' + (ok1 ? 'step-chip--ok' : 'step-chip--bad') + '">'
+        + (ok1 ? '✓ ' : '') + 'Ловушка: ' + TRAP_NAMES[state.i] + '</span>'
+        + '<p class="question-text mt-sm">Что вы посоветуете руководителю?</p>';
+  }
+
+  var last = (state.i === CASES.length - 1 && state.step === 2);
+  var nextLabel = state.step === 1 ? 'Дальше: совет руководителю →' : (last ? 'К итогам →' : 'Следующая ситуация →');
+
+  return '<div class="screen__body">'
+    +   progressHtml()
+    +   '<div class="card mt-xs"><p id="casetext" class="case-text' + (revealed ? ' is-revealed' : '') + '">' + c.text + '</p></div>'
+    +   '<div class="mt-md">' + top + '</div>'
+    +   '<div id="optbox" class="mt-sm">' + optsHtml() + '</div>'
+    +   '<div id="fbbox" class="fb-zone mt-sm">' + feedbackHtml(ans) + '</div>'
+    + '</div>'
+    + '<div class="nav-bar">'
+    +   '<button id="next-btn" class="btn btn--primary btn--full" onclick="next()"' + (answered ? '' : ' disabled') + '>' + nextLabel + '</button>'
+    + '</div>';
+}
+
+function renderFinal() {
+  var rows = '';
+  for (var k = 0; k < CASES.length; k++) {
+    rows += '<div class="trap-row">'
+      + '<div class="trap-row__name">' + TRAP_NAMES[k] + '</div>'
+      + '<div class="trap-row__line"><b>Как узнать:</b> ' + CASES[k].sign + '.</div>'
+      + '<div class="trap-row__line"><b>Как выйти:</b> ' + CASES[k].exit + '.</div>'
+      + '</div>';
+  }
+  return '<div class="screen__body screen__body--center">'
+    +   '<h2 class="section-title">Три ловушки — коротко</h2>'
+    +   '<div class="divider"></div>'
+    +   '<p class="lead-text">Во всех трёх ловушках руководитель берёт на себя то, что могла бы сделать команда. Выход тоже общий — передать сотрудникам знания, доступы и ответственность.</p>'
+    +   '<div class="mt-md">' + rows + '</div>'
+    + '</div>'
+    + '<button class="btn btn--secondary btn--full mt-md" onclick="restart()">Пройти заново</button>';
+}
+
+/* ─── Управление ────────────────────────────────────────── */
+
+function render() {
+  var body;
+  if (state.screen === 'intro') body = renderIntro();
+  else if (state.screen === 'q') body = renderQuestion();
+  else body = renderFinal();
+  document.getElementById('app').innerHTML = '<div class="page-wrap--compact screen anim-fade-up">' + body + '</div>';
+  notifyHeight();
+}
+
+function start() {
+  state.screen = 'q';
+  state.i = 0;
+  state.step = 1;
+  state.a1 = [];
+  state.a2 = [];
+  render();
+}
+
+/* Выбор обновляет блоки на месте: экран не перерисовывается и не вздрагивает */
+function pick(idx) {
+  var ans = answer();
+  if (ans !== undefined && ans !== null) return;
+  if (state.step === 1) state.a1[state.i] = idx;
+  else state.a2[state.i] = idx;
+
+  var right = rightIdx(stepData());
+  var cards = document.querySelectorAll('#optbox [data-opt]');
+  for (var k = 0; k < cards.length; k++) {
+    cards[k].className = optClass(k, idx, right);
+    cards[k].onclick = null;
+  }
+  document.getElementById('casetext').className = 'case-text is-revealed';
+  document.getElementById('fbbox').innerHTML = feedbackHtml(idx);
+  document.getElementById('next-btn').disabled = false;
+  notifyHeight();
+}
+
+function next() {
+  if (state.step === 1) state.step = 2;
+  else if (state.i < CASES.length - 1) { state.i++; state.step = 1; }
+  else state.screen = 'final';
+  render();
+}
+
+function restart() {
+  state.screen = 'intro';
+  state.i = 0;
+  state.step = 1;
+  state.a1 = [];
+  state.a2 = [];
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
